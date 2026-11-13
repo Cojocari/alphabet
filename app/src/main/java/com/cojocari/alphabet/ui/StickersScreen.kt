@@ -43,7 +43,7 @@ import kotlinx.coroutines.launch
 
 /** The sticker album: every 5 stars from any game unlocks the next sticker. */
 @Composable
-fun StickersScreen(onBack: () -> Unit) {
+fun StickersScreen(onBack: () -> Unit, onScene: () -> Unit) {
     val speaker = LocalSpeaker.current
     val sfx = LocalSfx.current
     val progress = LocalProgress.current
@@ -54,9 +54,10 @@ fun StickersScreen(onBack: () -> Unit) {
 
     Column(Modifier.fillMaxSize()) {
         TopBar(onBack = onBack) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
             // Stars towards the next sticker: ★★★☆☆ 🎁
             if (progress.starsToNextSticker > 0) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
+                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(end = 16.dp)) {
                     repeat(StarsPerSticker) { i ->
                         Text(
                             if (i < StarsPerSticker - progress.starsToNextSticker) "⭐" else "☆",
@@ -67,6 +68,9 @@ fun StickersScreen(onBack: () -> Unit) {
                     }
                     Text("🎁", fontSize = 34.sp, modifier = Modifier.padding(start = 8.dp))
                 }
+            }
+            // Play with the stickers in a picture.
+            com.cojocari.alphabet.ui.components.RoundButton("🏞️", Color(0xFF7BD389), onClick = { sfx.tap(); onScene() }, size = 72.dp)
             }
         }
         LazyVerticalGrid(
@@ -111,6 +115,7 @@ fun NewStickerOverlay(sticker: String, onDone: () -> Unit) {
     val speaker = LocalSpeaker.current
     val sfx = LocalSfx.current
     val t = LocalLanguage.current.strings
+    val childName = LocalProgress.current.childName
     val grow = remember(sticker) { Animatable(0f) }
     val visible = remember(sticker) { androidx.compose.runtime.mutableStateOf(false) }
 
@@ -119,7 +124,7 @@ fun NewStickerOverlay(sticker: String, onDone: () -> Unit) {
         kotlinx.coroutines.delay(2400)
         visible.value = true
         sfx.fanfare()
-        speaker.say(t.newSticker)
+        speaker.say(t.newStickerFor(childName))
         grow.animateTo(1f, spring(dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessLow))
         kotlinx.coroutines.delay(3000)
         onDone()

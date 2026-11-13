@@ -73,7 +73,7 @@ fun ParentScreen(onBack: () -> Unit) {
                         Text(t.unlocked, fontSize = 18.sp, color = Ink)
                     } else {
                         Text("🔓 ${t.unlockTitle}", fontSize = 22.sp, fontWeight = FontWeight.Bold, color = Ink)
-                        Text(t.unlockBody, fontSize = 16.sp, color = Ink)
+                        Text(t.unlockBodyFor(com.cojocari.alphabet.ui.GameId.entries.size), fontSize = 16.sp, color = Ink)
                         Button(
                             onClick = {
                                 message = null
@@ -93,11 +93,35 @@ fun ParentScreen(onBack: () -> Unit) {
                 }
 
                 Section {
+                    // The child's name, used in greetings and rewards.
+                    androidx.compose.material3.OutlinedTextField(
+                        value = progress.childName,
+                        onValueChange = { progress.updateChildName(it) },
+                        label = { Text(t.childNameLabel) },
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                    // Daily play-time limit.
+                    Text(t.dailyLimit, fontSize = 18.sp, color = Ink)
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        listOf(0, 15, 30, 45, 60).forEach { minutes ->
+                            val label = if (minutes == 0) t.noLimit else "$minutes"
+                            if (progress.dailyLimitMinutes == minutes) {
+                                Button(onClick = {}) { Text(label) }
+                            } else {
+                                OutlinedButton(onClick = { progress.updateDailyLimit(minutes) }) { Text(label) }
+                            }
+                        }
+                    }
+                    Text(t.playedToday(progress.playedTodaySeconds / 60), fontSize = 14.sp, color = Ink)
+                }
+
+                Section {
                     if (speaker.voiceCount > 1) {
                         SettingRow(t.voice) {
                             OutlinedButton(onClick = {
                                 speaker.nextVoice()
-                                speaker.say(t.greeting)
+                                speaker.say(t.greet(progress.childName))
                             }) {
                                 Text("🗣️  ${speaker.voiceNumber} / ${speaker.voiceCount}", fontSize = 16.sp)
                             }

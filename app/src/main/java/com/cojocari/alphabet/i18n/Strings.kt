@@ -117,6 +117,43 @@ interface Strings {
 
     /** Shown on the home screen when the device has no voice for this language. */
     val missingVoice: String
+
+    // ---- Personal touches ----
+    /** Greeting with the child's name when the parent has entered one. */
+    fun greet(name: String): String
+    fun newStickerFor(name: String): String
+    val mascotLines: List<String>
+    val giftOpened: String
+    fun streak(days: Int): String
+
+    // ---- Colours & shapes ----
+    val worldArt: String
+    val gameColors: String
+    val gameShapes: String
+    val gameFreeDraw: String
+    /** Names of [com.cojocari.alphabet.data.ArtColors], in the same order. */
+    val colorNames: List<String>
+    fun findColor(name: String): String
+    fun rightColor(praise: String, name: String): String
+    fun wrongColor(name: String): String
+    /** "Find the circle!" for each of [com.cojocari.alphabet.data.Shapes]. */
+    val shapeFind: List<String>
+    /** "That's a circle!" for each shape. */
+    val shapeIs: List<String>
+    val tryAgainShort: String
+    val freeDrawStart: String
+    val drawingSaved: String
+    val sceneStart: String
+
+    // ---- Play-time limit ----
+    val restTitle: String
+    fun restSay(name: String): String
+    val restMore: String
+    val childNameLabel: String
+    val dailyLimit: String
+    val noLimit: String
+    fun playedToday(minutes: Int): String
+    fun unlockBodyFor(games: Int): String
 }
 
 object EnglishStrings : Strings {
@@ -228,6 +265,54 @@ object EnglishStrings : Strings {
     override val privacy = "This app collects no data, needs no account and shows no ads."
     override val devUnlock = "Developer: unlock without paying"
     override val missingVoice = "🔇 No English voice. Settings → Text-to-speech"
+
+    override fun greet(name: String) =
+        if (name.isBlank()) greeting else "Hi $name! What do you want to learn today?"
+    override fun newStickerFor(name: String) =
+        if (name.isBlank()) newSticker else "Wow, $name! You won a new sticker!"
+    override val mascotLines = listOf(
+        "Hoo hoo! Let's learn together!",
+        "You are doing great!",
+        "I love playing with you!",
+        "Which world shall we visit?",
+        "Hoo hoo! You are so clever!",
+    )
+    override val giftOpened = "Surprise! A present for you!"
+    override fun streak(days: Int) =
+        if (days <= 1) "You came to play today! See you tomorrow!" else "You played $days days in a row! Amazing!"
+
+    override val worldArt = "Colors & Shapes"
+    override val gameColors = "Colors"
+    override val gameShapes = "Shapes"
+    override val gameFreeDraw = "Free draw"
+    override val colorNames = listOf("red", "orange", "yellow", "green", "blue", "purple", "pink", "brown", "black", "white")
+    override fun findColor(name: String) = "Find the color $name!"
+    override fun rightColor(praise: String, name: String) = "$praise That's $name!"
+    override fun wrongColor(name: String) = "That's $name. Try again!"
+    override val shapeFind = listOf(
+        "Find the circle!", "Find the square!", "Find the triangle!",
+        "Find the star!", "Find the heart!", "Find the diamond!",
+    )
+    override val shapeIs = listOf(
+        "That's a circle!", "That's a square!", "That's a triangle!",
+        "That's a star!", "That's a heart!", "That's a diamond!",
+    )
+    override val tryAgainShort = "Try again!"
+    override val freeDrawStart = "Let's draw anything you like!"
+    override val drawingSaved = "Your picture is saved!"
+    override val sceneStart = "Put your stickers in the picture!"
+
+    override val restTitle = "Time to rest!"
+    override fun restSay(name: String) =
+        "Great playing today${if (name.isBlank()) "" else ", $name"}! Time to rest your eyes. See you tomorrow!"
+    override val restMore = "Grown-ups: 15 more minutes"
+    override val childNameLabel = "Child's name"
+    override val dailyLimit = "Daily play time"
+    override val noLimit = "No limit"
+    override fun playedToday(minutes: Int) = "Played today: $minutes min"
+    override fun unlockBodyFor(games: Int) =
+        "All $games games in Letters, Numbers, Reading, Writing, Math and Colors & Shapes, plus every " +
+            "future game and update. One-time purchase: no ads, no subscriptions, ever."
 }
 
 object RomanianStrings : Strings {
@@ -354,4 +439,55 @@ object RomanianStrings : Strings {
     override val privacy = "Aplicația nu colectează date, nu cere cont și nu afișează reclame."
     override val devUnlock = "Dezvoltator: deblochează fără plată"
     override val missingVoice = "🔇 Lipsește vocea română. Setări → Text-to-speech"
+
+    override fun greet(name: String) =
+        if (name.isBlank()) greeting else "Bună, $name! Ce vrei să învățăm azi?"
+    override fun newStickerFor(name: String) =
+        if (name.isBlank()) newSticker else "Uau, $name! Ai câștigat un abțibild nou!"
+    override val mascotLines = listOf(
+        "Hu-hu! Hai să învățăm împreună!",
+        "Te descurci minunat!",
+        "Îmi place să mă joc cu tine!",
+        "În ce lume mergem azi?",
+        "Hu-hu! Ce bine te descurci!",
+    )
+    override val giftOpened = "Surpriză! Un cadou pentru tine!"
+    override fun streak(days: Int) = when {
+        days <= 1 -> "Ai venit azi să te joci! Ne vedem mâine!"
+        days % 100 in 1..19 -> "Te-ai jucat $days zile la rând! Minunat!"
+        else -> "Te-ai jucat $days de zile la rând! Minunat!"
+    }
+
+    override val worldArt = "Culori și forme"
+    override val gameColors = "Culori"
+    override val gameShapes = "Forme"
+    override val gameFreeDraw = "Desen liber"
+    override val colorNames = listOf("roșie", "portocalie", "galbenă", "verde", "albastră", "mov", "roz", "maro", "neagră", "albă")
+    override fun findColor(name: String) = "Găsește culoarea $name!"
+    override fun rightColor(praise: String, name: String) = "$praise Aceasta este culoarea $name!"
+    override fun wrongColor(name: String) = "Aceasta este culoarea $name. Mai încearcă!"
+    override val shapeFind = listOf(
+        "Găsește cercul!", "Găsește pătratul!", "Găsește triunghiul!",
+        "Găsește steaua!", "Găsește inima!", "Găsește rombul!",
+    )
+    override val shapeIs = listOf(
+        "Acesta este un cerc!", "Acesta este un pătrat!", "Acesta este un triunghi!",
+        "Aceasta este o stea!", "Aceasta este o inimă!", "Acesta este un romb!",
+    )
+    override val tryAgainShort = "Mai încearcă!"
+    override val freeDrawStart = "Hai să desenăm ce vrei tu!"
+    override val drawingSaved = "Desenul tău a fost salvat!"
+    override val sceneStart = "Pune abțibildurile în imagine!"
+
+    override val restTitle = "E timpul pentru o pauză!"
+    override fun restSay(name: String) =
+        "Te-ai jucat frumos azi${if (name.isBlank()) "" else ", $name"}! E timpul să te odihnești. Ne vedem mâine!"
+    override val restMore = "Adulți: încă 15 minute"
+    override val childNameLabel = "Numele copilului"
+    override val dailyLimit = "Timp de joacă pe zi"
+    override val noLimit = "Fără limită"
+    override fun playedToday(minutes: Int) = "Azi: $minutes min"
+    override fun unlockBodyFor(games: Int) =
+        "Toate cele $games de jocuri de Litere, Numere, Citire, Scriere, Matematică și Culori și forme, plus " +
+            "toate jocurile și actualizările viitoare. O singură plată: fără reclame și fără abonamente."
 }

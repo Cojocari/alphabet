@@ -74,7 +74,18 @@ class MainActivity : ComponentActivity() {
                 val speaker = rememberSpeaker(language.locale)
                 var route by rememberSaveable { mutableStateOf("home") }
                 var gate by remember { mutableStateOf(false) }
+                // True when the gate was opened from the rest screen to add play time.
+                var gateForMoreTime by remember { mutableStateOf(false) }
                 val goHome = remember { { route = "home" } }
+
+                // Count play time while the app is on screen.
+                androidx.compose.runtime.LaunchedEffect(Unit) {
+                    while (true) {
+                        kotlinx.coroutines.delay(1000)
+                        val visible = lifecycle.currentState.isAtLeast(androidx.lifecycle.Lifecycle.State.RESUMED)
+                        if (visible && !progress.timeUp) progress.tickSecond()
+                    }
+                }
                 CompositionLocalProvider(
                     LocalSpeaker provides speaker,
                     LocalLanguage provides language,
@@ -92,6 +103,7 @@ class MainActivity : ComponentActivity() {
                             when {
                                 gate -> gate = false
                                 route.startsWith("game:") -> route = gameOf(route)?.let { "world:${it.world.name}" } ?: "home"
+                                route == "scene" -> route = "stickers"
                                 else -> goHome()
                             }
                         }
@@ -103,7 +115,8 @@ class MainActivity : ComponentActivity() {
                                 label = "screen",
                             ) { current ->
                                 when {
-                                    current == "stickers" -> StickersScreen(onBack = goHome)
+                                    current == "stickers" -> StickersScreen(onBack = goHome, onScene = { route = "scene" })
+                                    current == "scene" -> com.cojocari.alphabet.ui.StickerSceneScreen(onBack = { route = "stickers" })
                                     current == "parent" -> ParentScreen(onBack = goHome)
                                     current.startsWith("world:") && worldOf(current) != null -> {
                                         val world = worldOf(current)!!
@@ -133,10 +146,17 @@ class MainActivity : ComponentActivity() {
                             progress.newSticker?.let { sticker ->
                                 NewStickerOverlay(sticker) { progress.newSticker = null }
                             }
+                            if (progress.timeUp && route != "parent") {
+                                com.cojocari.alphabet.ui.RestOverlay(onMoreTime = { gateForMoreTime = true; gate = true })
+                            }
                             if (gate) {
                                 ParentGate(
-                                    onPass = { gate = false; route = "parent" },
-                                    onCancel = { gate = false },
+                                    onPass = {
+                                        gate = false
+                                        if (gateForMoreTime) progress.grantExtraMinutes(15) else route = "parent"
+                                        gateForMoreTime = false
+                                    },
+                                    onCancel = { gate = false; gateForMoreTime = false },
                                 )
                             }
                         }
@@ -144,6 +164,11 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        progress.onAppOpen() // new day → streak, daily gift, play-time counter
     }
 
     override fun onDestroy() {

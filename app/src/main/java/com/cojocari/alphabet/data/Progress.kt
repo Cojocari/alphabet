@@ -39,6 +39,101 @@ class Progress(context: Context) {
     /** Set when a sticker was just won; the app shows it, then clears it. */
     var newSticker by mutableStateOf<String?>(null)
 
+    // ---- Personal touches ----
+
+    var childName by mutableStateOf(prefs.getString("name", "").orEmpty())
+        private set
+
+    /** Days in a row the app was opened. */
+    var streak by mutableIntStateOf(prefs.getInt("streak", 0))
+        private set
+
+    /** True until today's gift has been opened. */
+    var giftAvailable by mutableStateOf(false)
+        private set
+
+    // ---- Play-time limit ----
+
+    /** 0 = no limit. */
+    var dailyLimitMinutes by mutableIntStateOf(prefs.getInt("limit", 0))
+        private set
+    var playedTodaySeconds by mutableIntStateOf(prefs.getInt("played", 0))
+        private set
+    private var extraMinutes by mutableIntStateOf(prefs.getInt("extra", 0))
+
+    val timeUp: Boolean
+        get() = dailyLimitMinutes > 0 && playedTodaySeconds >= (dailyLimitMinutes + extraMinutes) * 60
+
+    // ---- Sticker scenes ----
+
+    var placed by mutableStateOf(loadPlaced())
+        private set
+
+    private fun today() = java.time.LocalDate.now().toEpochDay()
+
+    /** Call when the app comes to the front: rolls the day over, updates streak and gift. */
+    fun onAppOpen() {
+        val today = today()
+        val last = prefs.getLong("lastDay", -1)
+        if (last != today) {
+            streak = if (last == today - 1) streak + 1 else 1
+            playedTodaySeconds = 0
+            extraMinutes = 0
+            prefs.edit()
+                .putLong("lastDay", today)
+                .putInt("streak", streak)
+                .putInt("played", 0)
+                .putInt("extra", 0)
+                .apply()
+        }
+        giftAvailable = prefs.getLong("giftDay", -1) != today
+    }
+
+    /** Today's surprise: enough stars for a new sticker. */
+    fun openGift() {
+        if (!giftAvailable) return
+        giftAvailable = false
+        prefs.edit().putLong("giftDay", today()).apply()
+        repeat(StarsPerSticker - stars % StarsPerSticker) { addStar() }
+    }
+
+    fun updateChildName(value: String) {
+        childName = value.take(20)
+        prefs.edit().putString("name", childName).apply()
+    }
+
+    fun updateDailyLimit(minutes: Int) {
+        dailyLimitMinutes = minutes
+        prefs.edit().putInt("limit", minutes).apply()
+    }
+
+    fun grantExtraMinutes(minutes: Int) {
+        // Count from now, so the child really gets [minutes] more.
+        val usedExtra = (playedTodaySeconds / 60 - dailyLimitMinutes).coerceAtLeast(extraMinutes)
+        extraMinutes = usedExtra + minutes
+        prefs.edit().putInt("extra", extraMinutes).apply()
+    }
+
+    /** Called once a second while the app is open. */
+    fun tickSecond() {
+        playedTodaySeconds++
+        if (playedTodaySeconds % 15 == 0) prefs.edit().putInt("played", playedTodaySeconds).apply()
+    }
+
+    fun updatePlaced(list: List<PlacedSticker>) {
+        placed = list
+        prefs.edit().putString("placed", list.joinToString("\n") { "${it.scene},${it.x},${it.y},${it.emoji}" }).apply()
+    }
+
+    private fun loadPlaced(): List<PlacedSticker> =
+        prefs.getString("placed", "").orEmpty().lines().mapNotNull { line ->
+            val parts = line.split(",", limit = 4)
+            if (parts.size < 4) null
+            else runCatching {
+                PlacedSticker(parts[0].toInt(), parts[3], parts[1].toFloat(), parts[2].toFloat())
+            }.getOrNull()
+        }
+
     private var learned by mutableStateOf(
         Language.entries.associateWith { prefs.getString("learned_${it.name}", "").orEmpty().toSet() }
     )
@@ -90,3 +185,6 @@ class Progress(context: Context) {
 }
 
 val LocalProgress = staticCompositionLocalOf<Progress> { error("No Progress provided") }
+
+/** A sticker placed in one of the sticker scenes; [x] and [y] are 0..1 of the scene size. */
+data class PlacedSticker(val scene: Int, val emoji: String, val x: Float, val y: Float)

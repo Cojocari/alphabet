@@ -69,7 +69,11 @@ fun HomeScreen(
     val progress = LocalProgress.current
     val language = LocalLanguage.current
     val t = language.strings
-    LaunchedEffect(language) { speaker.say(t.greeting) }
+    LaunchedEffect(language) { speaker.say(t.greet(progress.childName)) }
+    val roomy = androidx.compose.ui.platform.LocalConfiguration.current.screenWidthDp >= 600
+    val anim = rememberInfiniteTransition(label = "home")
+    val giftWiggle by anim.animateFloat(-12f, 12f, infiniteRepeatable(tween(300), RepeatMode.Reverse), label = "gift")
+    val owlBob by anim.animateFloat(-5f, 5f, infiniteRepeatable(tween(900), RepeatMode.Reverse), label = "owl")
 
     Column(
         modifier = Modifier
@@ -99,7 +103,55 @@ fun HomeScreen(
                     modifier = Modifier.padding(start = 4.dp),
                 )
             }
+            // Day streak.
+            if (roomy && progress.streak > 0) {
+                Row(
+                    modifier = Modifier
+                        .padding(start = 10.dp)
+                        .shadow(4.dp, RoundedCornerShape(32.dp))
+                        .clip(RoundedCornerShape(32.dp))
+                        .background(Color.White)
+                        .bouncyClick { sfx.tap(); speaker.say(t.streak(progress.streak)) }
+                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text("🔥", fontSize = 26.sp)
+                    Text(
+                        "${progress.streak}",
+                        fontSize = 26.sp,
+                        fontWeight = FontWeight.Black,
+                        color = Color(0xFFE63946),
+                        modifier = Modifier.padding(start = 4.dp),
+                    )
+                }
+            }
+            // Today's gift, wiggling until it's opened.
+            if (progress.giftAvailable) {
+                Box(
+                    modifier = Modifier
+                        .padding(start = 10.dp)
+                        .size(60.dp)
+                        .rotate(giftWiggle)
+                        .bouncyClick {
+                            sfx.fanfare()
+                            speaker.say(t.giftOpened)
+                            progress.openGift()
+                        },
+                    contentAlignment = Alignment.Center,
+                ) { Text("🎁", fontSize = 44.sp) }
+            }
             Spacer(Modifier.weight(1f))
+            // The owl mascot: tap it for a friendly word.
+            if (roomy) {
+                Text(
+                    "🦉",
+                    fontSize = 52.sp,
+                    modifier = Modifier
+                        .offset(y = owlBob.dp)
+                        .bouncyClick { speaker.say(t.mascotLines.random()) },
+                )
+                Spacer(Modifier.weight(1f))
+            }
             Language.entries.forEach { lang ->
                 val isSelected = lang == language
                 Box(

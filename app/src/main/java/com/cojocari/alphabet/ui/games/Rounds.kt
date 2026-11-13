@@ -230,3 +230,38 @@ private fun Group(things: String, n: Int, size: androidx.compose.ui.unit.TextUni
 private fun Symbol(text: String, color: Color = Ink) {
     Text(text, fontSize = 64.sp, fontWeight = FontWeight.Black, color = color)
 }
+
+// ---------------------------------------------------------------- Colours & shapes
+
+fun colorRound(language: Language, level: Int): PickRound {
+    val t = language.strings
+    val colors = com.cojocari.alphabet.data.ArtColors
+    // Start with the six main colours, then add brown, black and white.
+    val pool = colors.indices.toList().take(if (level < 5) 6 else colors.size)
+    val target = pool.random()
+    val (choices, answer) = options(target, pool, choiceCount(level))
+    return PickRound(
+        ask = t.findColor(t.colorNames[target]),
+        choices = choices.map { Choice("", colors[it].color) },
+        answer = answer,
+        right = { t.rightColor(it, t.colorNames[target]) },
+        wrong = { t.wrongColor(t.colorNames[choices[it]]) },
+    ) { solved -> Text(if (solved) colors[target].example else "🎨", fontSize = 160.sp) }
+}
+
+fun shapeRound(language: Language, level: Int): PickRound {
+    val t = language.strings
+    val shapes = com.cojocari.alphabet.data.Shapes
+    val pool = shapes.indices.toList().take(if (level < 5) 4 else shapes.size)
+    val target = pool.random()
+    val (choices, answer) = options(target, pool, choiceCount(level))
+    // Different colours on each tile, so the child looks at the shape, not the colour.
+    val tileColors = FunColors.shuffled()
+    return PickRound(
+        ask = t.shapeFind[target],
+        choices = choices.mapIndexed { i, s -> Choice(shapes[s].glyph, tileColors[i % tileColors.size], 110.sp) },
+        answer = answer,
+        right = { "$it ${t.shapeIs[target]}" },
+        wrong = { "${t.shapeIs[choices[it]]} ${t.tryAgainShort}" },
+    ) { solved -> Text(if (solved) shapes[target].example else "👀", fontSize = 160.sp) }
+}

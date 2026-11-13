@@ -19,6 +19,9 @@ import com.cojocari.alphabet.ui.games.PickGame
 import com.cojocari.alphabet.ui.games.SpellScreen
 import com.cojocari.alphabet.ui.games.addRound
 import com.cojocari.alphabet.ui.games.compareRound
+import com.cojocari.alphabet.ui.games.colorRound
+import com.cojocari.alphabet.ui.games.shapeRound
+import com.cojocari.alphabet.ui.games.FreeDrawScreen
 import com.cojocari.alphabet.ui.games.findNumberRound
 import com.cojocari.alphabet.ui.games.firstLetterRound
 import com.cojocari.alphabet.ui.games.howManyRound
@@ -53,6 +56,10 @@ enum class GameId(val emoji: String, val label: (Strings) -> String) {
     Add("➕", { it.gameAdd }),
     Subtract("➖", { it.gameSubtract }),
     Compare("⚖️", { it.gameCompare }),
+
+    Colors("🎨", { it.gameColors }),
+    Shapes("🔷", { it.gameShapes }),
+    FreeDraw("🖌️", { it.gameFreeDraw }),
 }
 
 /** The five learning worlds on the home screen. */
@@ -82,6 +89,10 @@ enum class World(
     Math(
         "+ −", "🍎", listOf(Color(0xFFFF8787), Color(0xFFF783AC)), { it.worldMath },
         listOf(GameId.Add, GameId.Subtract, GameId.Compare),
+    ),
+    Art(
+        "●▲■", "🦄", listOf(Color(0xFF20C997), Color(0xFF15AABF)), { it.worldArt },
+        listOf(GameId.Colors, GameId.Shapes, GameId.FreeDraw),
     ),
 }
 
@@ -173,6 +184,10 @@ fun GameContent(id: GameId, onBack: () -> Unit) {
             GameId.Add -> PickGame(onBack) { addRound(language, it) }
             GameId.Subtract -> PickGame(onBack) { subtractRound(language, it) }
             GameId.Compare -> PickGame(onBack) { compareRound(language, it) }
+
+            GameId.Colors -> PickGame(onBack) { colorRound(language, it) }
+            GameId.Shapes -> PickGame(onBack) { shapeRound(language, it) }
+            GameId.FreeDraw -> FreeDrawScreen(onBack)
         }
     }
 }
