@@ -26,14 +26,14 @@ fun sendFeedback(context: Context, t: Strings, subject: String, language: String
         appendLine()
         appendLine()
         appendLine("—")
-        appendLine("Alphabet Fun ${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})")
+        appendLine("Clever Owl ${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})")
         appendLine("Android ${Build.VERSION.RELEASE} (API ${Build.VERSION.SDK_INT})")
         appendLine("${Build.MANUFACTURER} ${Build.MODEL}")
         appendLine("Language: $language")
     }
     val intent = Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:")).apply {
         putExtra(Intent.EXTRA_EMAIL, arrayOf(SupportEmail))
-        putExtra(Intent.EXTRA_SUBJECT, "Alphabet Fun – $subject")
+        putExtra(Intent.EXTRA_SUBJECT, "Clever Owl – $subject")
         putExtra(Intent.EXTRA_TEXT, body)
         addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
     }

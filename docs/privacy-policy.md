@@ -1,10 +1,10 @@
-# Alphabet Fun – Privacy Policy
+# Clever Owl – Privacy Policy
 
 *Last updated: 13 November 2026*
 
 **[Română mai jos](#politica-de-confidențialitate)**
 
-Alphabet Fun is a learning game for children aged 2 to 6. We built it so that it collects
+Clever Owl is a learning game for children aged 2 to 6. We built it so that it collects
 nothing about your child or your family.
 
 ## What we collect
@@ -58,7 +58,7 @@ cojocari.adrianp@gmail.com
 
 *Ultima actualizare: 13 noiembrie 2026*
 
-Alphabet Fun este un joc educativ pentru copii între 2 și 6 ani. L-am creat astfel încât să
+Bufnița Isteață (Clever Owl) este un joc educativ pentru copii între 2 și 6 ani. L-am creat astfel încât să
 nu colecteze nimic despre copilul sau familia dumneavoastră.
 
 ## Ce colectăm

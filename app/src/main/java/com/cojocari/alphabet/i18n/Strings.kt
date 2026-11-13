@@ -166,6 +166,9 @@ interface Strings {
     val paywallFeatures: List<String>
     val paywallOnce: String
     val familyNote: String
+    val appName: String
+    val licenses: String
+    val licensesIntro: String
     val backHome: String
 
     // ---- Contact (grown-ups' corner) ----
@@ -348,6 +351,9 @@ object EnglishStrings : Strings {
     )
     override val paywallOnce = "Pay once, play forever"
     override val familyNote = "Works on all your family's devices with Google Play Family Library."
+    override val appName = "Clever Owl"
+    override val licenses = "Open-source licences"
+    override val licensesIntro = "This app is built with these libraries. Thank you to their authors!"
     override val backHome = "Back to the games"
 
     override val contactTitle = "Contact us"
@@ -550,6 +556,9 @@ object RomanianStrings : Strings {
     )
     override val paywallOnce = "Plătești o dată, te joci mereu"
     override val familyNote = "Funcționează pe toate dispozitivele familiei prin Biblioteca de familie Google Play."
+    override val appName = "Bufnița Isteață"
+    override val licenses = "Licențe open-source"
+    override val licensesIntro = "Aplicația este construită cu aceste biblioteci. Mulțumim autorilor lor!"
     override val backHome = "Înapoi la jocuri"
 
     override val contactTitle = "Contactează-ne"

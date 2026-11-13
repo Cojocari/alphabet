@@ -44,7 +44,7 @@ Google needs a public link (URL). The text is in `docs/privacy-policy.md`. Pick 
 
 ## 5. Create the app
 *Play Console → Create app*
-- [ ] App name: **Alfabet Vesel: Litere și Cifre**, default language **Romanian (ro-RO)**
+- [ ] App name: **Bufnița Isteață: ABC și 123**, default language **Romanian (ro-RO)**
 - [ ] App, **Free** (the unlock is an in-app purchase; the app download itself must be free)
 - [ ] Accept the declarations
 
@@ -65,7 +65,7 @@ Google needs a public link (URL). The text is in `docs/privacy-policy.md`. Pick 
 
 ## 7. Store listing (*Grow users → Store presence → Main store listing*)
 - [ ] Texts from `docs/store-listing.md`, Romanian main plus English translation
-- [ ] App icon 512 × 512, feature graphic 1024 × 500
+- [ ] App icon and feature graphic: ready in `branding/` (`icon-512.png`, `feature-graphic-ro.png`, `feature-graphic-en.png`)
 - [ ] Phone screenshots (2–8) and tablet screenshots (7" and 10")
 - [ ] Category **Education**, contact email **cojocari.adrianp@gmail.com**
 

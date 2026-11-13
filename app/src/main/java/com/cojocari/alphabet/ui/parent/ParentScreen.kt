@@ -196,7 +196,8 @@ fun ParentScreen(onBack: () -> Unit) {
                 }
 
                 Text("🔒 ${t.privacy}", fontSize = 14.sp, color = Ink)
-                Text("Alphabet Fun ${BuildConfig.VERSION_NAME}", fontSize = 12.sp, color = Ink.copy(alpha = 0.5f))
+                OpenSourceLicenses()
+                Text("${t.appName} ${BuildConfig.VERSION_NAME}", fontSize = 12.sp, color = Ink.copy(alpha = 0.5f))
                 Spacer(Modifier.size(24.dp))
             }
         }

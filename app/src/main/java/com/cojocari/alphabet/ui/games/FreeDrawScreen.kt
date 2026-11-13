@@ -232,7 +232,7 @@ private fun androidx.compose.ui.graphics.drawscope.DrawScope.drawLine(line: Line
     }
 }
 
-/** Renders the drawing to a PNG in Pictures/Alphabet Fun. Android 10+ needs no permission. */
+/** Renders the drawing to a PNG in Pictures/Clever Owl. Android 10+ needs no permission. */
 private fun saveDrawing(context: Context, marks: List<Mark>, size: IntSize): Boolean {
     if (size.width <= 0 || marks.isEmpty() || Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) return false
     val bitmap = Bitmap.createBitmap(size.width, size.height, Bitmap.Config.ARGB_8888)
@@ -264,7 +264,7 @@ private fun saveDrawing(context: Context, marks: List<Mark>, size: IntSize): Boo
         val values = ContentValues().apply {
             put(MediaStore.Images.Media.DISPLAY_NAME, "drawing_${System.currentTimeMillis()}.png")
             put(MediaStore.Images.Media.MIME_TYPE, "image/png")
-            put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/Alphabet Fun")
+            put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/Clever Owl")
         }
         val uri = context.contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values) ?: return false
         context.contentResolver.openOutputStream(uri)?.use { bitmap.compress(Bitmap.CompressFormat.PNG, 100, it) }

@@ -10,7 +10,7 @@ Google's: app name 30, short description 80, full description 4000.
 
 **App name** (≤30)
 ```
-Alfabet Vesel: Litere și Cifre
+Bufnița Isteață: ABC și 123
 ```
 
 **Short description** (≤80)
@@ -20,7 +20,7 @@ Litere, cifre, citire și matematică pentru copii 2–6 ani. Fără reclame.
 
 **Full description**
 ```
-Alfabet Vesel transformă primele lecții în joacă! Copilul învață literele, cifrele, primele cuvinte și matematica de bază prin 21 de jocuri colorate, cu voce în limba română.
+Bufnița Isteață transformă primele lecții în joacă! Copilul învață literele, cifrele, primele cuvinte și matematica de bază prin 21 de jocuri colorate, cu voce în limba română.
 
 🔤 LITERE – toate cele 31 de litere ale alfabetului românesc, inclusiv Ă, Â, Î, Ș și Ț, cu imagini și cuvinte („Be de la banană!”), baloane de spart, perechi de memorie și „Cu ce literă începe?”
 
@@ -56,7 +56,7 @@ Ai o idee sau ai găsit o problemă? Scrie-ne din colțul părinților – citim
 
 **App name** (≤30)
 ```
-Alphabet Fun: ABC & 123 Kids
+Clever Owl: ABC & 123 for Kids
 ```
 
 **Short description** (≤80)
@@ -66,7 +66,7 @@ Letters, numbers, reading and math games for kids 2–6. No ads, no subscription
 
 **Full description**
 ```
-Alphabet Fun turns first lessons into play! Children learn letters, numbers, first words and simple math through 21 colourful games, all spoken aloud.
+Clever Owl turns first lessons into play! Children learn letters, numbers, first words and simple math through 21 colourful games, all spoken aloud.
 
 🔤 LETTERS – the whole alphabet with pictures and words ("B is for Bee!"), balloon popping, memory pairs and "What letter does it start with?"
 
@@ -113,8 +113,8 @@ Found a problem or have an idea? Write to us from the grown-ups' corner – we r
 
 | Asset | Size | Idea |
 |---|---|---|
-| App icon | 512 × 512 PNG | the launcher icon, larger |
-| Feature graphic | 1024 × 500 PNG | the six world tiles with "Alfabet Vesel" |
+| App icon | 512 × 512 PNG | ready: `branding/icon-512.png` |
+| Feature graphic | 1024 × 500 PNG | ready: `branding/feature-graphic-ro.png` (Romanian listing) and `branding/feature-graphic-en.png` (English) |
 | Phone screenshots | at least 2, up to 8 | Home, a letter card, Balloons, Math, drawing, stickers |
 | 7-inch and 10-inch tablet screenshots | at least 1 each | needed to be shown as "Designed for tablets"; take them on the Redmi Pad |
 

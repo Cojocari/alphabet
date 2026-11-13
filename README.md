@@ -1,4 +1,4 @@
-# Alphabet Fun / Alfabet Vesel 🔤🔢📖✏️➕🎨
+# Clever Owl / Bufnița Isteață 🦉
 
 An Android learning game for children aged 2 to 6, in **Romanian and English**.
 Everything is big, colourful and spoken aloud, so children who can't read yet can play on their own.
@@ -43,6 +43,10 @@ Release signing reads `keystore.properties` (git-ignored). Debug builds have a
 - [Store listing](docs/store-listing.md): titles, descriptions and graphics, in RO and EN
 - [Privacy policy](docs/privacy-policy.md)
 - [Romanian voice recording script](docs/recording-script-ro.md)
+- [branding/](branding/): logo (`logo.svg`), Play Store icon and feature graphics. The owl is drawn in
+  `owl.svgpart`; the launcher icon (`res/drawable/ic_launcher_foreground.xml`) uses the same shapes.
+  The PNGs are rendered from the `.html` files with a headless browser. Text uses the Nunito font
+  (SIL Open Font License, Google Fonts).
 
 ## Tech
 Kotlin, Jetpack Compose, Material 3, Google Play Billing. Speech uses the device's text-to-speech
