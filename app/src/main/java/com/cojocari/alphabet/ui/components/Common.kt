@@ -18,6 +18,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -65,9 +66,16 @@ fun RoundButton(
     }
 }
 
-/** Top bar with a home button on the left and optional extra content on the right. */
+/** Goes straight to the home screen from anywhere; provided by MainActivity. */
+val LocalGoHome = staticCompositionLocalOf<() -> Unit> { {} }
+
+/**
+ * Top bar with a back button (one step up: game → its world → home) and a home button
+ * on the left, and optional extra content on the right.
+ */
 @Composable
-fun TopBar(onHome: () -> Unit, trailing: @Composable () -> Unit = {}) {
+fun TopBar(onBack: () -> Unit, trailing: @Composable () -> Unit = {}) {
+    val goHome = LocalGoHome.current
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -75,7 +83,10 @@ fun TopBar(onHome: () -> Unit, trailing: @Composable () -> Unit = {}) {
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        RoundButton(emoji = "🏠", color = Color(0xFF8ECAE6), onClick = onHome, size = 64.dp)
+        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            RoundButton(emoji = "⬅️", color = Color(0xFFFFD6A5), onClick = onBack, size = 64.dp)
+            RoundButton(emoji = "🏠", color = Color(0xFF8ECAE6), onClick = goHome, size = 64.dp)
+        }
         trailing()
     }
 }

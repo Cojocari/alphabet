@@ -91,7 +91,7 @@ fun SpellScreen(onHome: () -> Unit) {
 
     Box(Modifier.fillMaxSize()) {
         Column(Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
-            TopBar(onHome = onHome) {
+            TopBar(onBack = onHome) {
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                     StarCounter(level)
                     RoundButton("🔊", Color(0xFFFFB703), onClick = { speaker.say(t.spellAsk(word.text)) }, size = 64.dp)

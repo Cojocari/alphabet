@@ -142,7 +142,7 @@ fun DrawScreen(onHome: () -> Unit, items: List<TraceItem>) {
 
     Box(Modifier.fillMaxSize()) {
         Column(Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
-            TopBar(onHome = onHome) {
+            TopBar(onBack = onHome) {
                 Text(letter.emoji, fontSize = 48.sp, modifier = Modifier.bouncyClick {
                     speaker.say(letter.start)
                 })

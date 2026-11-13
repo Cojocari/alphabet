@@ -142,7 +142,7 @@ fun BalloonsScreen(onHome: () -> Unit, items: List<BalloonItem>) {
 
     Box(Modifier.fillMaxSize()) {
         Column(Modifier.fillMaxSize()) {
-            TopBar(onHome = onHome) {
+            TopBar(onBack = onHome) {
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(14.dp)) {
                     // Target and how many are popped so far.
                     Box(

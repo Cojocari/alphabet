@@ -39,6 +39,7 @@ import com.cojocari.alphabet.ui.NewStickerOverlay
 import com.cojocari.alphabet.ui.StickersScreen
 import com.cojocari.alphabet.ui.World
 import com.cojocari.alphabet.ui.WorldScreen
+import com.cojocari.alphabet.ui.components.LocalGoHome
 import com.cojocari.alphabet.ui.parent.ParentGate
 import com.cojocari.alphabet.ui.parent.ParentScreen
 import com.cojocari.alphabet.ui.theme.AlphabetTheme
@@ -71,20 +72,21 @@ class MainActivity : ComponentActivity() {
             AlphabetTheme {
                 var language by remember { mutableStateOf(loadLanguage(this)) }
                 val speaker = rememberSpeaker(language.locale)
+                var route by rememberSaveable { mutableStateOf("home") }
+                var gate by remember { mutableStateOf(false) }
+                val goHome = remember { { route = "home" } }
                 CompositionLocalProvider(
                     LocalSpeaker provides speaker,
                     LocalLanguage provides language,
                     LocalProgress provides progress,
                     LocalSfx provides sfx,
                     LocalBilling provides billing,
+                    LocalGoHome provides goHome,
                 ) {
                     Surface(
                         modifier = Modifier.fillMaxSize(),
                         color = MaterialTheme.colorScheme.background,
                     ) {
-                        var route by rememberSaveable { mutableStateOf("home") }
-                        var gate by remember { mutableStateOf(false) }
-                        val goHome = { route = "home" }
 
                         BackHandler(enabled = gate || route != "home") {
                             when {

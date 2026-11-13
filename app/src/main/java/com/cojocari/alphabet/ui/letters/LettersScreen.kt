@@ -65,7 +65,7 @@ fun LettersScreen(onHome: () -> Unit, items: List<CardItem>) {
     LaunchedEffect(index) { strip.animateScrollToItem((index - 2).coerceAtLeast(0)) }
 
     Column(Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
-        TopBar(onHome = onHome) {
+        TopBar(onBack = onHome) {
             RoundButton("🔊", Color(0xFFFFB703), onClick = { speaker.say(letter.spoken) }, size = 64.dp)
         }
 

@@ -119,7 +119,7 @@ fun QuizScreen(onHome: () -> Unit) {
 
     Box(Modifier.fillMaxSize()) {
         Column(Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
-            TopBar(onHome = onHome) {
+            TopBar(onBack = onHome) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text("⭐", fontSize = 36.sp)
                     Text(

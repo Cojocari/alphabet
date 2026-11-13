@@ -57,7 +57,7 @@ fun ParentScreen(onBack: () -> Unit) {
     var confirmReset by remember { mutableStateOf(false) }
 
     Column(Modifier.fillMaxSize()) {
-        TopBar(onHome = onBack) {
+        TopBar(onBack = onBack) {
             Text(t.parentTitle, fontSize = 26.sp, fontWeight = FontWeight.Black, color = Ink)
         }
         Column(

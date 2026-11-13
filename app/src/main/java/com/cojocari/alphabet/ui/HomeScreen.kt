@@ -22,7 +22,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.GridItemSpan
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
@@ -140,30 +141,29 @@ fun HomeScreen(
         ) {
             val wide = maxWidth > maxHeight
             val columns = if (wide) 3 else 2
-            val tiles = World.entries.size + 1 // five worlds + the sticker album
-            val rows = (tiles + columns - 1) / columns
+            val rows = World.entries.chunked(columns)
             val gap = 16.dp
-            val tileHeight = ((maxHeight - gap * (rows - 1)) / rows).coerceIn(140.dp, 360.dp)
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(columns),
-                horizontalArrangement = Arrangement.spacedBy(gap),
+            val tileWidth = (maxWidth - gap * (columns - 1)) / columns
+            val tileHeight = ((maxHeight - gap * (rows.size - 1)) / rows.size).coerceIn(140.dp, 360.dp)
+            // Rows of world tiles; a shorter last row is centred.
+            Column(
+                modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.spacedBy(gap),
-                modifier = Modifier.fillMaxSize(),
             ) {
-                itemsIndexed(World.entries) { i, world ->
-                    WorldTile(world.symbol, world.emoji, world.colors, world.label(t), tileHeight, delayIndex = i) {
-                        sfx.tap()
-                        speaker.say(world.label(t))
-                        onWorld(world)
-                    }
-                }
-                item {
-                    WorldTile(
-                        "📒", "⭐", listOf(Color(0xFFFFC94D), Color(0xFFFFA94D)),
-                        "${progress.stickersWon} / ${com.cojocari.alphabet.data.Stickers.size}", tileHeight, delayIndex = 5,
+                rows.forEach { row ->
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(gap, Alignment.CenterHorizontally),
                     ) {
-                        sfx.tap()
-                        onStickers()
+                        row.forEach { world ->
+                            Box(Modifier.width(tileWidth)) {
+                                WorldTile(world.symbol, world.emoji, world.colors, world.label(t), tileHeight, delayIndex = world.ordinal) {
+                                    sfx.tap()
+                                    speaker.say(world.label(t))
+                                    onWorld(world)
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -258,7 +258,7 @@ fun WorldScreen(world: World, onBack: () -> Unit, onGame: (GameId) -> Unit, onLo
     val t = LocalLanguage.current.strings
 
     Column(Modifier.fillMaxSize()) {
-        TopBar(onHome = onBack) {
+        TopBar(onBack = onBack) {
             Row(
                 modifier = Modifier
                     .clip(RoundedCornerShape(28.dp))

@@ -53,7 +53,7 @@ fun StickersScreen(onBack: () -> Unit) {
     LaunchedEffect(Unit) { speaker.say(t.stickerBook(won)) }
 
     Column(Modifier.fillMaxSize()) {
-        TopBar(onHome = onBack) {
+        TopBar(onBack = onBack) {
             // Stars towards the next sticker: ★★★☆☆ 🎁
             if (progress.starsToNextSticker > 0) {
                 Row(verticalAlignment = Alignment.CenterVertically) {

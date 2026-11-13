@@ -121,7 +121,7 @@ fun MemoryScreen(onHome: () -> Unit) {
 
     Box(Modifier.fillMaxSize()) {
         Column(Modifier.fillMaxSize()) {
-            TopBar(onHome = onHome) { StarCounter(wins) }
+            TopBar(onBack = onHome) { StarCounter(wins) }
             BoxWithConstraints(Modifier.weight(1f).fillMaxWidth().padding(16.dp), contentAlignment = Alignment.Center) {
                 val gap = 12.dp
                 // Pick the column count that makes the cards biggest.

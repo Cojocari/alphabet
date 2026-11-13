@@ -108,7 +108,7 @@ fun PickGame(onHome: () -> Unit, newRound: (level: Int) -> PickRound) {
 
     Box(Modifier.fillMaxSize()) {
         Column(Modifier.fillMaxSize()) {
-            TopBar(onHome = onHome) {
+            TopBar(onBack = onHome) {
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                     StarCounter(level)
                     RoundButton("🔊", Color(0xFFFFB703), onClick = { speaker.say(round.ask) }, size = 64.dp)
