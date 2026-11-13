@@ -39,6 +39,17 @@ class Progress(context: Context) {
     /** Set when a sticker was just won; the app shows it, then clears it. */
     var newSticker by mutableStateOf<String?>(null)
 
+    /** Easy / Medium / Hard, shared by all games. */
+    var difficulty by mutableStateOf(
+        Difficulty.entries.firstOrNull { it.name == prefs.getString("difficulty", null) } ?: Difficulty.Easy
+    )
+        private set
+
+    fun updateDifficulty(value: Difficulty) {
+        difficulty = value
+        prefs.edit().putString("difficulty", value.name).apply()
+    }
+
     // ---- Personal touches ----
 
     var childName by mutableStateOf(prefs.getString("name", "").orEmpty())

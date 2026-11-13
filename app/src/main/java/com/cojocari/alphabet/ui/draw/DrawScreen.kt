@@ -102,7 +102,9 @@ fun DrawScreen(onHome: () -> Unit, items: List<TraceItem>) {
     var crayon by remember { mutableStateOf(Crayons.first()) }
     var canvasSize by remember { mutableStateOf(IntSize.Zero) }
 
-    val brushPx = with(density) { 30.dp.toPx() }
+    // Easy: thick brush and less to colour in; Hard: thin brush, almost all of it.
+    val brushPx = with(density) { stars.difficulty.pick(40, 30, 22).dp.toPx() }
+    val doneAt = stars.difficulty.pick(0.55f, 0.7f, 0.85f)
     val glyph = remember(letter.text, canvasSize) { buildGlyph(letter.text, canvasSize) }
 
     val strokes = remember(letter.text) { mutableStateListOf<CrayonStroke>() }
@@ -124,7 +126,7 @@ fun DrawScreen(onHome: () -> Unit, items: List<TraceItem>) {
         }
         if (newly == 0) return
         progress = covered.count { it }.toFloat() / covered.size
-        if (!done && progress >= DoneAt) {
+        if (!done && progress >= doneAt) {
             done = true
             celebrate++
             sfx.fanfare()
@@ -146,7 +148,7 @@ fun DrawScreen(onHome: () -> Unit, items: List<TraceItem>) {
                 Text(letter.emoji, fontSize = 48.sp, modifier = Modifier.bouncyClick {
                     speaker.say(letter.start)
                 })
-                StarMeter(progress)
+                StarMeter(progress, doneAt)
             }
 
             // Drawing paper
@@ -246,10 +248,10 @@ fun DrawScreen(onHome: () -> Unit, items: List<TraceItem>) {
 
 /** Five stars that light up as the letter gets coloured in. */
 @Composable
-private fun StarMeter(progress: Float) {
+private fun StarMeter(progress: Float, doneAt: Float) {
     Row {
         repeat(5) { i ->
-            val lit = progress >= DoneAt * (i + 1) / 5f
+            val lit = progress >= doneAt * (i + 1) / 5f
             Text(if (lit) "⭐" else "☆", fontSize = 30.sp, color = Color(0xFFFFB703), fontWeight = FontWeight.Bold)
         }
     }

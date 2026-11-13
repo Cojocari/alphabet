@@ -106,7 +106,12 @@ val GameId.world: World get() = World.entries.first { this in it.games }
 fun GameContent(id: GameId, onBack: () -> Unit) {
     val language = LocalLanguage.current
     val t = language.strings
-    key(language, id) {
+    val d = com.cojocari.alphabet.data.LocalProgress.current.difficulty
+    // Changing the level restarts the game with freshly generated rounds.
+    key(language, id, d) {
+    androidx.compose.runtime.CompositionLocalProvider(
+        com.cojocari.alphabet.ui.components.LocalShowDifficulty provides id.hasLevels,
+    ) {
         when (id) {
             GameId.LetterCards -> {
                 val items = remember {
@@ -127,7 +132,7 @@ fun GameContent(id: GameId, onBack: () -> Unit) {
                 BalloonsScreen(onBack, items)
             }
             GameId.Memory -> MemoryScreen(onBack)
-            GameId.FirstLetter -> PickGame(onBack) { firstLetterRound(language, it) }
+            GameId.FirstLetter -> PickGame(onBack) { firstLetterRound(language, d) }
 
             GameId.NumberCards -> {
                 val items = remember {
@@ -145,8 +150,8 @@ fun GameContent(id: GameId, onBack: () -> Unit) {
                 }
                 LettersScreen(onBack, items)
             }
-            GameId.FindNumber -> PickGame(onBack) { findNumberRound(language, it) }
-            GameId.HowMany -> PickGame(onBack) { howManyRound(language, it) }
+            GameId.FindNumber -> PickGame(onBack) { findNumberRound(language, d) }
+            GameId.HowMany -> PickGame(onBack) { howManyRound(language, d) }
             GameId.NumberBalloons -> {
                 val items = remember {
                     (0..10).map { BalloonItem("$it", t.balloonsNumber(it), t.wrongNumber(it)) }
@@ -154,8 +159,8 @@ fun GameContent(id: GameId, onBack: () -> Unit) {
                 BalloonsScreen(onBack, items)
             }
 
-            GameId.ReadPicture -> PickGame(onBack) { readPictureRound(language, it) }
-            GameId.WhichWord -> PickGame(onBack) { whichWordRound(language, it) }
+            GameId.ReadPicture -> PickGame(onBack) { readPictureRound(language, d) }
+            GameId.WhichWord -> PickGame(onBack) { whichWordRound(language, d) }
 
             GameId.TraceUpper -> {
                 val items = remember {
@@ -181,13 +186,18 @@ fun GameContent(id: GameId, onBack: () -> Unit) {
             }
             GameId.Spell -> SpellScreen(onBack)
 
-            GameId.Add -> PickGame(onBack) { addRound(language, it) }
-            GameId.Subtract -> PickGame(onBack) { subtractRound(language, it) }
-            GameId.Compare -> PickGame(onBack) { compareRound(language, it) }
+            GameId.Add -> PickGame(onBack) { addRound(language, d) }
+            GameId.Subtract -> PickGame(onBack) { subtractRound(language, d) }
+            GameId.Compare -> PickGame(onBack) { compareRound(language, d) }
 
-            GameId.Colors -> PickGame(onBack) { colorRound(language, it) }
-            GameId.Shapes -> PickGame(onBack) { shapeRound(language, it) }
+            GameId.Colors -> PickGame(onBack) { colorRound(language, d) }
+            GameId.Shapes -> PickGame(onBack) { shapeRound(language, d) }
             GameId.FreeDraw -> FreeDrawScreen(onBack)
         }
     }
 }
+}
+
+/** Games with Easy / Medium / Hard (flash cards and free drawing have none). */
+val GameId.hasLevels: Boolean
+    get() = this != GameId.LetterCards && this != GameId.NumberCards && this != GameId.FreeDraw

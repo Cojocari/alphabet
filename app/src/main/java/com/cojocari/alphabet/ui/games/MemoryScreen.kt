@@ -69,7 +69,8 @@ fun MemoryScreen(onHome: () -> Unit) {
     var wins by rememberSaveable { mutableIntStateOf(0) }
     var deal by remember { mutableIntStateOf(0) }
     val cards = remember(deal, language) {
-        val pairs = (3 + wins).coerceAtMost(6)
+        // Easy 3 pairs, Medium 5, Hard 8.
+        val pairs = progress.difficulty.pick(3, 5, 8)
         language.alphabet.filterNot { it.inside }.shuffled().take(pairs)
             .flatMap { listOf(MemoryCard(it, false), MemoryCard(it, true)) }
             .shuffled()
@@ -125,7 +126,7 @@ fun MemoryScreen(onHome: () -> Unit) {
             BoxWithConstraints(Modifier.weight(1f).fillMaxWidth().padding(16.dp), contentAlignment = Alignment.Center) {
                 val gap = 12.dp
                 // Pick the column count that makes the cards biggest.
-                val (cols, size) = (2..6).map { c ->
+                val (cols, size) = (2..8).map { c ->
                     val r = (cards.size + c - 1) / c
                     c to min((maxWidth - gap * (c - 1)) / c, ((maxHeight - gap * (r - 1)) / r) / 1.15f)
                 }.maxBy { it.second.value }

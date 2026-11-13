@@ -105,12 +105,12 @@ fun BalloonsScreen(onHome: () -> Unit, items: List<BalloonItem>) {
                 now = ms
                 if (!resting && ms - lastSpawn > 1000) {
                     lastSpawn = ms
-                    val item = if (Random.nextFloat() < 0.4f) target else items.filter { it != target }.random()
+                    val item = if (Random.nextFloat() < progress.difficulty.pick(0.55f, 0.4f, 0.28f)) target else items.filter { it != target }.random()
                     balloons += Balloon(
                         item = item,
                         x = Random.nextFloat() * 0.8f + 0.1f,
                         born = ms,
-                        speed = 0.12f + 0.01f * round.coerceAtMost(6),
+                        speed = progress.difficulty.pick(0.08f, 0.12f, 0.17f),
                         color = BalloonColors.random(),
                         phase = Random.nextFloat() * 6f,
                     )

@@ -70,13 +70,14 @@ fun SpellScreen(onHome: () -> Unit) {
     var level by rememberSaveable { mutableIntStateOf(0) }
     var roundNo by remember { mutableIntStateOf(0) }
     val word = remember(roundNo, language) {
-        val maxLen = if (level < 4) 3 else if (level < 8) 4 else 6
+        // Easy: 3-letter words, Medium: up to 4, Hard: up to 6.
+        val maxLen = progress.difficulty.pick(3, 4, 6)
         language.words.filter { it.text.length <= maxLen }.ifEmpty { language.words }.random()
     }
     val letters = word.text.uppercase()
     val tiles = remember(word) {
         // The word's letters plus two extra ones to choose from.
-        val extras = language.alphabet.map { it.char }.filter { it !in letters }.shuffled().take(2)
+        val extras = language.alphabet.map { it.char }.filter { it !in letters }.shuffled().take(progress.difficulty.pick(1, 2, 3))
         (letters.toList() + extras).mapIndexed { i, c -> Tile(i, c) }.shuffled()
     }
     val placed = remember(word) { mutableStateListOf<Char>() }

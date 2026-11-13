@@ -21,6 +21,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
@@ -87,7 +88,86 @@ fun TopBar(onBack: () -> Unit, trailing: @Composable () -> Unit = {}) {
             RoundButton(emoji = "⬅️", color = Color(0xFFFFD6A5), onClick = onBack, size = 64.dp)
             RoundButton(emoji = "🏠", color = Color(0xFF8ECAE6), onClick = goHome, size = 64.dp)
         }
+        if (LocalShowDifficulty.current) DifficultyPicker()
         trailing()
+    }
+}
+
+/** True inside games that have Easy / Medium / Hard; set by GameContent. */
+val LocalShowDifficulty = staticCompositionLocalOf { false }
+
+private val LevelColors = listOf(Color(0xFF43AA8B), Color(0xFFF77F00), Color(0xFFE63946))
+
+/**
+ * Difficulty meter for Easy, Medium and Hard: rising signal-style bars (1, 2 or 3 filled)
+ * in green, orange and red, with the level's name next to them on wider screens.
+ * Deliberately not stars, so it isn't confused with the stars children win.
+ * Changing it restarts the game at that level.
+ */
+@Composable
+fun DifficultyPicker() {
+    val progress = com.cojocari.alphabet.data.LocalProgress.current
+    val speaker = com.cojocari.alphabet.audio.LocalSpeaker.current
+    val sfx = com.cojocari.alphabet.audio.LocalSfx.current
+    val t = com.cojocari.alphabet.i18n.LocalLanguage.current.strings
+    val showWords = androidx.compose.ui.platform.LocalConfiguration.current.screenWidthDp >= 600
+    val pill = androidx.compose.foundation.shape.RoundedCornerShape(36.dp)
+    Row(
+        modifier = Modifier
+            .shadow(4.dp, pill)
+            .clip(pill)
+            .background(Color.White)
+            .padding(6.dp),
+        horizontalArrangement = Arrangement.spacedBy(6.dp),
+    ) {
+        com.cojocari.alphabet.data.Difficulty.entries.forEach { d ->
+            val selected = progress.difficulty == d
+            val color = LevelColors[d.ordinal]
+            Row(
+                modifier = Modifier
+                    .clip(pill)
+                    .background(if (selected) color else color.copy(alpha = 0.08f))
+                    .bouncyClick {
+                        if (!selected) {
+                            sfx.tap()
+                            progress.updateDifficulty(d)
+                            speaker.say(t.difficultyNames[d.ordinal])
+                        }
+                    }
+                    .padding(horizontal = 16.dp, vertical = 10.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                LevelBars(level = d.ordinal + 1, color = if (selected) Color.White else color)
+                if (showWords) {
+                    Text(
+                        t.difficultyNames[d.ordinal].trimEnd('!'),
+                        fontSize = 20.sp,
+                        fontWeight = androidx.compose.ui.text.font.FontWeight.Black,
+                        color = if (selected) Color.White else color,
+                        modifier = Modifier.padding(start = 10.dp),
+                    )
+                }
+            }
+        }
+    }
+}
+
+/** Three bars of rising height, the first [level] of them filled, like a signal meter. */
+@Composable
+private fun LevelBars(level: Int, color: Color) {
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(3.dp),
+        verticalAlignment = Alignment.Bottom,
+        modifier = Modifier.size(width = 27.dp, height = 24.dp),
+    ) {
+        listOf(10.dp, 17.dp, 24.dp).forEachIndexed { i, h ->
+            Box(
+                Modifier
+                    .size(width = 7.dp, height = h)
+                    .clip(androidx.compose.foundation.shape.RoundedCornerShape(3.dp))
+                    .background(if (i < level) color else color.copy(alpha = 0.25f))
+            )
+        }
     }
 }
 

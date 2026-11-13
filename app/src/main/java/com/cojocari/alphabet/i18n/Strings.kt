@@ -154,6 +154,9 @@ interface Strings {
     val noLimit: String
     fun playedToday(minutes: Int): String
     fun unlockBodyFor(games: Int): String
+
+    /** Said when the level is switched: Easy, Medium, Hard. */
+    val difficultyNames: List<String>
 }
 
 object EnglishStrings : Strings {
@@ -310,6 +313,7 @@ object EnglishStrings : Strings {
     override val dailyLimit = "Daily play time"
     override val noLimit = "No limit"
     override fun playedToday(minutes: Int) = "Played today: $minutes min"
+    override val difficultyNames = listOf("Easy!", "Medium!", "Hard!")
     override fun unlockBodyFor(games: Int) =
         "All $games games in Letters, Numbers, Reading, Writing, Math and Colors & Shapes, plus every " +
             "future game and update. One-time purchase: no ads, no subscriptions, ever."
@@ -487,6 +491,7 @@ object RomanianStrings : Strings {
     override val dailyLimit = "Timp de joacă pe zi"
     override val noLimit = "Fără limită"
     override fun playedToday(minutes: Int) = "Azi: $minutes min"
+    override val difficultyNames = listOf("Ușor!", "Mediu!", "Greu!")
     override fun unlockBodyFor(games: Int) =
         "Toate cele $games de jocuri de Litere, Numere, Citire, Scriere, Matematică și Culori și forme, plus " +
             "toate jocurile și actualizările viitoare. O singură plată: fără reclame și fără abonamente."

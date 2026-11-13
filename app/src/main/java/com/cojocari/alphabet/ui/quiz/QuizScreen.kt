@@ -61,7 +61,7 @@ private fun choicesFor(stars: Int) = when {
 
 private fun newRound(alphabet: List<Letter>, stars: Int, previous: Letter?): Round {
     val target = alphabet.filter { it != previous }.random()
-    val others = alphabet.filter { it != target }.shuffled().take(choicesFor(stars) - 1)
+    val others = alphabet.filter { it != target }.shuffled().take(stars - 1)
     return Round(target, (others + target).shuffled())
 }
 
@@ -80,7 +80,7 @@ fun QuizScreen(onHome: () -> Unit) {
 
     var stars by rememberSaveable { mutableIntStateOf(0) }
     var roundNo by remember { mutableIntStateOf(0) }
-    var round by remember { mutableStateOf(newRound(language.alphabet, 0, null)) }
+    var round by remember { mutableStateOf(newRound(language.alphabet, progress.difficulty.pick(2, 3, 4), null)) }
     val wrong = remember { mutableStateListOf<Char>() }
     var solved by remember { mutableStateOf(false) }
     var celebrate by remember { mutableIntStateOf(0) }
@@ -104,7 +104,7 @@ fun QuizScreen(onHome: () -> Unit) {
             speaker.say(t.correct(t.praise.random(), letter, superstar = stars % 5 == 0))
             scope.launch {
                 delay(2600)
-                round = newRound(language.alphabet, stars, round.target)
+                round = newRound(language.alphabet, progress.difficulty.pick(2, 3, 4), round.target)
                 wrong.clear()
                 solved = false
                 roundNo++
