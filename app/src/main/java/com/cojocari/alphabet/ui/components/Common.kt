@@ -79,3 +79,18 @@ fun TopBar(onHome: () -> Unit, trailing: @Composable () -> Unit = {}) {
         trailing()
     }
 }
+
+/** "⭐ 12": stars won in the current game. */
+@Composable
+fun StarCounter(stars: Int) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Text("⭐", fontSize = 34.sp)
+        Text(
+            "$stars",
+            fontSize = 34.sp,
+            fontWeight = androidx.compose.ui.text.font.FontWeight.Black,
+            color = Color(0xFFF77F00),
+            modifier = Modifier.padding(start = 4.dp),
+        )
+    }
+}

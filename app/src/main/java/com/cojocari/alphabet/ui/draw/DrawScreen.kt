@@ -56,7 +56,8 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cojocari.alphabet.audio.LocalSpeaker
-import com.cojocari.alphabet.data.Alphabet
+import com.cojocari.alphabet.audio.LocalSfx
+import com.cojocari.alphabet.data.LocalProgress
 import com.cojocari.alphabet.ui.components.Celebration
 import com.cojocari.alphabet.ui.components.RoundButton
 import com.cojocari.alphabet.ui.components.TopBar
@@ -76,30 +77,41 @@ private class CrayonStroke(val color: Color, val points: SnapshotStateList<Offse
 /** The letter shape, laid out to fit the canvas, plus sample points inside it. */
 private class Glyph(val path: Path, val targets: List<Offset>)
 
+/** Something to trace: a letter or number, and what to say when starting and finishing. */
+class TraceItem(
+    val text: String,
+    val color: Color,
+    val emoji: String,
+    val start: String,
+    val done: String,
+)
+
 /**
  * Tracing game: a big pale letter fills the canvas and the child colours over it with a
  * finger. Stars light up as more of the letter gets coloured; at [DoneAt] we celebrate.
  */
 @Composable
-fun DrawScreen(onHome: () -> Unit) {
+fun DrawScreen(onHome: () -> Unit, items: List<TraceItem>) {
     val speaker = LocalSpeaker.current
+    val sfx = LocalSfx.current
+    val stars = LocalProgress.current
     val density = LocalDensity.current
 
     var index by rememberSaveable { mutableIntStateOf(0) }
-    val letter = Alphabet[index]
+    val letter = items[index.coerceAtMost(items.lastIndex)]
     var crayon by remember { mutableStateOf(Crayons.first()) }
     var canvasSize by remember { mutableStateOf(IntSize.Zero) }
 
     val brushPx = with(density) { 30.dp.toPx() }
-    val glyph = remember(letter.char, canvasSize) { buildGlyph(letter.char, canvasSize) }
+    val glyph = remember(letter.text, canvasSize) { buildGlyph(letter.text, canvasSize) }
 
-    val strokes = remember(letter.char) { mutableStateListOf<CrayonStroke>() }
+    val strokes = remember(letter.text) { mutableStateListOf<CrayonStroke>() }
     val covered = remember(glyph) { BooleanArray(glyph?.targets?.size ?: 0) }
     var progress by remember(glyph) { mutableFloatStateOf(0f) }
     var celebrate by remember { mutableIntStateOf(0) }
-    var done by remember(letter.char) { mutableStateOf(false) }
+    var done by remember(letter.text) { mutableStateOf(false) }
 
-    LaunchedEffect(letter.char) { speaker.say("Let's draw the letter ${letter.char}. ${letter.char} is for ${letter.word}!") }
+    LaunchedEffect(letter.text) { speaker.say(letter.start) }
 
     fun paintAt(p: Offset) {
         val g = glyph ?: return
@@ -115,7 +127,9 @@ fun DrawScreen(onHome: () -> Unit) {
         if (!done && progress >= DoneAt) {
             done = true
             celebrate++
-            speaker.say("Wow! You drew the letter ${letter.char}! Great job!")
+            sfx.fanfare()
+            stars.addStar()
+            speaker.say(letter.done)
         }
     }
 
@@ -130,7 +144,7 @@ fun DrawScreen(onHome: () -> Unit) {
         Column(Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
             TopBar(onHome = onHome) {
                 Text(letter.emoji, fontSize = 48.sp, modifier = Modifier.bouncyClick {
-                    speaker.say("${letter.char} is for ${letter.word}!")
+                    speaker.say(letter.start)
                 })
                 StarMeter(progress)
             }
@@ -220,10 +234,10 @@ fun DrawScreen(onHome: () -> Unit) {
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 RoundButton("⬅️", Color(0xFF8ECAE6), onClick = {
-                    index = (index - 1 + Alphabet.size) % Alphabet.size
+                    index = (index - 1 + items.size) % items.size
                 }, size = 68.dp)
                 RoundButton("🧽", Color(0xFFFFD6E0), onClick = { clear() }, size = 68.dp)
-                NextButton(pulse = done) { index = (index + 1) % Alphabet.size }
+                NextButton(pulse = done) { index = (index + 1) % items.size }
             }
         }
         Celebration(trigger = celebrate)
@@ -255,15 +269,14 @@ private fun NextButton(pulse: Boolean, onClick: () -> Unit) {
 }
 
 /** Lays the letter out as large as possible in [size] and samples points inside it. */
-private fun buildGlyph(char: Char, size: IntSize): Glyph? {
+private fun buildGlyph(text: String, size: IntSize): Glyph? {
     if (size.width <= 0 || size.height <= 0) return null
-    val text = char.toString()
     val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         typeface = Typeface.create(Typeface.SANS_SERIF, Typeface.BOLD)
         textSize = 100f
     }
     val raw = android.graphics.Path()
-    paint.getTextPath(text, 0, 1, 0f, 0f, raw)
+    paint.getTextPath(text, 0, text.length, 0f, 0f, raw)
     val b = android.graphics.RectF()
     raw.computeBounds(b, true)
 

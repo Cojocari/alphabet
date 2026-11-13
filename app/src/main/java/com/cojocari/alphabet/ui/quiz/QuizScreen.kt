@@ -38,17 +38,17 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.cojocari.alphabet.audio.LocalSfx
 import com.cojocari.alphabet.audio.LocalSpeaker
-import com.cojocari.alphabet.data.Alphabet
+import com.cojocari.alphabet.data.LocalProgress
 import com.cojocari.alphabet.data.Letter
+import com.cojocari.alphabet.i18n.LocalLanguage
 import com.cojocari.alphabet.ui.components.Celebration
 import com.cojocari.alphabet.ui.components.RoundButton
 import com.cojocari.alphabet.ui.components.TopBar
 import com.cojocari.alphabet.ui.components.bouncyClick
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-
-private val Praise = listOf("Yes!", "Great job!", "Super!", "You got it!", "Hooray!", "Well done!")
 
 private class Round(val target: Letter, val choices: List<Letter>)
 
@@ -59,9 +59,9 @@ private fun choicesFor(stars: Int) = when {
     else -> 4
 }
 
-private fun newRound(stars: Int, previous: Letter?): Round {
-    val target = Alphabet.filter { it != previous }.random()
-    val others = Alphabet.filter { it != target }.shuffled().take(choicesFor(stars) - 1)
+private fun newRound(alphabet: List<Letter>, stars: Int, previous: Letter?): Round {
+    val target = alphabet.filter { it != previous }.random()
+    val others = alphabet.filter { it != target }.shuffled().take(choicesFor(stars) - 1)
     return Round(target, (others + target).shuffled())
 }
 
@@ -73,15 +73,19 @@ private fun newRound(stars: Int, previous: Letter?): Round {
 fun QuizScreen(onHome: () -> Unit) {
     val speaker = LocalSpeaker.current
     val scope = rememberCoroutineScope()
+    val language = LocalLanguage.current
+    val sfx = LocalSfx.current
+    val progress = LocalProgress.current
+    val t = language.strings
 
     var stars by rememberSaveable { mutableIntStateOf(0) }
     var roundNo by remember { mutableIntStateOf(0) }
-    var round by remember { mutableStateOf(newRound(0, null)) }
+    var round by remember { mutableStateOf(newRound(language.alphabet, 0, null)) }
     val wrong = remember { mutableStateListOf<Char>() }
     var solved by remember { mutableStateOf(false) }
     var celebrate by remember { mutableIntStateOf(0) }
 
-    fun ask() = speaker.say("Find the letter ${round.target.char}!")
+    fun ask() = speaker.say(t.findLetter(round.target))
 
     LaunchedEffect(roundNo) {
         delay(300)
@@ -93,19 +97,22 @@ fun QuizScreen(onHome: () -> Unit) {
         if (letter == round.target) {
             solved = true
             stars++
+            sfx.success()
+            progress.addStar()
+            progress.markLearned(language, letter.char)
             celebrate++
-            val bonus = if (stars % 5 == 0) " You are a superstar!" else ""
-            speaker.say("${Praise.random()} That's ${letter.char}, for ${letter.word}!$bonus")
+            speaker.say(t.correct(t.praise.random(), letter, superstar = stars % 5 == 0))
             scope.launch {
                 delay(2600)
-                round = newRound(stars, round.target)
+                round = newRound(language.alphabet, stars, round.target)
                 wrong.clear()
                 solved = false
                 roundNo++
             }
         } else {
             wrong += letter.char
-            speaker.say("That's ${letter.char}. Try again! Find ${round.target.char}.")
+            sfx.wrong()
+            speaker.say(t.wrong(letter, round.target))
             scope.launch { shake() }
         }
     }
@@ -132,7 +139,7 @@ fun QuizScreen(onHome: () -> Unit) {
             ) {
                 RoundButton("🔊", Color(0xFFFFB703), onClick = { ask() }, size = 110.dp)
                 Text(
-                    text = if (solved) "${round.target.emoji} ${round.target.word}" else "Find the letter!",
+                    text = if (solved) "${round.target.emoji} ${round.target.word}" else t.findLetterLabel,
                     fontSize = 30.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color(0xFF3D2C2E),

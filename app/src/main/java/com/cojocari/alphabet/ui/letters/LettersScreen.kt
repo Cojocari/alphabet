@@ -39,8 +39,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cojocari.alphabet.audio.LocalSpeaker
-import com.cojocari.alphabet.data.Alphabet
-import com.cojocari.alphabet.data.Letter
+import androidx.compose.ui.unit.TextUnit
 import com.cojocari.alphabet.ui.components.RoundButton
 import com.cojocari.alphabet.ui.components.TopBar
 import com.cojocari.alphabet.ui.components.bouncyClick
@@ -50,23 +49,24 @@ import com.cojocari.alphabet.ui.components.bouncyClick
  * swipe or press the arrows to move on. A strip at the bottom jumps to any letter.
  */
 @Composable
-fun LettersScreen(onHome: () -> Unit) {
+fun LettersScreen(onHome: () -> Unit, items: List<CardItem>) {
     val speaker = LocalSpeaker.current
+
     var index by rememberSaveable { mutableIntStateOf(0) }
-    val letter = Alphabet[index]
+    val letter = items[index.coerceAtMost(items.lastIndex)]
 
     fun go(delta: Int) {
-        index = (index + delta + Alphabet.size) % Alphabet.size
+        index = (index + delta + items.size) % items.size
     }
 
-    LaunchedEffect(index) { speaker.say(spokenText(letter)) }
+    LaunchedEffect(index) { speaker.say(letter.spoken) }
 
     val strip = rememberLazyListState()
     LaunchedEffect(index) { strip.animateScrollToItem((index - 2).coerceAtLeast(0)) }
 
     Column(Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
         TopBar(onHome = onHome) {
-            RoundButton("🔊", Color(0xFFFFB703), onClick = { speaker.say(spokenText(letter)) }, size = 64.dp)
+            RoundButton("🔊", Color(0xFFFFB703), onClick = { speaker.say(letter.spoken) }, size = 64.dp)
         }
 
         AnimatedContent(
@@ -91,7 +91,8 @@ fun LettersScreen(onHome: () -> Unit) {
                 },
             label = "card",
         ) { i ->
-            LetterCard(Alphabet[i]) { speaker.say(spokenText(Alphabet[i])) }
+            val l = items[i.coerceAtMost(items.lastIndex)]
+            LetterCard(l) { speaker.say(l.spoken) }
         }
 
         Row(
@@ -110,7 +111,7 @@ fun LettersScreen(onHome: () -> Unit) {
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 16.dp),
         ) {
-            itemsIndexed(Alphabet) { i, l ->
+            itemsIndexed(items) { i, l ->
                 Box(
                     modifier = Modifier
                         .size(52.dp)
@@ -120,7 +121,7 @@ fun LettersScreen(onHome: () -> Unit) {
                     contentAlignment = Alignment.Center,
                 ) {
                     Text(
-                        l.char.toString(),
+                        l.chip,
                         fontSize = 26.sp,
                         fontWeight = FontWeight.Black,
                         color = if (i == index) Color.White else l.color,
@@ -132,7 +133,7 @@ fun LettersScreen(onHome: () -> Unit) {
 }
 
 @Composable
-private fun LetterCard(letter: Letter, onTap: () -> Unit) {
+private fun LetterCard(letter: CardItem, onTap: () -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -145,15 +146,15 @@ private fun LetterCard(letter: Letter, onTap: () -> Unit) {
         verticalArrangement = Arrangement.SpaceEvenly,
     ) {
         Text(
-            text = "${letter.char}${letter.char.lowercaseChar()}",
+            text = letter.big,
             fontSize = 130.sp,
             fontWeight = FontWeight.Black,
             color = letter.color,
             lineHeight = 130.sp,
         )
-        Text(letter.emoji, fontSize = 110.sp)
+        Text(letter.picture, fontSize = letter.pictureSize, textAlign = androidx.compose.ui.text.style.TextAlign.Center, lineHeight = letter.pictureSize * 1.15f)
         Text(
-            text = letter.word,
+            text = letter.caption,
             fontSize = 44.sp,
             fontWeight = FontWeight.Bold,
             color = letter.color,
@@ -161,4 +162,14 @@ private fun LetterCard(letter: Letter, onTap: () -> Unit) {
     }
 }
 
-private fun spokenText(letter: Letter) = "${letter.char}. ${letter.char} is for ${letter.word}!"
+/** One flash card: a big letter or number, a picture, a caption and what to say. */
+class CardItem(
+    val big: String,
+    val picture: String,
+    val pictureSize: TextUnit,
+    val caption: String,
+    val spoken: String,
+    val color: Color,
+    /** Short label in the strip at the bottom. */
+    val chip: String,
+)
