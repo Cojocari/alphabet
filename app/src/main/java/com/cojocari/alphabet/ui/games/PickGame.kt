@@ -32,6 +32,9 @@ import com.cojocari.alphabet.audio.LocalSpeaker
 import com.cojocari.alphabet.data.LocalProgress
 import com.cojocari.alphabet.i18n.LocalLanguage
 import com.cojocari.alphabet.ui.components.Celebration
+import com.cojocari.alphabet.ui.components.DemoEnd
+import com.cojocari.alphabet.ui.components.DemoRounds
+import com.cojocari.alphabet.ui.components.LocalGameAccess
 import com.cojocari.alphabet.ui.components.ChoiceTile
 import com.cojocari.alphabet.ui.components.RoundButton
 import com.cojocari.alphabet.ui.components.StarCounter
@@ -76,6 +79,8 @@ fun PickGame(onHome: () -> Unit, newRound: (level: Int) -> PickRound) {
     val wrong = remember { mutableStateListOf<Int>() }
     var solved by remember { mutableStateOf(false) }
     var celebrate by remember { mutableIntStateOf(0) }
+    val access = LocalGameAccess.current
+    var demoOver by remember { mutableStateOf(false) }
 
     LaunchedEffect(roundNo) {
         delay(350)
@@ -94,6 +99,10 @@ fun PickGame(onHome: () -> Unit, newRound: (level: Int) -> PickRound) {
             speaker.say(round.right(t.praise.random()))
             scope.launch {
                 delay(3000)
+                if (access.demo && level >= DemoRounds) {
+                    demoOver = true
+                    return@launch
+                }
                 round = newRound(level)
                 wrong.clear()
                 solved = false
@@ -138,6 +147,7 @@ fun PickGame(onHome: () -> Unit, newRound: (level: Int) -> PickRound) {
             }
         }
         Celebration(trigger = celebrate)
+        if (demoOver) DemoEnd(onBack = onHome)
     }
 }
 

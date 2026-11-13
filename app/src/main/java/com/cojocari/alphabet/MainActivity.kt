@@ -72,10 +72,16 @@ class MainActivity : ComponentActivity() {
             AlphabetTheme {
                 var language by remember { mutableStateOf(loadLanguage(this)) }
                 val speaker = rememberSpeaker(language.locale)
+                // Keep the child's name away from online voices (see Speaker.privateName).
+                androidx.compose.runtime.SideEffect { speaker.privateName = progress.childName }
                 var route by rememberSaveable { mutableStateOf("home") }
                 var gate by remember { mutableStateOf(false) }
                 // True when the gate was opened from the rest screen to add play time.
-                var gateForMoreTime by remember { mutableStateOf(false) }
+                // Why the parental gate is open: "parent" (settings), "unlock" (purchase) or "time" (more play time).
+                var gatePurpose by remember { mutableStateOf("parent") }
+                // Where to return after the purchase screen.
+                var unlockReturn by remember { mutableStateOf("home") }
+                val openUnlock = { unlockReturn = route; gatePurpose = "unlock"; gate = true }
                 val goHome = remember { { route = "home" } }
 
                 // Count play time while the app is on screen.
@@ -104,6 +110,7 @@ class MainActivity : ComponentActivity() {
                                 gate -> gate = false
                                 route.startsWith("game:") -> route = gameOf(route)?.let { "world:${it.world.name}" } ?: "home"
                                 route == "scene" -> route = "stickers"
+                                route == "unlock" -> route = unlockReturn
                                 else -> goHome()
                             }
                         }
@@ -118,23 +125,24 @@ class MainActivity : ComponentActivity() {
                                     current == "stickers" -> StickersScreen(onBack = goHome, onScene = { route = "scene" })
                                     current == "scene" -> com.cojocari.alphabet.ui.StickerSceneScreen(onBack = { route = "stickers" })
                                     current == "parent" -> ParentScreen(onBack = goHome)
+                                    current == "unlock" -> com.cojocari.alphabet.ui.parent.PaywallScreen(onBack = { route = unlockReturn })
                                     current.startsWith("world:") && worldOf(current) != null -> {
                                         val world = worldOf(current)!!
                                         WorldScreen(
                                             world = world,
                                             onBack = goHome,
                                             onGame = { route = "game:${it.name}" },
-                                            onLocked = { gate = true },
+                                            onLocked = openUnlock,
                                         )
                                     }
                                     current.startsWith("game:") && gameOf(current) != null -> {
                                         val game = gameOf(current)!!
-                                        GameContent(game, onBack = { route = "world:${game.world.name}" })
+                                        GameContent(game, onBack = { route = "world:${game.world.name}" }, onUnlock = openUnlock)
                                     }
                                     else -> HomeScreen(
                                         onWorld = { route = "world:${it.name}" },
                                         onStickers = { route = "stickers" },
-                                        onParent = { gate = true },
+                                        onParent = { gatePurpose = "parent"; gate = true },
                                         onLanguage = {
                                             language = it
                                             saveLanguage(this@MainActivity, it)
@@ -146,17 +154,21 @@ class MainActivity : ComponentActivity() {
                             progress.newSticker?.let { sticker ->
                                 NewStickerOverlay(sticker) { progress.newSticker = null }
                             }
-                            if (progress.timeUp && route != "parent") {
-                                com.cojocari.alphabet.ui.RestOverlay(onMoreTime = { gateForMoreTime = true; gate = true })
+                            if (progress.timeUp && route != "parent" && route != "unlock") {
+                                com.cojocari.alphabet.ui.RestOverlay(onMoreTime = { gatePurpose = "time"; gate = true })
                             }
                             if (gate) {
                                 ParentGate(
                                     onPass = {
                                         gate = false
-                                        if (gateForMoreTime) progress.grantExtraMinutes(15) else route = "parent"
-                                        gateForMoreTime = false
+                                        when (gatePurpose) {
+                                            "time" -> progress.grantExtraMinutes(15)
+                                            "unlock" -> route = "unlock"
+                                            else -> route = "parent"
+                                        }
+                                        gatePurpose = "parent"
                                     },
-                                    onCancel = { gate = false; gateForMoreTime = false },
+                                    onCancel = { gate = false; gatePurpose = "parent" },
                                 )
                             }
                         }

@@ -1,7 +1,9 @@
 package com.cojocari.alphabet.ui
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.sp
@@ -72,7 +74,7 @@ enum class World(
 ) {
     Letters(
         "ABC", "🦁", listOf(Color(0xFFFF6B6B), Color(0xFFFFA94D)), { it.worldLetters },
-        listOf(GameId.LetterCards, GameId.FindLetter, GameId.LetterBalloons, GameId.Memory, GameId.FirstLetter),
+        listOf(GameId.LetterCards, GameId.LetterBalloons, GameId.FindLetter, GameId.Memory, GameId.FirstLetter),
     ),
     Numbers(
         "123", "🐞", listOf(Color(0xFF4DABF7), Color(0xFF3BC9DB)), { it.worldNumbers },
@@ -92,25 +94,54 @@ enum class World(
     ),
     Art(
         "●▲■", "🦄", listOf(Color(0xFF20C997), Color(0xFF15AABF)), { it.worldArt },
-        listOf(GameId.Colors, GameId.Shapes, GameId.FreeDraw),
+        listOf(GameId.FreeDraw, GameId.Colors, GameId.Shapes),
     ),
 }
 
-/** The first game of every world is free, so children can try each world before buying. */
-val GameId.isFree: Boolean get() = World.entries.any { it.games.first() == this }
+/**
+ * Free without the purchase (7 of 21): one "hook" per world, plus Balloons, the most fun
+ * letter game. They're free at Easy and Medium; ⭐⭐⭐ Hard needs the unlock.
+ * Every other game can be tried as a short demo.
+ */
+val FreeGames = setOf(
+    GameId.LetterCards, GameId.LetterBalloons, GameId.NumberCards, GameId.ReadPicture,
+    GameId.TraceUpper, GameId.Add, GameId.FreeDraw,
+)
+
+val GameId.isFree: Boolean get() = this in FreeGames
 
 val GameId.world: World get() = World.entries.first { this in it.games }
 
 /** Starts a game in the current language. */
 @Composable
-fun GameContent(id: GameId, onBack: () -> Unit) {
+fun GameContent(id: GameId, onBack: () -> Unit, onUnlock: () -> Unit) {
     val language = LocalLanguage.current
     val t = language.strings
-    val d = com.cojocari.alphabet.data.LocalProgress.current.difficulty
-    // Changing the level restarts the game with freshly generated rounds.
-    key(language, id, d) {
+    val progress = com.cojocari.alphabet.data.LocalProgress.current
+    val premium = progress.premium
+    val hardLocked = !premium && id.isFree
+    val demo = !premium && !id.isFree
+    val chosen = progress.difficulty
+    val d = if (hardLocked && chosen == com.cojocari.alphabet.data.Difficulty.Hard) com.cojocari.alphabet.data.Difficulty.Medium else chosen
+    // Bumped by "play again" at the end of a demo, to start it over.
+    var demoRun by androidx.compose.runtime.saveable.rememberSaveable { androidx.compose.runtime.mutableIntStateOf(0) }
+    // Changing the level (or buying) restarts the game with freshly generated rounds.
+    key(language, id, d, premium, demoRun) {
+    val access = remember {
+        com.cojocari.alphabet.ui.components.GameAccess(
+            demo = demo,
+            hardLocked = hardLocked,
+            level = d,
+            // A demo always plays the same rounds: a fixed seed per game and level.
+            random = if (demo) kotlin.random.Random(id.ordinal * 7 + d.ordinal) else kotlin.random.Random.Default,
+            replay = { demoRun++ },
+            unlock = onUnlock,
+        )
+    }
+    val rnd = access.random
     androidx.compose.runtime.CompositionLocalProvider(
         com.cojocari.alphabet.ui.components.LocalShowDifficulty provides id.hasLevels,
+        com.cojocari.alphabet.ui.components.LocalGameAccess provides access,
     ) {
         when (id) {
             GameId.LetterCards -> {
@@ -132,7 +163,7 @@ fun GameContent(id: GameId, onBack: () -> Unit) {
                 BalloonsScreen(onBack, items)
             }
             GameId.Memory -> MemoryScreen(onBack)
-            GameId.FirstLetter -> PickGame(onBack) { firstLetterRound(language, d) }
+            GameId.FirstLetter -> PickGame(onBack) { firstLetterRound(language, d, rnd) }
 
             GameId.NumberCards -> {
                 val items = remember {
@@ -150,8 +181,8 @@ fun GameContent(id: GameId, onBack: () -> Unit) {
                 }
                 LettersScreen(onBack, items)
             }
-            GameId.FindNumber -> PickGame(onBack) { findNumberRound(language, d) }
-            GameId.HowMany -> PickGame(onBack) { howManyRound(language, d) }
+            GameId.FindNumber -> PickGame(onBack) { findNumberRound(language, d, rnd) }
+            GameId.HowMany -> PickGame(onBack) { howManyRound(language, d, rnd) }
             GameId.NumberBalloons -> {
                 val items = remember {
                     (0..10).map { BalloonItem("$it", t.balloonsNumber(it), t.wrongNumber(it)) }
@@ -159,8 +190,8 @@ fun GameContent(id: GameId, onBack: () -> Unit) {
                 BalloonsScreen(onBack, items)
             }
 
-            GameId.ReadPicture -> PickGame(onBack) { readPictureRound(language, d) }
-            GameId.WhichWord -> PickGame(onBack) { whichWordRound(language, d) }
+            GameId.ReadPicture -> PickGame(onBack) { readPictureRound(language, d, rnd) }
+            GameId.WhichWord -> PickGame(onBack) { whichWordRound(language, d, rnd) }
 
             GameId.TraceUpper -> {
                 val items = remember {
@@ -186,12 +217,12 @@ fun GameContent(id: GameId, onBack: () -> Unit) {
             }
             GameId.Spell -> SpellScreen(onBack)
 
-            GameId.Add -> PickGame(onBack) { addRound(language, d) }
-            GameId.Subtract -> PickGame(onBack) { subtractRound(language, d) }
-            GameId.Compare -> PickGame(onBack) { compareRound(language, d) }
+            GameId.Add -> PickGame(onBack) { addRound(language, d, rnd) }
+            GameId.Subtract -> PickGame(onBack) { subtractRound(language, d, rnd) }
+            GameId.Compare -> PickGame(onBack) { compareRound(language, d, rnd) }
 
-            GameId.Colors -> PickGame(onBack) { colorRound(language, d) }
-            GameId.Shapes -> PickGame(onBack) { shapeRound(language, d) }
+            GameId.Colors -> PickGame(onBack) { colorRound(language, d, rnd) }
+            GameId.Shapes -> PickGame(onBack) { shapeRound(language, d, rnd) }
             GameId.FreeDraw -> FreeDrawScreen(onBack)
         }
     }

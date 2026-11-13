@@ -44,6 +44,9 @@ import com.cojocari.alphabet.data.LocalProgress
 import com.cojocari.alphabet.data.Letter
 import com.cojocari.alphabet.i18n.LocalLanguage
 import com.cojocari.alphabet.ui.components.Celebration
+import com.cojocari.alphabet.ui.components.DemoEnd
+import com.cojocari.alphabet.ui.components.DemoRounds
+import com.cojocari.alphabet.ui.components.LocalGameAccess
 import com.cojocari.alphabet.ui.components.RoundButton
 import com.cojocari.alphabet.ui.components.TopBar
 import com.cojocari.alphabet.ui.components.bouncyClick
@@ -59,10 +62,10 @@ private fun choicesFor(stars: Int) = when {
     else -> 4
 }
 
-private fun newRound(alphabet: List<Letter>, stars: Int, previous: Letter?): Round {
-    val target = alphabet.filter { it != previous }.random()
-    val others = alphabet.filter { it != target }.shuffled().take(stars - 1)
-    return Round(target, (others + target).shuffled())
+private fun newRound(alphabet: List<Letter>, stars: Int, previous: Letter?, rnd: kotlin.random.Random): Round {
+    val target = alphabet.filter { it != previous }.random(rnd)
+    val others = alphabet.filter { it != target }.shuffled(rnd).take(stars - 1)
+    return Round(target, (others + target).shuffled(rnd))
 }
 
 /**
@@ -76,11 +79,13 @@ fun QuizScreen(onHome: () -> Unit) {
     val language = LocalLanguage.current
     val sfx = LocalSfx.current
     val progress = LocalProgress.current
+    val access = LocalGameAccess.current
+    var demoOver by remember { mutableStateOf(false) }
     val t = language.strings
 
     var stars by rememberSaveable { mutableIntStateOf(0) }
     var roundNo by remember { mutableIntStateOf(0) }
-    var round by remember { mutableStateOf(newRound(language.alphabet, progress.difficulty.pick(2, 3, 4), null)) }
+    var round by remember { mutableStateOf(newRound(language.alphabet, access.level.pick(2, 3, 4), null, access.random)) }
     val wrong = remember { mutableStateListOf<Char>() }
     var solved by remember { mutableStateOf(false) }
     var celebrate by remember { mutableIntStateOf(0) }
@@ -104,7 +109,11 @@ fun QuizScreen(onHome: () -> Unit) {
             speaker.say(t.correct(t.praise.random(), letter, superstar = stars % 5 == 0))
             scope.launch {
                 delay(2600)
-                round = newRound(language.alphabet, progress.difficulty.pick(2, 3, 4), round.target)
+                if (access.demo && stars >= DemoRounds) {
+                    demoOver = true
+                    return@launch
+                }
+                round = newRound(language.alphabet, access.level.pick(2, 3, 4), round.target, access.random)
                 wrong.clear()
                 solved = false
                 roundNo++
@@ -179,6 +188,7 @@ fun QuizScreen(onHome: () -> Unit) {
             }
         }
         Celebration(trigger = celebrate)
+        if (demoOver) DemoEnd(onBack = onHome)
     }
 }
 

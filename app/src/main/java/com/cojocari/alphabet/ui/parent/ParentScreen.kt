@@ -173,7 +173,30 @@ fun ParentScreen(onBack: () -> Unit) {
                     }
                 }
 
+                // Contact the developer: problem reports, ideas, rating.
+                Section {
+                    Text(t.contactTitle, fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Ink)
+                    Text(t.contactBody, fontSize = 15.sp, color = Ink)
+                    var noEmail by remember { mutableStateOf(false) }
+                    val context = LocalContext.current
+                    OutlinedButton(
+                        onClick = { noEmail = !sendFeedback(context, t, t.bugSubject, language.name) },
+                        modifier = Modifier.fillMaxWidth(),
+                    ) { Text(t.reportBug, fontSize = 16.sp) }
+                    OutlinedButton(
+                        onClick = { noEmail = !sendFeedback(context, t, t.ideaSubject, language.name) },
+                        modifier = Modifier.fillMaxWidth(),
+                    ) { Text(t.suggestIdea, fontSize = 16.sp) }
+                    OutlinedButton(
+                        onClick = { openStorePage(context) },
+                        modifier = Modifier.fillMaxWidth(),
+                    ) { Text(t.rateApp, fontSize = 16.sp) }
+                    if (noEmail) Text("${t.noEmailApp} $SupportEmail", fontSize = 14.sp, color = Color(0xFFE63946))
+                    Text("✉️ $SupportEmail", fontSize = 13.sp, color = Ink.copy(alpha = 0.7f))
+                }
+
                 Text("🔒 ${t.privacy}", fontSize = 14.sp, color = Ink)
+                Text("Alphabet Fun ${BuildConfig.VERSION_NAME}", fontSize = 12.sp, color = Ink.copy(alpha = 0.5f))
                 Spacer(Modifier.size(24.dp))
             }
         }

@@ -339,7 +339,8 @@ fun WorldScreen(world: World, onBack: () -> Unit, onGame: (GameId) -> Unit, onLo
                 modifier = Modifier.fillMaxSize(),
             ) {
                 itemsIndexed(world.games) { i, game ->
-                    val locked = !game.isFree && !progress.premium
+                    // Paid games are playable as a short demo until the unlock.
+                    val demo = !game.isFree && !progress.premium
                     val color = world.colors[i % 2]
                     Box(
                         modifier = Modifier
@@ -350,15 +351,9 @@ fun WorldScreen(world: World, onBack: () -> Unit, onGame: (GameId) -> Unit, onLo
                             .background(Color.White)
                             .border(5.dp, color, RoundedCornerShape(32.dp))
                             .bouncyClick {
-                                if (locked) {
-                                    sfx.wrong()
-                                    speaker.say(t.askGrownUp)
-                                    onLocked()
-                                } else {
-                                    sfx.tap()
-                                    speaker.say(game.label(t))
-                                    onGame(game)
-                                }
+                                sfx.tap()
+                                speaker.say(game.label(t))
+                                onGame(game)
                             },
                     ) {
                         Column(
@@ -376,18 +371,11 @@ fun WorldScreen(world: World, onBack: () -> Unit, onGame: (GameId) -> Unit, onLo
                                 overflow = TextOverflow.Ellipsis,
                             )
                         }
-                        if (locked) {
-                            Box(
-                                modifier = Modifier
-                                    .align(Alignment.TopEnd)
-                                    .padding(12.dp)
-                                    .size(46.dp)
-                                    .clip(CircleShape)
-                                    .background(color),
-                                contentAlignment = Alignment.Center,
-                            ) {
-                                Text("🔒", fontSize = 22.sp)
-                            }
+                        if (demo) {
+                            com.cojocari.alphabet.ui.components.DemoBadge(
+                                color = color,
+                                modifier = Modifier.align(Alignment.TopEnd).padding(12.dp),
+                            )
                         }
                     }
                 }

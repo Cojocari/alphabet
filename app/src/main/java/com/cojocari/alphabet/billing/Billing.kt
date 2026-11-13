@@ -37,6 +37,8 @@ class Billing(context: Context, private val onUnlocked: () -> Unit) : PurchasesU
     private val client = BillingClient.newBuilder(context)
         .setListener(this)
         .enablePendingPurchases(PendingPurchasesParams.newBuilder().enableOneTimeProducts().build())
+        // Reconnects to Google Play by itself if the connection drops.
+        .enableAutoServiceReconnection()
         .build()
 
     private var product: ProductDetails? = null
@@ -78,7 +80,8 @@ class Billing(context: Context, private val onUnlocked: () -> Unit) : PurchasesU
                 )
             )
             .build()
-        client.queryProductDetailsAsync(params) { _, details ->
+        client.queryProductDetailsAsync(params) { _, result ->
+            val details = result.productDetailsList
             val p = details.firstOrNull()
             main.post {
                 product = p

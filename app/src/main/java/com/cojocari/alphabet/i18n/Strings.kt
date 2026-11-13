@@ -157,6 +157,27 @@ interface Strings {
 
     /** Said when the level is switched: Easy, Medium, Hard. */
     val difficultyNames: List<String>
+
+    // ---- Demo & purchase ----
+    val demoEnd: String
+    val demoEndTitle: String
+    val demoEndBody: String
+    /** Lines on the purchase screen, each starting with an emoji. */
+    val paywallFeatures: List<String>
+    val paywallOnce: String
+    val familyNote: String
+    val backHome: String
+
+    // ---- Contact (grown-ups' corner) ----
+    val contactTitle: String
+    val contactBody: String
+    val reportBug: String
+    val suggestIdea: String
+    val rateApp: String
+    val bugSubject: String
+    val ideaSubject: String
+    val emailIntro: String
+    val noEmailApp: String
 }
 
 object EnglishStrings : Strings {
@@ -314,6 +335,30 @@ object EnglishStrings : Strings {
     override val noLimit = "No limit"
     override fun playedToday(minutes: Int) = "Played today: $minutes min"
     override val difficultyNames = listOf("Easy!", "Medium!", "Hard!")
+
+    override val demoEnd = "Well done! Did you like it? Ask a grown-up to unlock all the games!"
+    override val demoEndTitle = "Well done! 🌟"
+    override val demoEndBody = "That was the free try. Ask a grown-up to unlock this game and all the others."
+    override val paywallFeatures = listOf(
+        "🎮  All 21 games in 6 worlds",
+        "⭐  Easy, Medium and Hard levels in every game",
+        "🇷🇴🇬🇧  Romanian and English",
+        "🎁  Every future game and update, free",
+        "🚫  No ads, no subscriptions",
+    )
+    override val paywallOnce = "Pay once, play forever"
+    override val familyNote = "Works on all your family's devices with Google Play Family Library."
+    override val backHome = "Back to the games"
+
+    override val contactTitle = "Contact us"
+    override val contactBody = "Found a problem or have an idea? We read every message."
+    override val reportBug = "🐞  Report a problem"
+    override val suggestIdea = "💡  Suggest an idea"
+    override val rateApp = "⭐  Rate the app"
+    override val bugSubject = "Problem report"
+    override val ideaSubject = "Idea"
+    override val emailIntro = "Please describe what happened or your idea here:"
+    override val noEmailApp = "No email app found. Write to us at:"
     override fun unlockBodyFor(games: Int) =
         "All $games games in Letters, Numbers, Reading, Writing, Math and Colors & Shapes, plus every " +
             "future game and update. One-time purchase: no ads, no subscriptions, ever."
@@ -492,6 +537,30 @@ object RomanianStrings : Strings {
     override val noLimit = "Fără limită"
     override fun playedToday(minutes: Int) = "Azi: $minutes min"
     override val difficultyNames = listOf("Ușor!", "Mediu!", "Greu!")
+
+    override val demoEnd = "Bravo! Ți-a plăcut? Roagă un adult să deblocheze toate jocurile!"
+    override val demoEndTitle = "Bravo! 🌟"
+    override val demoEndBody = "Aceasta a fost încercarea gratuită. Roagă un adult să deblocheze acest joc și toate celelalte."
+    override val paywallFeatures = listOf(
+        "🎮  Toate cele 21 de jocuri din 6 lumi",
+        "⭐  Nivel ușor, mediu și greu în fiecare joc",
+        "🇷🇴🇬🇧  Română și engleză",
+        "🎁  Toate jocurile și actualizările viitoare, gratuit",
+        "🚫  Fără reclame, fără abonamente",
+    )
+    override val paywallOnce = "Plătești o dată, te joci mereu"
+    override val familyNote = "Funcționează pe toate dispozitivele familiei prin Biblioteca de familie Google Play."
+    override val backHome = "Înapoi la jocuri"
+
+    override val contactTitle = "Contactează-ne"
+    override val contactBody = "Ai găsit o problemă sau ai o idee? Citim fiecare mesaj."
+    override val reportBug = "🐞  Raportează o problemă"
+    override val suggestIdea = "💡  Propune o idee"
+    override val rateApp = "⭐  Evaluează aplicația"
+    override val bugSubject = "Raport problemă"
+    override val ideaSubject = "Idee"
+    override val emailIntro = "Descrie aici ce s-a întâmplat sau ideea ta:"
+    override val noEmailApp = "Nu am găsit o aplicație de e-mail. Scrie-ne la:"
     override fun unlockBodyFor(games: Int) =
         "Toate cele $games de jocuri de Litere, Numere, Citire, Scriere, Matematică și Culori și forme, plus " +
             "toate jocurile și actualizările viitoare. O singură plată: fără reclame și fără abonamente."

@@ -59,6 +59,9 @@ import com.cojocari.alphabet.audio.LocalSpeaker
 import com.cojocari.alphabet.audio.LocalSfx
 import com.cojocari.alphabet.data.LocalProgress
 import com.cojocari.alphabet.ui.components.Celebration
+import com.cojocari.alphabet.ui.components.DemoEnd
+import com.cojocari.alphabet.ui.components.DemoRounds
+import com.cojocari.alphabet.ui.components.LocalGameAccess
 import com.cojocari.alphabet.ui.components.RoundButton
 import com.cojocari.alphabet.ui.components.TopBar
 import com.cojocari.alphabet.ui.components.bouncyClick
@@ -96,6 +99,16 @@ fun DrawScreen(onHome: () -> Unit, items: List<TraceItem>) {
     val sfx = LocalSfx.current
     val stars = LocalProgress.current
     val density = LocalDensity.current
+    val access = LocalGameAccess.current
+    var demoOver by remember { mutableStateOf(false) }
+    var demoDone by remember { mutableIntStateOf(0) }
+    // A demo is two traced letters.
+    LaunchedEffect(demoDone) {
+        if (access.demo && demoDone >= 2) {
+            kotlinx.coroutines.delay(2800)
+            demoOver = true
+        }
+    }
 
     var index by rememberSaveable { mutableIntStateOf(0) }
     val letter = items[index.coerceAtMost(items.lastIndex)]
@@ -103,8 +116,8 @@ fun DrawScreen(onHome: () -> Unit, items: List<TraceItem>) {
     var canvasSize by remember { mutableStateOf(IntSize.Zero) }
 
     // Easy: thick brush and less to colour in; Hard: thin brush, almost all of it.
-    val brushPx = with(density) { stars.difficulty.pick(40, 30, 22).dp.toPx() }
-    val doneAt = stars.difficulty.pick(0.55f, 0.7f, 0.85f)
+    val brushPx = with(density) { access.level.pick(40, 30, 22).dp.toPx() }
+    val doneAt = access.level.pick(0.55f, 0.7f, 0.85f)
     val glyph = remember(letter.text, canvasSize) { buildGlyph(letter.text, canvasSize) }
 
     val strokes = remember(letter.text) { mutableStateListOf<CrayonStroke>() }
@@ -129,6 +142,7 @@ fun DrawScreen(onHome: () -> Unit, items: List<TraceItem>) {
         if (!done && progress >= doneAt) {
             done = true
             celebrate++
+            demoDone++
             sfx.fanfare()
             stars.addStar()
             speaker.say(letter.done)
@@ -243,6 +257,7 @@ fun DrawScreen(onHome: () -> Unit, items: List<TraceItem>) {
             }
         }
         Celebration(trigger = celebrate)
+        if (demoOver) DemoEnd(onBack = onHome)
     }
 }
 

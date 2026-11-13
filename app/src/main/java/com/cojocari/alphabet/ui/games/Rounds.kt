@@ -34,8 +34,8 @@ private val Pastels = listOf(
 )
 
 /** [n] different values from [pool] including [answer], shuffled; returns them and the answer's index. */
-private fun <T> options(answer: T, pool: List<T>, n: Int): Pair<List<T>, Int> {
-    val list = (listOf(answer) + pool.filter { it != answer }.distinct().shuffled().take(n - 1)).shuffled()
+private fun <T> options(answer: T, pool: List<T>, n: Int, rnd: Random): Pair<List<T>, Int> {
+    val list = (listOf(answer) + pool.filter { it != answer }.distinct().shuffled(rnd).take(n - 1)).shuffled(rnd)
     return list to list.indexOf(answer)
 }
 
@@ -44,19 +44,21 @@ private fun choices(d: Difficulty) = d.pick(2, 3, 4)
 
 /** Avoids asking the same thing twice in a row. */
 private val lastAsked = mutableMapOf<String, Any?>()
-private fun <T> fresh(game: String, pool: List<T>): T {
-    val pick = pool.filter { it != lastAsked[game] }.ifEmpty { pool }.random()
+private fun <T> fresh(game: String, pool: List<T>, rnd: Random): T {
+    // Demos use their own fixed sequence, so they are the same every time.
+    if (rnd !== Random.Default) return pool.random(rnd)
+    val pick = pool.filter { it != lastAsked[game] }.ifEmpty { pool }.random(rnd)
     lastAsked[game] = pick
     return pick
 }
 
 // ---------------------------------------------------------------- Letters
 
-fun firstLetterRound(language: Language, d: Difficulty): PickRound {
+fun firstLetterRound(language: Language, d: Difficulty, rnd: Random = Random.Default): PickRound {
     val t = language.strings
     val pool = language.alphabet.filterNot { it.inside }
-    val target = fresh("first", pool)
-    val (choices, answer) = options(target, pool, choices(d))
+    val target = fresh("first", pool, rnd)
+    val (choices, answer) = options(target, pool, choices(d), rnd)
     return PickRound(
         ask = t.pictureAsk(target),
         choices = choices.map { Choice(it.char.toString(), it.color) },
@@ -78,11 +80,11 @@ fun firstLetterRound(language: Language, d: Difficulty): PickRound {
 
 // ---------------------------------------------------------------- Numbers
 
-fun findNumberRound(language: Language, d: Difficulty): PickRound {
+fun findNumberRound(language: Language, d: Difficulty, rnd: Random = Random.Default): PickRound {
     val t = language.strings
     val pool = d.pick((1..5).toList(), (0..10).toList(), (0..20).toList())
-    val target = fresh("findNumber", pool)
-    val (choices, answer) = options(target, pool, choices(d))
+    val target = fresh("findNumber", pool, rnd)
+    val (choices, answer) = options(target, pool, choices(d), rnd)
     return PickRound(
         ask = t.findNumber(target),
         choices = choices.map { Choice("$it", numberColor(it), if (it >= 10) 72.sp else 96.sp) },
@@ -98,12 +100,12 @@ fun findNumberRound(language: Language, d: Difficulty): PickRound {
     }
 }
 
-fun howManyRound(language: Language, d: Difficulty): PickRound {
+fun howManyRound(language: Language, d: Difficulty, rnd: Random = Random.Default): PickRound {
     val t = language.strings
     val pool = d.pick((1..3).toList(), (1..6).toList(), (1..10).toList())
-    val target = fresh("howMany", pool)
-    val thing = CountingThings.random()
-    val (choices, answer) = options(target, d.pick((1..4).toList(), (1..7).toList(), (1..10).toList()), choices(d) + 1)
+    val target = fresh("howMany", pool, rnd)
+    val thing = CountingThings.random(rnd)
+    val (choices, answer) = options(target, d.pick((1..4).toList(), (1..7).toList(), (1..10).toList()), choices(d) + 1, rnd)
     return PickRound(
         ask = t.countAsk,
         choices = choices.map { Choice("$it", numberColor(it)) },
@@ -119,11 +121,11 @@ fun howManyRound(language: Language, d: Difficulty): PickRound {
 private fun readingWords(language: Language, d: Difficulty) =
     language.words.filter { it.text.length <= d.pick(3, 4, 99) }.ifEmpty { language.words }
 
-fun readPictureRound(language: Language, d: Difficulty): PickRound {
+fun readPictureRound(language: Language, d: Difficulty, rnd: Random = Random.Default): PickRound {
     val t = language.strings
     val pool = readingWords(language, d)
-    val target = fresh("read", pool)
-    val (choices, answer) = options(target, language.words, choices(d))
+    val target = fresh("read", pool, rnd)
+    val (choices, answer) = options(target, language.words, choices(d), rnd)
     return PickRound(
         ask = t.readAsk,
         choices = choices.mapIndexed { i, w -> Choice(w.emoji, Pastels[i % Pastels.size], 80.sp) },
@@ -142,11 +144,11 @@ fun readPictureRound(language: Language, d: Difficulty): PickRound {
     }
 }
 
-fun whichWordRound(language: Language, d: Difficulty): PickRound {
+fun whichWordRound(language: Language, d: Difficulty, rnd: Random = Random.Default): PickRound {
     val t = language.strings
     val pool = readingWords(language, d)
-    val target = fresh("whichWord", pool)
-    val (choices, answer) = options(target, pool, choices(d))
+    val target = fresh("whichWord", pool, rnd)
+    val (choices, answer) = options(target, pool, choices(d), rnd)
     return PickRound(
         ask = t.whichWordAsk(target.text),
         choices = choices.mapIndexed { i, w ->
@@ -167,13 +169,13 @@ private fun mathMax(d: Difficulty) = d.pick(5, 10, 20)
 /** Wrong answers close to the right one, so children can't guess by size. */
 private fun nearby(answer: Int, max: Int) = ((answer - 3)..(answer + 3)).filter { it in 0..max }
 
-fun addRound(language: Language, d: Difficulty): PickRound {
+fun addRound(language: Language, d: Difficulty, rnd: Random = Random.Default): PickRound {
     val t = language.strings
     val max = mathMax(d)
-    val a = Random.nextInt(1, max)
-    val b = Random.nextInt(1, max - a + 1)
-    val thing = CountingThings.random()
-    val (choices, answer) = options(a + b, nearby(a + b, max), choices(d) + 1)
+    val a = rnd.nextInt(1, max)
+    val b = rnd.nextInt(1, max - a + 1)
+    val thing = CountingThings.random(rnd)
+    val (choices, answer) = options(a + b, nearby(a + b, max), choices(d) + 1, rnd)
     return PickRound(
         ask = t.addAsk(a, b),
         choices = choices.map { Choice("$it", numberColor(it), if (it >= 10) 72.sp else 88.sp) },
@@ -183,13 +185,13 @@ fun addRound(language: Language, d: Difficulty): PickRound {
     ) { solved -> Sum(thing, a, b, "+", if (solved) "${a + b}" else "?", crossed = false, showThings = a + b <= 10) }
 }
 
-fun subtractRound(language: Language, d: Difficulty): PickRound {
+fun subtractRound(language: Language, d: Difficulty, rnd: Random = Random.Default): PickRound {
     val t = language.strings
     val max = mathMax(d)
-    val a = Random.nextInt(2, max + 1)
-    val b = Random.nextInt(1, a)
-    val thing = CountingThings.random()
-    val (choices, answer) = options(a - b, nearby(a - b, max), choices(d) + 1)
+    val a = rnd.nextInt(2, max + 1)
+    val b = rnd.nextInt(1, a)
+    val thing = CountingThings.random(rnd)
+    val (choices, answer) = options(a - b, nearby(a - b, max), choices(d) + 1, rnd)
     return PickRound(
         ask = t.subAsk(a, b),
         choices = choices.map { Choice("$it", numberColor(it), if (it >= 10) 72.sp else 88.sp) },
@@ -199,17 +201,17 @@ fun subtractRound(language: Language, d: Difficulty): PickRound {
     ) { solved -> Sum(thing, a, b, "−", if (solved) "${a - b}" else "?", crossed = true, showThings = a <= 10) }
 }
 
-fun compareRound(language: Language, d: Difficulty): PickRound {
+fun compareRound(language: Language, d: Difficulty, rnd: Random = Random.Default): PickRound {
     val t = language.strings
     val max = d.pick(5, 9, 10)
-    val x = Random.nextInt(1, max + 1)
+    val x = rnd.nextInt(1, max + 1)
     // Hard: the two groups differ by only 1 or 2, so the child really has to count.
     val y = generateSequence {
-        if (d == Difficulty.Hard) x + listOf(-2, -1, 1, 2).random() else Random.nextInt(1, max + 1)
+        if (d == Difficulty.Hard) x + listOf(-2, -1, 1, 2).random(rnd) else rnd.nextInt(1, max + 1)
     }.first { it != x && it in 1..max }
     // Easy only asks "more"; other levels also ask "fewer".
-    val askMore = d == Difficulty.Easy || Random.nextBoolean()
-    val thing = CountingThings.random()
+    val askMore = d == Difficulty.Easy || rnd.nextBoolean()
+    val thing = CountingThings.random(rnd)
     val answer = if ((x > y) == askMore) 0 else 1
     return PickRound(
         ask = if (askMore) t.compareMore else t.compareFewer,
@@ -273,12 +275,12 @@ private fun Symbol(text: String, color: Color = Ink) {
 
 // ---------------------------------------------------------------- Colours & shapes
 
-fun colorRound(language: Language, d: Difficulty): PickRound {
+fun colorRound(language: Language, d: Difficulty, rnd: Random = Random.Default): PickRound {
     val t = language.strings
     // Easy: the six main colours. Medium adds brown and black, Hard adds white.
     val pool = ArtColors.indices.toList().take(d.pick(6, 8, ArtColors.size))
-    val target = fresh("color", pool)
-    val (choices, answer) = options(target, pool, choices(d))
+    val target = fresh("color", pool, rnd)
+    val (choices, answer) = options(target, pool, choices(d), rnd)
     return PickRound(
         ask = t.findColor(t.colorNames[target]),
         choices = choices.map { Choice("", ArtColors[it].color) },
@@ -288,13 +290,13 @@ fun colorRound(language: Language, d: Difficulty): PickRound {
     ) { solved -> Text(if (solved) ArtColors[target].example else "🎨", fontSize = 160.sp) }
 }
 
-fun shapeRound(language: Language, d: Difficulty): PickRound {
+fun shapeRound(language: Language, d: Difficulty, rnd: Random = Random.Default): PickRound {
     val t = language.strings
     val pool = Shapes.indices.toList().take(d.pick(4, 5, Shapes.size))
-    val target = fresh("shape", pool)
-    val (choices, answer) = options(target, pool, choices(d))
+    val target = fresh("shape", pool, rnd)
+    val (choices, answer) = options(target, pool, choices(d), rnd)
     // Different colours on each tile, so the child looks at the shape, not the colour.
-    val tileColors = FunColors.shuffled()
+    val tileColors = FunColors.shuffled(rnd)
     return PickRound(
         ask = t.shapeFind[target],
         choices = choices.mapIndexed { i, s -> Choice(Shapes[s].glyph, tileColors[i % tileColors.size], 110.sp) },

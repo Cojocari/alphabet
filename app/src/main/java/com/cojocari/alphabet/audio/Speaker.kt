@@ -123,11 +123,30 @@ class Speaker(context: Context, private var locale: Locale) {
         }
         // Speak sentence by sentence with a short pause in between.
         val sentences = text.split(Regex("(?<=[.!?])\\s+")).filter { it.isNotBlank() }
+        val online = tts.voice
         sentences.forEachIndexed { i, sentence ->
             val mode = if (i == 0) TextToSpeech.QUEUE_FLUSH else TextToSpeech.QUEUE_ADD
             if (i > 0) tts.playSilentUtterance(SentencePauseMs, TextToSpeech.QUEUE_ADD, null)
+            // Privacy: a sentence with the child's name is spoken by the offline voice,
+            // so the name never leaves the device.
+            val private = privateName.isNotBlank() && sentence.contains(privateName, ignoreCase = true)
+            if (private) offlineTwin(online)?.let { tts.voice = it }
             tts.speak(sentence, mode, null, "$i-${sentence.hashCode()}")
+            if (private && online != null) tts.voice = online
         }
+    }
+
+    /** The child's name, set from the parent settings. Never sent to online voices. */
+    var privateName: String = ""
+
+    /** The on-device copy of [voice] (Google ships each voice as "-network" and "-local"). */
+    private fun offlineTwin(voice: Voice?): Voice? {
+        if (voice == null || !voice.isNetworkConnectionRequired) return voice
+        val base = voice.name.removeSuffix("-network")
+        return tts.voices.orEmpty().firstOrNull { it.name == "$base-local" && "notInstalled" !in it.features }
+            ?: tts.voices.orEmpty().firstOrNull {
+                it.locale == voice.locale && !it.isNetworkConnectionRequired && "notInstalled" !in it.features
+            }
     }
 
     fun shutdown() {

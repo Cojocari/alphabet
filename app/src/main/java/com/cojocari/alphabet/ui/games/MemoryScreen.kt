@@ -42,6 +42,9 @@ import com.cojocari.alphabet.data.Letter
 import com.cojocari.alphabet.data.LocalProgress
 import com.cojocari.alphabet.i18n.LocalLanguage
 import com.cojocari.alphabet.ui.components.Celebration
+import com.cojocari.alphabet.ui.components.DemoEnd
+import com.cojocari.alphabet.ui.components.DemoRounds
+import com.cojocari.alphabet.ui.components.LocalGameAccess
 import com.cojocari.alphabet.ui.components.StarCounter
 import com.cojocari.alphabet.ui.components.TopBar
 import com.cojocari.alphabet.ui.components.bouncyClick
@@ -68,12 +71,15 @@ fun MemoryScreen(onHome: () -> Unit) {
 
     var wins by rememberSaveable { mutableIntStateOf(0) }
     var deal by remember { mutableIntStateOf(0) }
+    val access = LocalGameAccess.current
+    var demoOver by remember { mutableStateOf(false) }
     val cards = remember(deal, language) {
-        // Easy 3 pairs, Medium 5, Hard 8.
-        val pairs = progress.difficulty.pick(3, 5, 8)
-        language.alphabet.filterNot { it.inside }.shuffled().take(pairs)
+        // Easy 3 pairs, Medium 5, Hard 8. A demo always deals the same board.
+        val pairs = access.level.pick(3, 5, 8)
+        val rnd = access.random
+        language.alphabet.filterNot { it.inside }.shuffled(rnd).take(pairs)
             .flatMap { listOf(MemoryCard(it, false), MemoryCard(it, true)) }
-            .shuffled()
+            .shuffled(rnd)
     }
     var first by remember(deal) { mutableStateOf<MemoryCard?>(null) }
     var busy by remember(deal) { mutableStateOf(false) }
@@ -106,7 +112,7 @@ fun MemoryScreen(onHome: () -> Unit) {
                     wins++
                     speaker.say(t.memoryDone)
                     delay(3500)
-                    deal++
+                    if (access.demo) demoOver = true else deal++
                 }
             }
         } else {
@@ -142,6 +148,7 @@ fun MemoryScreen(onHome: () -> Unit) {
             }
         }
         Celebration(trigger = celebrate)
+        if (demoOver) DemoEnd(onBack = onHome)
     }
 }
 

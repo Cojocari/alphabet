@@ -38,6 +38,9 @@ import com.cojocari.alphabet.audio.LocalSpeaker
 import com.cojocari.alphabet.data.LocalProgress
 import com.cojocari.alphabet.i18n.LocalLanguage
 import com.cojocari.alphabet.ui.components.Celebration
+import com.cojocari.alphabet.ui.components.DemoEnd
+import com.cojocari.alphabet.ui.components.DemoRounds
+import com.cojocari.alphabet.ui.components.LocalGameAccess
 import com.cojocari.alphabet.ui.components.RoundButton
 import com.cojocari.alphabet.ui.components.TopBar
 import com.cojocari.alphabet.ui.components.bouncyClick
@@ -84,7 +87,9 @@ fun BalloonsScreen(onHome: () -> Unit, items: List<BalloonItem>) {
     val language = LocalLanguage.current
     val t = language.strings
 
-    var target by remember(items) { mutableStateOf(items.random()) }
+    val access = LocalGameAccess.current
+    var demoOver by remember { mutableStateOf(false) }
+    var target by remember(items) { mutableStateOf(items.random(access.random)) }
     var popped by remember { mutableIntStateOf(0) }
     var round by remember { mutableIntStateOf(0) }
     var resting by remember { mutableStateOf(false) }
@@ -105,12 +110,12 @@ fun BalloonsScreen(onHome: () -> Unit, items: List<BalloonItem>) {
                 now = ms
                 if (!resting && ms - lastSpawn > 1000) {
                     lastSpawn = ms
-                    val item = if (Random.nextFloat() < progress.difficulty.pick(0.55f, 0.4f, 0.28f)) target else items.filter { it != target }.random()
+                    val item = if (Random.nextFloat() < access.level.pick(0.55f, 0.4f, 0.28f)) target else items.filter { it != target }.random()
                     balloons += Balloon(
                         item = item,
                         x = Random.nextFloat() * 0.8f + 0.1f,
                         born = ms,
-                        speed = progress.difficulty.pick(0.08f, 0.12f, 0.17f),
+                        speed = access.level.pick(0.08f, 0.12f, 0.17f),
                         color = BalloonColors.random(),
                         phase = Random.nextFloat() * 6f,
                     )
@@ -132,8 +137,13 @@ fun BalloonsScreen(onHome: () -> Unit, items: List<BalloonItem>) {
             target.learned?.let { progress.markLearned(language, it) }
             speaker.say(t.balloonsDone)
             delay(3000)
+            // A demo is one round of balloons.
+            if (access.demo) {
+                demoOver = true
+                return@LaunchedEffect
+            }
             balloons.clear()
-            target = items.filter { it != target }.random()
+            target = items.filter { it != target }.random(access.random)
             popped = 0
             resting = false
             round++
@@ -190,6 +200,7 @@ fun BalloonsScreen(onHome: () -> Unit, items: List<BalloonItem>) {
             }
         }
         Celebration(trigger = celebrate)
+        if (demoOver) DemoEnd(onBack = onHome)
     }
 }
 

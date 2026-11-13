@@ -1,30 +1,49 @@
-# Alphabet Fun 🔤🖍️❓
+# Alphabet Fun / Alfabet Vesel 🔤🔢📖✏️➕🎨
 
-A simple Android game that helps children aged 2 to 5 learn the letters of the alphabet.
-Everything is big, colourful and spoken out loud, so a child who can't read yet can still play.
+An Android learning game for children aged 2 to 6, in **Romanian and English**.
+Everything is big, colourful and spoken aloud, so children who can't read yet can play on their own.
 
-## Games
+## Six worlds, 21 games
 
-| | Game | What the child does |
-|---|---|---|
-| 🔤 | **Letters** | Flip through big letter cards (A is for Apple 🍎) and hear each one spoken. |
-| 🖍️ | **Draw** | Trace a big letter with a finger using bright crayons. Fill it in to earn stars. |
-| ❓ | **Quiz** | Hear "Find the letter B!" and tap the right one of three big letters. |
+| World | Games |
+|---|---|
+| 🔤 Letters | Cards · Balloons · Find it · Memory · First letter |
+| 🔢 Numbers | Cards 1–20 · How many? · Find the number · Number balloons |
+| 📖 Reading | Read it · Which word? |
+| ✏️ Writing | Trace ABC · Trace abc · Trace 0–10 · Spell it |
+| ➕ Math | Add · Take away · More or less |
+| 🎨 Colours & Shapes | Free draw · Colours · Shapes |
+
+Every game (except cards and free drawing) has **Easy / Medium / Hard** levels, and rounds are
+generated from the chosen level. The Romanian version uses the full 31-letter alphabet.
+
+**Rewards:** stars, a 40-sticker album, sticker scenes, a daily gift, a day streak and an owl mascot.
+**Grown-ups' corner** (behind a parental gate): unlock, voice, sound, child's name, daily play-time
+limit, progress, and contact the developer.
+
+## Monetisation
+One-time in-app purchase `unlock_all` (Google Play Billing). 7 games are free at Easy and Medium;
+the other 14 can be played as a short demo with fixed rounds; Hard is part of the unlock.
+No ads, no subscriptions, no data collection.
 
 ## Building
 
-Requirements: JDK 17 and the Android SDK (platform 35).
+Requirements: JDK 17 and the Android SDK (platform 36; Gradle downloads it if missing).
 
 ```bash
-./gradlew assembleDebug        # build the APK
-./gradlew installDebug         # install on a connected device/emulator
+./gradlew installDebug    # debug build on a connected device
+./gradlew bundleRelease   # signed bundle for Google Play: app/build/outputs/bundle/release/app-release.aab
 ```
 
-The APK is written to `app/build/outputs/apk/debug/app-debug.apk`.
-Or open the folder in Android Studio and press ▶ Run.
+Release signing reads `keystore.properties` (git-ignored). Debug builds have a
+"Developer: unlock without paying" switch in the grown-ups' corner.
 
-Speech uses the device's built-in text-to-speech engine (English, US).
+## Docs
+- [Release checklist](docs/release-checklist.md): Play Console step by step
+- [Store listing](docs/store-listing.md): titles, descriptions and graphics, in RO and EN
+- [Privacy policy](docs/privacy-policy.md)
+- [Romanian voice recording script](docs/recording-script-ro.md)
 
 ## Tech
-
-Kotlin, Jetpack Compose, Material 3. No third-party libraries, no network, no ads.
+Kotlin, Jetpack Compose, Material 3, Google Play Billing. Speech uses the device's text-to-speech
+engine. Sound effects are synthesised in code. Works offline.

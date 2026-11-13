@@ -120,15 +120,22 @@ fun DifficultyPicker() {
             .padding(6.dp),
         horizontalArrangement = Arrangement.spacedBy(6.dp),
     ) {
+        val access = LocalGameAccess.current
         com.cojocari.alphabet.data.Difficulty.entries.forEach { d ->
-            val selected = progress.difficulty == d
+            val selected = access.level == d
+            // Hard is part of the purchase in the free games.
+            val locked = access.hardLocked && d == com.cojocari.alphabet.data.Difficulty.Hard
             val color = LevelColors[d.ordinal]
             Row(
                 modifier = Modifier
                     .clip(pill)
                     .background(if (selected) color else color.copy(alpha = 0.08f))
                     .bouncyClick {
-                        if (!selected) {
+                        if (locked) {
+                            sfx.wrong()
+                            speaker.say(t.askGrownUp)
+                            access.unlock()
+                        } else if (!selected) {
                             sfx.tap()
                             progress.updateDifficulty(d)
                             speaker.say(t.difficultyNames[d.ordinal])
@@ -147,6 +154,7 @@ fun DifficultyPicker() {
                         modifier = Modifier.padding(start = 10.dp),
                     )
                 }
+                if (locked) Text("🔒", fontSize = 18.sp, modifier = Modifier.padding(start = 6.dp))
             }
         }
     }

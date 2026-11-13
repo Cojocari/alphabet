@@ -43,6 +43,9 @@ import com.cojocari.alphabet.data.FunColors
 import com.cojocari.alphabet.data.LocalProgress
 import com.cojocari.alphabet.i18n.LocalLanguage
 import com.cojocari.alphabet.ui.components.Celebration
+import com.cojocari.alphabet.ui.components.DemoEnd
+import com.cojocari.alphabet.ui.components.DemoRounds
+import com.cojocari.alphabet.ui.components.LocalGameAccess
 import com.cojocari.alphabet.ui.components.RoundButton
 import com.cojocari.alphabet.ui.components.StarCounter
 import com.cojocari.alphabet.ui.components.TopBar
@@ -69,16 +72,18 @@ fun SpellScreen(onHome: () -> Unit) {
 
     var level by rememberSaveable { mutableIntStateOf(0) }
     var roundNo by remember { mutableIntStateOf(0) }
+    val access = LocalGameAccess.current
+    var demoOver by remember { mutableStateOf(false) }
     val word = remember(roundNo, language) {
         // Easy: 3-letter words, Medium: up to 4, Hard: up to 6.
-        val maxLen = progress.difficulty.pick(3, 4, 6)
-        language.words.filter { it.text.length <= maxLen }.ifEmpty { language.words }.random()
+        val maxLen = access.level.pick(3, 4, 6)
+        language.words.filter { it.text.length <= maxLen }.ifEmpty { language.words }.random(access.random)
     }
     val letters = word.text.uppercase()
     val tiles = remember(word) {
         // The word's letters plus two extra ones to choose from.
-        val extras = language.alphabet.map { it.char }.filter { it !in letters }.shuffled().take(progress.difficulty.pick(1, 2, 3))
-        (letters.toList() + extras).mapIndexed { i, c -> Tile(i, c) }.shuffled()
+        val extras = language.alphabet.map { it.char }.filter { it !in letters }.shuffled(access.random).take(access.level.pick(1, 2, 3))
+        (letters.toList() + extras).mapIndexed { i, c -> Tile(i, c) }.shuffled(access.random)
     }
     val placed = remember(word) { mutableStateListOf<Char>() }
     var celebrate by remember { mutableIntStateOf(0) }
@@ -148,7 +153,8 @@ fun SpellScreen(onHome: () -> Unit) {
                                                 speaker.say(t.spellDone(t.praise.random(), word.text))
                                                 scope.launch {
                                                     delay(3200)
-                                                    roundNo++
+                                                    // A demo is three words.
+                                                    if (access.demo && level >= 3) demoOver = true else roundNo++
                                                 }
                                             }
                                             true
@@ -166,6 +172,7 @@ fun SpellScreen(onHome: () -> Unit) {
             }
         }
         Celebration(trigger = celebrate)
+        if (demoOver) DemoEnd(onBack = onHome)
     }
 }
 
