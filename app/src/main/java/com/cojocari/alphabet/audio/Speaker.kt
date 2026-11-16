@@ -91,6 +91,17 @@ class Speaker(context: Context, private var locale: Locale) {
         withTimeoutOrNull(1500L + text.length * 85L) { done.await() }
     }
 
+    /**
+     * Waits while something is still being said, e.g. an instruction the child asked to hear
+     * again by tapping Hupi, so a step doesn't move on in the middle of it.
+     */
+    suspend fun awaitQuiet(maxMs: Long = 15_000) {
+        withTimeoutOrNull(maxMs) {
+            kotlinx.coroutines.delay(250)
+            while (ready && tts.isSpeaking) kotlinx.coroutines.delay(150)
+        }
+    }
+
     /** Switches the voice to [newLocale]; later [say] calls speak in that language. */
     fun setLocale(newLocale: Locale) {
         if (newLocale == locale) return

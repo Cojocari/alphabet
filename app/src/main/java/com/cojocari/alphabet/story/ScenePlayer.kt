@@ -97,6 +97,8 @@ private class SceneContext(
     val struggled: () -> Unit,
     val player: AnimalSoundPlayer,
     val setStage: (Int) -> Unit,
+    /** What the current step asks of the child; tapping Hupi (or his 🔊) says it again. */
+    val setPrompt: (String) -> Unit,
 )
 
 /**
@@ -130,6 +132,8 @@ fun StoryScene(scene: Int, onExit: (finished: Boolean) -> Unit, startStep: Int =
             var struggles by remember { mutableIntStateOf(0) }
             var celebrate by remember { mutableIntStateOf(0) }
             var stage by remember { mutableIntStateOf(story.stage) }
+            // The current step's instruction, tagged with its step so an old one is never repeated.
+            var prompt by remember { mutableStateOf(-1 to "") }
 
             LaunchedEffect(index) {
                 if (index >= steps.size) {
@@ -158,12 +162,13 @@ fun StoryScene(scene: Int, onExit: (finished: Boolean) -> Unit, startStep: Int =
                             struggled = { struggles++ },
                             player = player,
                             setStage = { stage = it },
+                            setPrompt = { prompt = current to it },
                         )
                         // Each step gets a fresh state; the guard above ignores double "next".
                         key(index) {
                             StageLayout(
                                 showHupi = step !is Step.Hatch && step !is Step.ShowOff && step !is Step.Diploma && !(step is Step.Reward && step.stage != null),
-                                hupi = { Hupi(stage, mood, Modifier.fillMaxSize(), ScarfColors[story.scarf]) },
+                                hupi = { HupiRepeat(stage, mood, ScarfColors[story.scarf], prompt.second.takeIf { prompt.first == current }) },
                             ) { StepContent(step, ctx, stage) }
                         }
                     }
@@ -209,6 +214,37 @@ private fun StageLayout(showHupi: Boolean, hupi: @Composable () -> Unit, content
                     Box(Modifier.size(130.dp)) { hupi() }
                 }
             }
+        }
+    }
+}
+
+/**
+ * Hupi beside the step. When the step asks something ([prompt]), a 🔊 badge sits on his
+ * shoulder and gently pulses: tapping Hupi or the badge says the instruction again, for a
+ * child who didn't hear it.
+ */
+@Composable
+private fun HupiRepeat(stage: Int, mood: Mood, scarf: Color, prompt: String?) {
+    val speaker = LocalSpeaker.current
+    val again = prompt?.takeIf { it.isNotBlank() }?.let { { speaker.say(it) } }
+    val pulse by rememberInfiniteTransition(label = "again").animateFloat(1f, 1.12f, infiniteRepeatable(tween(900), RepeatMode.Reverse), label = "a")
+    BoxWithConstraints(Modifier.fillMaxSize()) {
+        val badge = (maxWidth * 0.3f).coerceIn(48.dp, 84.dp)
+        Hupi(stage, mood, Modifier.fillMaxSize(), scarf, onTap = again)
+        if (again != null) {
+            Box(
+                Modifier
+                    .align(Alignment.TopEnd)
+                    .offset(x = -badge * 0.3f, y = badge * 0.45f)
+                    .size(badge)
+                    .scale(pulse)
+                    .shadow(6.dp, CircleShape)
+                    .clip(CircleShape)
+                    .background(Color.White)
+                    .border(3.dp, Color(0xFFFFB703), CircleShape)
+                    .bouncyClick { again() },
+                contentAlignment = Alignment.Center,
+            ) { Text("🔊", fontSize = (badge.value * 0.48f).sp) }
         }
     }
 }
@@ -261,9 +297,11 @@ private fun NarrateStep(step: Step.Narrate, ctx: SceneContext) {
     val friend = step.friend
     val scope = rememberCoroutineScope()
     LaunchedEffect(Unit) {
+        ctx.setPrompt(step.text)
         ctx.setMood(step.mood)
         if (step.sound && friend != null) delay(ctx.player.play(friend.key).coerceAtMost(2500) + 150)
         speaker.sayAndWait(step.text)
+        speaker.awaitQuiet()
         delay(800)
         ctx.next()
     }
@@ -336,6 +374,7 @@ private fun MeetStep(item: Item, ctx: SceneContext) {
     val s = language.story
     var ready by remember { mutableStateOf(false) }
     LaunchedEffect(Unit) {
+        ctx.setPrompt(item.meetLine(language))
         ctx.setMood(Mood.Normal)
         speaker.sayAndWait(item.meetLine(language))
         item.wrongShort(language, Random.Default)?.let { wrong ->
@@ -454,6 +493,7 @@ private fun AskStep(step: Step.Ask, ctx: SceneContext) {
             else -> null
         }
         if (com.cojocari.alphabet.BuildConfig.DEBUG) android.util.Log.d("StoryTest", "ask ${step.item.id} answer=${quest.answer} of ${quest.choices.size}")
+        ctx.setPrompt(quest.ask)
         if (intro != null && step.item.kind != Kind.Math) speaker.sayAndWait(intro)
         speaker.say(quest.ask)
     }
@@ -516,6 +556,8 @@ private fun TeachStep(step: Step.Teach, ctx: SceneContext) {
         ctx.setMood(Mood.Puzzled)
         speaker.sayAndWait(s.teachAsk(quest.names[guess]))
     }
+    // Once Hupi was caught, what's asked is to show him the right one.
+    LaunchedEffect(fixing) { ctx.setPrompt(if (fixing) quest.ask else s.teachAsk(quest.names[guess])) }
 
     fun finish(text: String) {
         busy = true
@@ -625,6 +667,7 @@ private fun CatchStep(item: Item, ctx: SceneContext) {
     val kindLabel = when (item.kind) { Kind.Letter -> "letter"; Kind.Number -> "number"; else -> "color" }
     val ask = s.catchAsk(kindLabel, item.short(language))
     LaunchedEffect(Unit) {
+        ctx.setPrompt(ask)
         ctx.setMood(Mood.Normal)
         speaker.say(ask)
     }
@@ -697,6 +740,7 @@ private fun TraceStep(item: Item, ctx: SceneContext) {
     val done = if (letter != null) t.drawDone(letter) else t.drawNumberDone(n)
     val trace = remember { TraceState() }
     LaunchedEffect(Unit) {
+        ctx.setPrompt(start)
         ctx.setMood(Mood.Normal)
         speaker.say(start)
     }

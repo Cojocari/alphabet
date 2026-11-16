@@ -2,6 +2,11 @@
 
 Step by step, from zero to the app on Google Play. Tick each box as you go.
 
+**Ready now (16 November 2026):** release bundle, store texts in Romanian and English (`docs/store-listing.md`,
+including release notes), icon, feature graphics, 8 phone and 8 tablet screenshots per language
+(`branding/screenshots/`), privacy policy text. **Only you can do:** the developer account (step 4),
+publishing the privacy policy (step 3), and everything inside Play Console (steps 5–11).
+
 ---
 
 ## 0. Already done in the code
@@ -12,6 +17,8 @@ Step by step, from zero to the app on Google Play. Tick each box as you go.
 - [x] Release build shrunk and signed with the upload key
 - [x] Developer "unlock without paying" switch exists only in debug builds
 - [x] Contact email in the grown-ups' corner
+- [x] Story mode and the learning diary save only on the device (covered in the privacy policy)
+- [x] Store screenshots and texts updated for the story mode
 
 ## 1. Back up the signing key, today
 The upload key signs every version you ever send to Google Play.
@@ -29,9 +36,10 @@ Google rejects a bundle whose `versionCode` it has already seen.
 
 ## 3. Publish the privacy policy online
 Google needs a public link (URL). The text is in `docs/privacy-policy.md`. Pick one:
-- **GitHub Pages** (free, needs the repository to be public): GitHub → repository →
-  *Settings → Pages → Deploy from branch → `main` / `docs`*. The link becomes
-  `https://cojocari.github.io/alphabet/privacy-policy`.
+- **GitHub Pages** (free; the repository is already public): on github.com open the repository →
+  *Settings → Pages → Build and deployment → Source: Deploy from a branch → Branch: `develop`, folder `/docs` → Save*.
+  After a minute the link is **`https://cojocari.github.io/alphabet/privacy-policy`**. Open it once to check.
+  (Use `develop` because `main` only has the first commit; switch to `main` after merging.)
 - **Google Sites** (free, works with a private repository): create a page, paste the text,
   publish, and use that link.
 
@@ -66,7 +74,8 @@ Google needs a public link (URL). The text is in `docs/privacy-policy.md`. Pick 
 ## 7. Store listing (*Grow users → Store presence → Main store listing*)
 - [ ] Texts from `docs/store-listing.md`, Romanian main plus English translation
 - [ ] App icon and feature graphic: ready in `branding/` (`icon-512.png`, `feature-graphic-ro.png`, `feature-graphic-en.png`)
-- [ ] Phone screenshots (2–8) and tablet screenshots (7" and 10")
+- [ ] Screenshots, ready in `branding/screenshots/`: `ro/phone-*.jpg` and `ro/tablet-*.jpg` on the Romanian
+      listing, `en/…` on the English one. Upload the tablet set for both 7-inch and 10-inch.
 - [ ] Category **Education**, contact email **cojocari.adrianp@gmail.com**
 
 ## 8. The in-app product

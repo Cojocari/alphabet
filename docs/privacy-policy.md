@@ -1,6 +1,6 @@
 # Clever Owl – Privacy Policy
 
-*Last updated: 13 November 2026*
+*Last updated: 16 November 2026*
 
 **[Română mai jos](#politica-de-confidențialitate)**
 
@@ -14,8 +14,10 @@ tracking. It does not send any personal information to us or to anyone else.
 ## What stays on the device
 To work, the app saves a few things **only on your device**:
 - your child's stars, stickers, sticker pictures and the letters they have found in games;
+- progress in Hupi's Adventure (the story mode) and the learning diary: which letters, numbers,
+  colours, shapes, words and sums your child has met, and on which days they answered right;
 - the settings you choose in the grown-ups' corner: language, voice, difficulty level,
-  sound effects, daily play-time limit, and your child's first name if you enter one.
+  sound effects, daily play-time limit, your child's age and first name if you enter them.
 
 You can erase progress at any time in the grown-ups' corner (*Reset progress*), and
 uninstalling the app deletes everything.
@@ -56,7 +58,7 @@ cojocari.adrianp@gmail.com
 
 # Politica de confidențialitate
 
-*Ultima actualizare: 13 noiembrie 2026*
+*Ultima actualizare: 16 noiembrie 2026*
 
 Bufnița Isteață (Clever Owl) este un joc educativ pentru copii între 2 și 6 ani. L-am creat astfel încât să
 nu colecteze nimic despre copilul sau familia dumneavoastră.
@@ -68,8 +70,10 @@ trimite nicio informație personală către noi sau către altcineva.
 ## Ce rămâne pe dispozitiv
 Pentru a funcționa, aplicația salvează câteva lucruri **doar pe dispozitivul dumneavoastră**:
 - stelele, abțibildurile, imaginile cu abțibilduri și literele găsite de copil în jocuri;
+- progresul din Aventura lui Hupi (modul poveste) și jurnalul învățării: ce litere, cifre, culori,
+  forme, cuvinte și socoteli a întâlnit copilul și în ce zile a răspuns corect;
 - setările alese în colțul părinților: limba, vocea, nivelul de dificultate, efectele sonore,
-  limita zilnică de joacă și prenumele copilului, dacă îl introduceți.
+  limita zilnică de joacă, vârsta și prenumele copilului, dacă le introduceți.
 
 Puteți șterge progresul oricând din colțul părinților (*Resetează progresul*), iar
 dezinstalarea aplicației șterge totul.

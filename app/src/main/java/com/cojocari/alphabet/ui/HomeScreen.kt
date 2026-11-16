@@ -291,13 +291,11 @@ private fun WorldTile(
                 modifier = Modifier.rotate(tilt),
                 style = TextStyle(shadow = Shadow(Color.Black.copy(alpha = 0.25f), Offset(4f, 6f), 8f)),
             )
-            Text(
+            com.cojocari.alphabet.ui.components.FitText(
                 label,
                 fontSize = (height.value * 0.12f).coerceIn(22f, 38f).sp,
                 fontWeight = FontWeight.Black,
                 color = Color.White,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
                 style = TextStyle(shadow = Shadow(Color.Black.copy(alpha = 0.2f), Offset(2f, 3f), 4f)),
             )
         }
@@ -421,13 +419,11 @@ private fun StoryBanner(roomy: Boolean, onClick: () -> Unit) {
             com.cojocari.alphabet.story.ScarfColors[story.scarf],
         )
         Column(Modifier.weight(1f).padding(start = 12.dp)) {
-            Text(
+            com.cojocari.alphabet.ui.components.FitText(
                 s.title,
                 fontSize = if (roomy) 34.sp else 26.sp,
                 fontWeight = FontWeight.Black,
                 color = Color.White,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
                 style = TextStyle(shadow = Shadow(Color.Black.copy(alpha = 0.25f), Offset(2f, 3f), 4f)),
             )
             Text(
@@ -472,13 +468,11 @@ private fun PathBanner(world: World, path: List<Int>, onClick: () -> Unit) {
             com.cojocari.alphabet.story.ScarfColors[story.scarf],
         )
         Column(Modifier.weight(1f).padding(start = 12.dp)) {
-            Text(
+            com.cojocari.alphabet.ui.components.FitText(
                 s.pathBanner,
                 fontSize = 28.sp,
                 fontWeight = FontWeight.Black,
                 color = Color.White,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
                 style = TextStyle(shadow = Shadow(Color.Black.copy(alpha = 0.25f), Offset(2f, 3f), 4f)),
             )
             Text(

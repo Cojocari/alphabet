@@ -68,9 +68,16 @@ Kotlin, Jetpack Compose, Material 3, Google Play Billing 8. See `README.md` for 
 - Tracing (`ui/draw/TracePad.kt`) checks strokes: Easy wide/65%, Medium 80%, Hard narrow/85% in order and direction.
 - Debug-only test helpers: `adb shell am start -n com.cojocari.alphabet/.MainActivity --es route story:30 --ei step 5`
   opens any screen/scene step; logcat tag `StoryTest` prints each question's right answer.
+- In a scene, tapping Hupi (or the 🔊 badge on him) repeats the current step's instruction (`ctx.setPrompt` in each
+  step; `Speaker.awaitQuiet` keeps narration steps from moving on while it repeats).
+- Store screenshots: `branding/screenshots/{ro,en}/{phone,tablet}-1..8.jpg`. Made on the tablet with demo progress
+  written to `shared_prefs` via `adb exec-in run-as` (back up the real files first, restore after), phone size via
+  `adb shell wm size 1080x2400` + `wm density 420` (always `wm size reset` / `wm density reset` after), then framed
+  with captions in HTML and rendered by headless Edge. `ui/components/FitText.kt` shrinks titles that don't fit on phones.
 
 ## State on 2026-11-16 and next steps
-Latest tag: **v4.0** (versionCode 6): Animals world, real sounds, stroke arrows, the tracing fix by level,
+Latest tag: **v4.0** (versionCode 6); version 4.1 (versionCode 7) adds tap-Hupi-to-repeat, phone title fit and
+the store screenshots. Earlier in v4.0: Animals world, real sounds, stroke arrows, the tracing fix by level,
 Hupi's Adventure (story mode, tested on the tablet: map, hatch, all step types, show, growing up, diploma,
 warm-up, house, age picker) and a "Learn with Hupi" story path in every world except Animals.
 
