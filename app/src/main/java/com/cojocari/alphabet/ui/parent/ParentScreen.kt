@@ -43,6 +43,9 @@ import com.cojocari.alphabet.data.Stickers
 import com.cojocari.alphabet.i18n.LocalLanguage
 import com.cojocari.alphabet.ui.components.TopBar
 import com.cojocari.alphabet.ui.theme.Ink
+import com.cojocari.alphabet.story.belongsTo
+import com.cojocari.alphabet.story.name
+import com.cojocari.alphabet.story.short
 
 /** Settings and the purchase, for adults only (reached through the parental gate). */
 @Composable
@@ -55,6 +58,8 @@ fun ParentScreen(onBack: () -> Unit) {
     val activity = LocalContext.current as? Activity
     var message by remember { mutableStateOf<String?>(null) }
     var confirmReset by remember { mutableStateOf(false) }
+    val story = com.cojocari.alphabet.story.LocalStory.current
+    val s = language.story
 
     Column(Modifier.fillMaxSize()) {
         TopBar(onBack = onBack) {
@@ -101,6 +106,19 @@ fun ParentScreen(onBack: () -> Unit) {
                         singleLine = true,
                         modifier = Modifier.fillMaxWidth(),
                     )
+                    // The child's age sets the starting level.
+                    Text(s.ageTitle, fontSize = 18.sp, color = Ink)
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        (2..6).forEach { age ->
+                            if (progress.childAge == age) {
+                                Button(onClick = {}) { Text("$age") }
+                            } else {
+                                OutlinedButton(onClick = { progress.updateChildAge(age) }) { Text("$age") }
+                            }
+                        }
+                        Text(s.years, fontSize = 16.sp, color = Ink, modifier = Modifier.align(Alignment.CenterVertically))
+                    }
+                    Text(s.ageHint, fontSize = 14.sp, color = Ink.copy(alpha = 0.7f))
                     // Daily play-time limit.
                     Text(t.dailyLimit, fontSize = 18.sp, color = Ink)
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -134,6 +152,7 @@ fun ParentScreen(onBack: () -> Unit) {
 
                 Section {
                     Text(t.progressTitle, fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Ink)
+                    LearningDiary()
                     Text("⭐ ${progress.stars}   ·   📒 ${progress.stickersWon} / ${Stickers.size}", fontSize = 18.sp, color = Ink)
                     val learned = progress.learned(language)
                     Text(t.lettersLearned(learned.size, language.alphabet.size), fontSize = 16.sp, color = Ink)
@@ -164,6 +183,7 @@ fun ParentScreen(onBack: () -> Unit) {
                     OutlinedButton(onClick = {
                         if (confirmReset) {
                             progress.reset()
+                            story.reset()
                             confirmReset = false
                         } else {
                             confirmReset = true
@@ -223,4 +243,43 @@ private fun SettingRow(label: String, control: @Composable () -> Unit) {
         Text(label, fontSize = 18.sp, color = Ink, modifier = Modifier.weight(1f))
         control()
     }
+}
+
+/**
+ * What the child has learned in Hupi's Adventure: the chapter reached, then for each kind of
+ * thing what is learned (right on the first try on 3 different days) and what is being practised.
+ */
+@Composable
+private fun LearningDiary() {
+    val story = com.cojocari.alphabet.story.LocalStory.current
+    val language = LocalLanguage.current
+    val s = language.story
+    Text("📔 ${s.diaryTitle}", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Ink)
+    Text(
+        if (story.finished) s.storyFinished
+        else s.storyAt(com.cojocari.alphabet.story.chapterOf(story.done)),
+        fontSize = 16.sp,
+        color = Ink,
+    )
+    val met = story.met().filter { it.belongsTo(language) }
+    val kinds = listOf(
+        com.cojocari.alphabet.story.Kind.Letter to s.shelfLetters,
+        com.cojocari.alphabet.story.Kind.Number to s.shelfNumbers,
+        com.cojocari.alphabet.story.Kind.Color to s.shelfColors,
+        com.cojocari.alphabet.story.Kind.Shape to s.shelfShapes,
+        com.cojocari.alphabet.story.Kind.Word to s.shelfWords,
+        com.cojocari.alphabet.story.Kind.Math to s.shelfMath,
+    )
+    kinds.forEach { (kind, label) ->
+        val items = met.filter { it.kind == kind }
+        if (items.isEmpty()) return@forEach
+        val learned = items.filter { story.status(it) == com.cojocari.alphabet.story.Status.Learned }
+        val practising = items - learned.toSet()
+        fun names(list: List<com.cojocari.alphabet.story.Item>) =
+            list.joinToString(", ") { if (kind == com.cojocari.alphabet.story.Kind.Math) it.name(language) else it.short(language) }
+        Text("$label", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Ink)
+        if (learned.isNotEmpty()) Text("✨ ${s.learnedLabel}: ${names(learned)}", fontSize = 14.sp, color = Ink)
+        if (practising.isNotEmpty()) Text("🕸️ ${s.practisingLabel}: ${names(practising)}", fontSize = 14.sp, color = Ink.copy(alpha = 0.8f))
+    }
+    Text(s.diaryNote, fontSize = 13.sp, color = Ink.copy(alpha = 0.6f))
 }

@@ -123,6 +123,18 @@ val GameId.isFree: Boolean get() = this in FreeGames
 
 val GameId.world: World get() = World.entries.first { this in it.games }
 
+/** The world's own story path with Hupi (see [com.cojocari.alphabet.story.Paths]); Animals has none. */
+val World.storyPath: List<Int>?
+    get() = when (this) {
+        World.Letters -> com.cojocari.alphabet.story.Paths.Letters
+        World.Numbers -> com.cojocari.alphabet.story.Paths.Numbers
+        World.Reading -> com.cojocari.alphabet.story.Paths.Reading
+        World.Writing -> com.cojocari.alphabet.story.Paths.Writing
+        World.Math -> com.cojocari.alphabet.story.Paths.Math
+        World.Art -> com.cojocari.alphabet.story.Paths.Art
+        World.Animals -> null
+    }
+
 /** Starts a game in the current language. */
 @Composable
 fun GameContent(id: GameId, onBack: () -> Unit, onUnlock: () -> Unit) {

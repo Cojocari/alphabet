@@ -60,6 +60,7 @@ import com.cojocari.alphabet.ui.theme.Ink
 @Composable
 fun HomeScreen(
     onWorld: (World) -> Unit,
+    onStory: () -> Unit,
     onStickers: () -> Unit,
     onParent: () -> Unit,
     onLanguage: (Language) -> Unit,
@@ -185,6 +186,12 @@ fun HomeScreen(
             Text(t.missingVoice, fontSize = 16.sp, color = Ink, modifier = Modifier.padding(top = 6.dp))
         }
 
+        StoryBanner(roomy) {
+            sfx.tap()
+            speaker.say(language.story.title)
+            onStory()
+        }
+
         BoxWithConstraints(
             Modifier
                 .weight(1f)
@@ -307,7 +314,7 @@ private fun WorldTile(
 
 /** A world's own page: its games as big tiles, paid ones with a lock badge. */
 @Composable
-fun WorldScreen(world: World, onBack: () -> Unit, onGame: (GameId) -> Unit, onLocked: () -> Unit) {
+fun WorldScreen(world: World, onBack: () -> Unit, onGame: (GameId) -> Unit, onLocked: () -> Unit, onPath: () -> Unit = {}) {
     val speaker = LocalSpeaker.current
     val sfx = LocalSfx.current
     val progress = LocalProgress.current
@@ -327,6 +334,7 @@ fun WorldScreen(world: World, onBack: () -> Unit, onGame: (GameId) -> Unit, onLo
                 Text(world.label(t), fontSize = 30.sp, fontWeight = FontWeight.Black, color = Color.White)
             }
         }
+        world.storyPath?.let { path -> PathBanner(world, path) { sfx.tap(); onPath() } }
         BoxWithConstraints(Modifier.weight(1f).fillMaxWidth().padding(16.dp)) {
             val columns = when {
                 maxWidth < 560.dp -> 2
@@ -385,5 +393,104 @@ fun WorldScreen(world: World, onBack: () -> Unit, onGame: (GameId) -> Unit, onLo
                 }
             }
         }
+    }
+}
+
+/** The big entry to Hupi's Adventure, above the worlds: Hupi as he is now and the chapter reached. */
+@Composable
+private fun StoryBanner(roomy: Boolean, onClick: () -> Unit) {
+    val story = com.cojocari.alphabet.story.LocalStory.current
+    val s = LocalLanguage.current.story
+    val height = if (roomy) 130.dp else 104.dp
+    Row(
+        modifier = Modifier
+            .padding(top = 14.dp)
+            .fillMaxWidth()
+            .height(height)
+            .shadow(12.dp, RoundedCornerShape(36.dp))
+            .clip(RoundedCornerShape(36.dp))
+            .background(Brush.linearGradient(listOf(Color(0xFF7B2CBF), Color(0xFF4361EE), Color(0xFF4CC9F0))))
+            .bouncyClick(onClick)
+            .padding(horizontal = 16.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        com.cojocari.alphabet.story.Hupi(
+            story.stage,
+            com.cojocari.alphabet.story.Mood.Happy,
+            Modifier.size(height - 12.dp),
+            com.cojocari.alphabet.story.ScarfColors[story.scarf],
+        )
+        Column(Modifier.weight(1f).padding(start = 12.dp)) {
+            Text(
+                s.title,
+                fontSize = if (roomy) 34.sp else 26.sp,
+                fontWeight = FontWeight.Black,
+                color = Color.White,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                style = TextStyle(shadow = Shadow(Color.Black.copy(alpha = 0.25f), Offset(2f, 3f), 4f)),
+            )
+            Text(
+                if (story.finished) s.storyFinished
+                else s.chapterLabel(com.cojocari.alphabet.story.chapterOf(story.done.coerceAtMost(com.cojocari.alphabet.story.TotalScenes - 1))),
+                fontSize = if (roomy) 20.sp else 16.sp,
+                color = Color.White.copy(alpha = 0.9f),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+        }
+        Box(
+            Modifier.size(if (roomy) 70.dp else 56.dp).clip(CircleShape).background(Color.White.copy(alpha = 0.25f)),
+            contentAlignment = Alignment.Center,
+        ) { Text("▶", fontSize = if (roomy) 34.sp else 26.sp, color = Color.White) }
+    }
+}
+
+/** A world's own story path with Hupi, above the world's games: Hupi, the stars won so far and ▶. */
+@Composable
+private fun PathBanner(world: World, path: List<Int>, onClick: () -> Unit) {
+    val story = com.cojocari.alphabet.story.LocalStory.current
+    val s = LocalLanguage.current.story
+    val scenes = com.cojocari.alphabet.story.pathScenes(path)
+    val stars = scenes.count { story.sceneDone(it) }
+    Row(
+        modifier = Modifier
+            .padding(start = 16.dp, end = 16.dp, top = 4.dp)
+            .fillMaxWidth()
+            .height(96.dp)
+            .shadow(8.dp, RoundedCornerShape(32.dp))
+            .clip(RoundedCornerShape(32.dp))
+            .background(Brush.linearGradient(listOf(Color(0xFF7B2CBF), Color(0xFF4361EE)) + world.colors.first()))
+            .bouncyClick(onClick)
+            .padding(horizontal = 14.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        com.cojocari.alphabet.story.Hupi(
+            story.stage,
+            com.cojocari.alphabet.story.Mood.Happy,
+            Modifier.size(84.dp),
+            com.cojocari.alphabet.story.ScarfColors[story.scarf],
+        )
+        Column(Modifier.weight(1f).padding(start = 12.dp)) {
+            Text(
+                s.pathBanner,
+                fontSize = 28.sp,
+                fontWeight = FontWeight.Black,
+                color = Color.White,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                style = TextStyle(shadow = Shadow(Color.Black.copy(alpha = 0.25f), Offset(2f, 3f), 4f)),
+            )
+            Text(
+                if (stars == scenes.size) "🏆 ⭐ $stars / ${scenes.size}" else "⭐ $stars / ${scenes.size}",
+                fontSize = 18.sp,
+                color = Color.White.copy(alpha = 0.95f),
+                maxLines = 1,
+            )
+        }
+        Box(
+            Modifier.size(60.dp).clip(CircleShape).background(Color.White.copy(alpha = 0.25f)),
+            contentAlignment = Alignment.Center,
+        ) { Text("▶", fontSize = 28.sp, color = Color.White) }
     }
 }

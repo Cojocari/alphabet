@@ -17,9 +17,10 @@ enum class Language(
     val alphabet: List<Letter>,
     val strings: Strings,
     val words: List<Word>,
+    val story: StoryStrings,
 ) {
-    English(Locale.US, "🇬🇧", EnglishAlphabet, EnglishStrings, EnglishWords),
-    Romanian(Locale("ro", "RO"), "🇷🇴", RomanianAlphabet, RomanianStrings, RomanianWords),
+    English(Locale.US, "🇬🇧", EnglishAlphabet, EnglishStrings, EnglishWords, EnglishStory),
+    Romanian(Locale("ro", "RO"), "🇷🇴", RomanianAlphabet, RomanianStrings, RomanianWords, RomanianStory),
 }
 
 val LocalLanguage = staticCompositionLocalOf { Language.English }

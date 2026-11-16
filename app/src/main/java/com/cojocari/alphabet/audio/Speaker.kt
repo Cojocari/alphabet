@@ -2,6 +2,7 @@ package com.cojocari.alphabet.audio
 
 import android.content.Context
 import android.speech.tts.TextToSpeech
+import android.speech.tts.UtteranceProgressListener
 import android.speech.tts.Voice
 import android.util.Log
 import androidx.compose.runtime.Composable
@@ -15,6 +16,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.platform.LocalContext
 import java.util.Locale
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.withTimeoutOrNull
 
 /** 1.0 is the engine's normal speed. Raise it (e.g. 1.1) to talk faster. */
 private const val SpeechRate = 1.0f
@@ -57,6 +60,35 @@ class Speaker(context: Context, private var locale: Locale) {
         } else {
             hasVoice = false
         }
+    }
+
+    // The last sentence queued by [say], and who is waiting for it to finish ([sayAndWait]).
+    @Volatile private var lastUtterance: String? = null
+    @Volatile private var waiting: CompletableDeferred<Unit>? = null
+
+    init {
+        tts.setOnUtteranceProgressListener(object : UtteranceProgressListener() {
+            override fun onStart(utteranceId: String?) {}
+            override fun onDone(utteranceId: String?) = finished(utteranceId)
+            @Deprecated("Deprecated in Java")
+            override fun onError(utteranceId: String?) = finished(utteranceId)
+            override fun onStop(utteranceId: String?, interrupted: Boolean) = finished(utteranceId)
+        })
+    }
+
+    private fun finished(utteranceId: String?) {
+        if (utteranceId != null && utteranceId == lastUtterance) waiting?.complete(Unit)
+    }
+
+    /**
+     * Speaks [text] and returns when it has been said (or interrupted). Falls back to an
+     * estimate from the text length, so a missing voice never blocks the caller.
+     */
+    suspend fun sayAndWait(text: String) {
+        val done = CompletableDeferred<Unit>()
+        say(text)
+        waiting = done
+        withTimeoutOrNull(1500L + text.length * 85L) { done.await() }
     }
 
     /** Switches the voice to [newLocale]; later [say] calls speak in that language. */
@@ -123,6 +155,8 @@ class Speaker(context: Context, private var locale: Locale) {
 
     /** Speaks [text], interrupting anything currently being said. */
     fun say(text: String) {
+        waiting?.complete(Unit)
+        waiting = null
         if (!ready) {
             pending = text
             return
@@ -137,7 +171,9 @@ class Speaker(context: Context, private var locale: Locale) {
             // so the name never leaves the device.
             val private = privateName.isNotBlank() && sentence.contains(privateName, ignoreCase = true)
             if (private) offlineTwin(online)?.let { tts.voice = it }
-            tts.speak(sentence, mode, null, "$i-${sentence.hashCode()}")
+            val id = "$i-${sentence.hashCode()}-${System.nanoTime()}"
+            lastUtterance = id
+            tts.speak(sentence, mode, null, id)
             if (private && online != null) tts.voice = online
         }
     }

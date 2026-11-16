@@ -235,7 +235,7 @@ fun compareRound(language: Language, d: Difficulty, rnd: Random = Random.Default
  * ones. With big numbers (Hard) the pictures are left out and only digits are shown.
  */
 @Composable
-private fun Sum(thing: String, a: Int, b: Int, sign: String, result: String, crossed: Boolean, showThings: Boolean) {
+internal fun Sum(thing: String, a: Int, b: Int, sign: String, result: String, crossed: Boolean, showThings: Boolean) {
     val emojiSize = if (a + b > 6) 34.sp else 46.sp
     Row(
         verticalAlignment = Alignment.CenterVertically,

@@ -74,6 +74,8 @@ interface Strings {
     fun drawLowerDone(l: Letter): String
     fun drawNumberStart(n: Int): String
     fun drawNumberDone(n: Int): String
+    /** Hard tracing: the child drew a later stroke first. */
+    fun traceStartWith(stroke: Int): String
     fun spellAsk(word: String): String
     fun spellDone(praise: String, word: String): String
 
@@ -261,6 +263,7 @@ object EnglishStrings : Strings {
     override fun drawLowerDone(l: Letter) = "Great! You wrote the small letter ${l.name}!"
     override fun drawNumberStart(n: Int) = "Let's write the number ${num(n)}!"
     override fun drawNumberDone(n: Int) = "Wow! You wrote the number ${num(n)}!"
+    override fun traceStartWith(stroke: Int) = "Start with line number ${num(stroke)}!"
     override fun spellAsk(word: String) = "Spell the word $word!"
     override fun spellDone(praise: String, word: String) = "$praise You spelled $word!"
 
@@ -471,6 +474,7 @@ object RomanianStrings : Strings {
     override fun drawLowerDone(l: Letter) = "Bravo! Ai scris litera mică ${l.name}!"
     override fun drawNumberStart(n: Int) = "Hai să scriem numărul ${num(n)}!"
     override fun drawNumberDone(n: Int) = "Uau! Ai scris numărul ${num(n)}!"
+    override fun traceStartWith(stroke: Int) = "Începe cu linia cu numărul ${num(stroke)}!"
     override fun spellAsk(word: String) = "Formează cuvântul $word!"
     override fun spellDone(praise: String, word: String) = "$praise Ai format cuvântul $word!"
 

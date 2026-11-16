@@ -50,6 +50,17 @@ class Progress(context: Context) {
         prefs.edit().putString("difficulty", value.name).apply()
     }
 
+    /** The child's age (2–6), chosen by a parent; 0 until set. It sets the starting level. */
+    var childAge by mutableIntStateOf(prefs.getInt("age", 0))
+        private set
+
+    /** Saves the age and sets the level to match (the level can still be changed any time). */
+    fun updateChildAge(age: Int) {
+        childAge = age
+        prefs.edit().putInt("age", age).apply()
+        updateDifficulty(Difficulty.forAge(age))
+    }
+
     // ---- Personal touches ----
 
     var childName by mutableStateOf(prefs.getString("name", "").orEmpty())

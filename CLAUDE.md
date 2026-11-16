@@ -51,17 +51,32 @@ Kotlin, Jetpack Compose, Material 3, Google Play Billing 8. See `README.md` for 
 - Sounds: credits in `docs/sound-credits.md` and `SoundCredits` in `ui/parent/Licenses.kt`;
   tools and rules in `tools/sounds/README.md`.
 
+## Hupi's Adventure (story mode), added 2026-11-16
+- Package `story/`: `Curriculum.kt` (7 chapters × 7 scenes, what each lesson teaches per level, scene steps),
+  `Quests.kt` (questions per item), `ScenePlayer.kt` (plays steps: narrate, hatch, meet, ask together/alone,
+  teach Hupi, catch, trace, show, reward, diploma), `Hupi.kt` (owl drawn in code, grows with 7 items),
+  `StoryMapScreen.kt` (map + age picker), `StoryHouseScreen.kt` (shelves), `StoryProgress.kt` (progress and the
+  learning tracker: learned = right on the first try on 3 different days; due items come back for review).
+- Texts: `i18n/StoryStrings.kt` (EN + RO). Chapters 1–2 free (`FreeScenes`), the rest need the unlock.
+- World paths ("Learn with Hupi" banner in each world except Animals): `Paths` in `Curriculum.kt`, `PathMapScreen.kt`,
+  routes "path:Letters" and "path:Letters/15". Same scenes as the chapter, without the magpie plot and without Hupi
+  growing up; scenes done in the adventure count in the path
+  (`StoryProgress.chapterDone`), but a path doesn't move the adventure on; the learning tracker is shared. Free: chapters 1–2, plus the first lesson of
+  every other path.
+- Parent chooses the child's age (map banner behind the gate, or grown-ups' corner) → sets the level; the level
+  can still be changed at any time from the top bar. No automatic pause (the parent decides when to stop).
+- Tracing (`ui/draw/TracePad.kt`) checks strokes: Easy wide/65%, Medium 80%, Hard narrow/85% in order and direction.
+- Debug-only test helpers: `adb shell am start -n com.cojocari.alphabet/.MainActivity --es route story:30 --ei step 5`
+  opens any screen/scene step; logcat tag `StoryTest` prints each question's right answer.
+
 ## State on 2026-11-16 and next steps
-Latest tag: **v3.1** (new name + owl logo + licences screen). On `develop` since then, not tagged:
-Animals world with real recorded sounds, stroke-order arrows for tracing, sheep plays 3 bleats,
-2 s minimum sound length, turkey replaced by donkey (no free real turkey gobble exists),
-dolphin replaced (old file was noise), Romanian "ham-ham" spoken as "ham, ham".
+Latest tag: **v4.0** (versionCode 6): Animals world, real sounds, stroke arrows, the tracing fix by level,
+Hupi's Adventure (story mode, tested on the tablet: map, hatch, all step types, show, growing up, diploma,
+warm-up, house, age picker) and a "Learn with Hupi" story path in every world except Animals.
 
 To do / to check with the owner:
-1. Owner to listen to all animal sounds on the tablet and report bad ones (pig is a piglet
-   squeal; tiger reuses the lion roar slowed down; snake is synthesised).
-2. Check the tracing arrows on the tablet (letters a, g, 5, 8 may sit slightly off the stroke).
-3. Confirm "Câinele face ham, ham" now sounds right; option: "hau, hau".
-4. Ask whether to tag this as v3.2 (bump versionCode 6 / versionName 3.2).
-5. Release: take store screenshots on the tablet, publish the privacy policy at a public URL,
-   trademark check for both names on TMview (classes 9 and 41), then `docs/release-checklist.md`.
+1. Owner to play the story with a child and report pace, humour and difficulty.
+2. Owner to listen to all animal sounds and check the tracing arrows on letters like a, g, 5, 8.
+3. Optional: record Romanian narration to replace text-to-speech in the story.
+4. Release: store screenshots (now with the story), privacy policy URL, TMview trademark check, then
+   `docs/release-checklist.md`.

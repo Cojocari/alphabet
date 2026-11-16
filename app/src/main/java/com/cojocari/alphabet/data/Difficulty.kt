@@ -10,4 +10,13 @@ enum class Difficulty {
         Medium -> medium
         Hard -> hard
     }
+
+    companion object {
+        /** Starting level for a child of [age]: 2–3 Easy, 4–5 Medium, 6 and up Hard. */
+        fun forAge(age: Int): Difficulty = when {
+            age <= 3 -> Easy
+            age <= 5 -> Medium
+            else -> Hard
+        }
+    }
 }
