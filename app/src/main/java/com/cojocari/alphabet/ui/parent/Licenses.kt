@@ -35,6 +35,20 @@ private val Libraries = listOf(
     ),
 )
 
+/** Sources of the animal recordings (details in docs/sound-credits.md). */
+private val SoundCredits = listOf(
+    "Cow, sheep, goat, horse, donkey, hen, rooster, chick, duck, dog, cat, mouse, owl, frog, bee, bird, cricket, parrot: " +
+        "Joseph Sardin, BigSoundBank.com · CC0",
+    "Pig: Foleyhaven, Freesound / Wikimedia Commons · CC0",
+    "Elephant: Thagavaluzhavan, Wikimedia Commons · CC0",
+    "Lion, tiger: Tha. Uzhavan, Wikimedia Commons · public domain",
+    "Wolf: Wikimedia Commons · public domain",
+    "Dolphin: Felix Blume, Freesound / Wikimedia Commons · CC0",
+    "Whale: U.S. National Park Service, Glacier Bay · public domain",
+    "Monkey: \"Pant-hoot call made by a male chimpanzee\", Pawel Fedurek et al., Scientific Reports · CC BY 4.0",
+    "Bear: \"Bear growl\", Shizhao, Wikimedia Commons · CC BY 3.0",
+)
+
 /** Grown-ups' corner entry that expands into the list of libraries and the Apache 2.0 text. */
 @Composable
 fun OpenSourceLicenses() {
@@ -58,6 +72,10 @@ fun OpenSourceLicenses() {
                 Text(lib.name, fontSize = 14.sp, fontWeight = FontWeight.Bold, color = Ink)
                 Text("${lib.author} · ${lib.license}", fontSize = 12.sp, color = Ink.copy(alpha = 0.7f))
             }
+        }
+        Text(t.soundCredits, fontSize = 14.sp, fontWeight = FontWeight.Bold, color = Ink)
+        SoundCredits.forEach { line ->
+            Text(line, fontSize = 12.sp, color = Ink.copy(alpha = 0.7f))
         }
         Text(apacheText, fontSize = 11.sp, color = Ink.copy(alpha = 0.7f))
     }

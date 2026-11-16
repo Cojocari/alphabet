@@ -115,6 +115,12 @@ class Speaker(context: Context, private var locale: Locale) {
 
     private fun voiceKey() = "voice_${locale.language}"
 
+    /** Stops speaking at once (e.g. when the child taps an animal to hear its sound). */
+    fun stop() {
+        if (ready) tts.stop()
+        pending = null
+    }
+
     /** Speaks [text], interrupting anything currently being said. */
     fun say(text: String) {
         if (!ready) {

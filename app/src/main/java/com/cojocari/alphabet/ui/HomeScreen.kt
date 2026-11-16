@@ -192,7 +192,11 @@ fun HomeScreen(
                 .padding(top = 14.dp)
         ) {
             val wide = maxWidth > maxHeight
-            val columns = if (wide) 3 else 2
+            val columns = when {
+                !wide -> 2
+                maxWidth > 900.dp -> 4
+                else -> 3
+            }
             val rows = World.entries.chunked(columns)
             val gap = 16.dp
             val tileWidth = (maxWidth - gap * (columns - 1)) / columns

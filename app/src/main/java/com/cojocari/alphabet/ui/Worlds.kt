@@ -7,7 +7,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.sp
+import com.cojocari.alphabet.data.Animals
 import com.cojocari.alphabet.data.CountingThings
+import com.cojocari.alphabet.data.Habitat
+import com.cojocari.alphabet.ui.animals.AnimalsScreen
 import com.cojocari.alphabet.data.numberColor
 import com.cojocari.alphabet.data.objects
 import com.cojocari.alphabet.i18n.LocalLanguage
@@ -62,9 +65,13 @@ enum class GameId(val emoji: String, val label: (Strings) -> String) {
     Colors("🎨", { it.gameColors }),
     Shapes("🔷", { it.gameShapes }),
     FreeDraw("🖌️", { it.gameFreeDraw }),
+
+    AnimalsFarm("🐄", { it.gameFarmAnimals }),
+    AnimalsWild("🦁", { it.gameWildAnimals }),
+    AnimalsAll("🐾", { it.gameAllAnimals }),
 }
 
-/** The five learning worlds on the home screen. */
+/** The learning worlds on the home screen. */
 enum class World(
     val symbol: String,
     val emoji: String,
@@ -96,16 +103,20 @@ enum class World(
         "●▲■", "🦄", listOf(Color(0xFF20C997), Color(0xFF15AABF)), { it.worldArt },
         listOf(GameId.FreeDraw, GameId.Colors, GameId.Shapes),
     ),
+    Animals(
+        "🐾", "🐮", listOf(Color(0xFFFAB005), Color(0xFF82C91E)), { it.worldAnimals },
+        listOf(GameId.AnimalsFarm, GameId.AnimalsWild, GameId.AnimalsAll),
+    ),
 }
 
 /**
- * Free without the purchase (7 of 21): one "hook" per world, plus Balloons, the most fun
+ * Free without the purchase (8 of 24): one "hook" per world, plus Balloons, the most fun
  * letter game. They're free at Easy and Medium; ⭐⭐⭐ Hard needs the unlock.
  * Every other game can be tried as a short demo.
  */
 val FreeGames = setOf(
     GameId.LetterCards, GameId.LetterBalloons, GameId.NumberCards, GameId.ReadPicture,
-    GameId.TraceUpper, GameId.Add, GameId.FreeDraw,
+    GameId.TraceUpper, GameId.Add, GameId.FreeDraw, GameId.AnimalsFarm,
 )
 
 val GameId.isFree: Boolean get() = this in FreeGames
@@ -224,11 +235,18 @@ fun GameContent(id: GameId, onBack: () -> Unit, onUnlock: () -> Unit) {
             GameId.Colors -> PickGame(onBack) { colorRound(language, d, rnd) }
             GameId.Shapes -> PickGame(onBack) { shapeRound(language, d, rnd) }
             GameId.FreeDraw -> FreeDrawScreen(onBack)
+
+            GameId.AnimalsFarm -> AnimalsScreen(onBack, Animals.filter { it.habitat == Habitat.Farm }, t.gameFarmAnimals, id.emoji)
+            GameId.AnimalsWild -> AnimalsScreen(onBack, Animals.filter { it.habitat == Habitat.Wild }, t.gameWildAnimals, id.emoji)
+            GameId.AnimalsAll -> AnimalsScreen(onBack, Animals, t.worldAnimals, id.emoji)
         }
     }
 }
 }
 
-/** Games with Easy / Medium / Hard (flash cards and free drawing have none). */
+/** Games with Easy / Medium / Hard (flash cards, free drawing and animals have none). */
 val GameId.hasLevels: Boolean
-    get() = this != GameId.LetterCards && this != GameId.NumberCards && this != GameId.FreeDraw
+    get() = this !in setOf(
+        GameId.LetterCards, GameId.NumberCards, GameId.FreeDraw,
+        GameId.AnimalsFarm, GameId.AnimalsWild, GameId.AnimalsAll,
+    )

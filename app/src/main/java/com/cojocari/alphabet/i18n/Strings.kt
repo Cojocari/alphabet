@@ -1,5 +1,6 @@
 package com.cojocari.alphabet.i18n
 
+import com.cojocari.alphabet.data.Animal
 import com.cojocari.alphabet.data.Letter
 
 /** Every phrase the app shows or says, so each language can word them naturally. */
@@ -131,6 +132,18 @@ interface Strings {
     val gameColors: String
     val gameShapes: String
     val gameFreeDraw: String
+
+    // ---- Animals ----
+    val worldAnimals: String
+    val gameFarmAnimals: String
+    val gameWildAnimals: String
+    val gameAllAnimals: String
+    val animalsHint: String
+    fun animalName(a: Animal): String
+    /** The sound in the speech bubble: "Moo!" */
+    fun animalSound(a: Animal): String
+    /** "The cow says moo!" */
+    fun animalSays(a: Animal): String
     /** Names of [com.cojocari.alphabet.data.ArtColors], in the same order. */
     val colorNames: List<String>
     fun findColor(name: String): String
@@ -169,6 +182,7 @@ interface Strings {
     val appName: String
     val licenses: String
     val licensesIntro: String
+    val soundCredits: String
     val backHome: String
 
     // ---- Contact (grown-ups' corner) ----
@@ -312,6 +326,14 @@ object EnglishStrings : Strings {
     override val gameColors = "Colors"
     override val gameShapes = "Shapes"
     override val gameFreeDraw = "Free draw"
+    override val worldAnimals = "Animals"
+    override val gameFarmAnimals = "Farm & pets"
+    override val gameWildAnimals = "Wild"
+    override val gameAllAnimals = "All"
+    override val animalsHint = "Tap an animal to hear it!"
+    override fun animalName(a: Animal) = a.en.replaceFirstChar { it.uppercase() }
+    override fun animalSound(a: Animal) = a.enSound
+    override fun animalSays(a: Animal) = "The ${a.en} says ${a.enSound.lowercase()}"
     override val colorNames = listOf("red", "orange", "yellow", "green", "blue", "purple", "pink", "brown", "black", "white")
     override fun findColor(name: String) = "Find the color $name!"
     override fun rightColor(praise: String, name: String) = "$praise That's $name!"
@@ -343,7 +365,7 @@ object EnglishStrings : Strings {
     override val demoEndTitle = "Well done! 🌟"
     override val demoEndBody = "That was the free try. Ask a grown-up to unlock this game and all the others."
     override val paywallFeatures = listOf(
-        "🎮  All 21 games in 6 worlds",
+        "🎮  All 24 games in 7 worlds, with 28 animal sounds",
         "⭐  Easy, Medium and Hard levels in every game",
         "🇷🇴🇬🇧  Romanian and English",
         "🎁  Every future game and update, free",
@@ -354,6 +376,7 @@ object EnglishStrings : Strings {
     override val appName = "Clever Owl"
     override val licenses = "Open-source licences"
     override val licensesIntro = "This app is built with these libraries. Thank you to their authors!"
+    override val soundCredits = "Animal sounds: real recordings under free licences (trimmed)."
     override val backHome = "Back to the games"
 
     override val contactTitle = "Contact us"
@@ -517,6 +540,15 @@ object RomanianStrings : Strings {
     override val gameColors = "Culori"
     override val gameShapes = "Forme"
     override val gameFreeDraw = "Desen liber"
+    override val worldAnimals = "Animale"
+    override val gameFarmAnimals = "Domestice"
+    override val gameWildAnimals = "Sălbatice"
+    override val gameAllAnimals = "Toate"
+    override val animalsHint = "Atinge un animal ca să-l auzi!"
+    override fun animalName(a: Animal) = a.ro.replaceFirstChar { it.uppercase() }
+    override fun animalSound(a: Animal) = a.roSound
+    // The voice reads "ham-ham" as one odd word; a comma gives a clear "ham, ham".
+    override fun animalSays(a: Animal) = "${animalName(a)} face ${a.roSound.lowercase().replace("-", ", ")}"
     override val colorNames = listOf("roșie", "portocalie", "galbenă", "verde", "albastră", "mov", "roz", "maro", "neagră", "albă")
     override fun findColor(name: String) = "Găsește culoarea $name!"
     override fun rightColor(praise: String, name: String) = "$praise Aceasta este culoarea $name!"
@@ -548,7 +580,7 @@ object RomanianStrings : Strings {
     override val demoEndTitle = "Bravo! 🌟"
     override val demoEndBody = "Aceasta a fost încercarea gratuită. Roagă un adult să deblocheze acest joc și toate celelalte."
     override val paywallFeatures = listOf(
-        "🎮  Toate cele 21 de jocuri din 6 lumi",
+        "🎮  Toate cele 24 de jocuri din 7 lumi, cu 28 de sunete de animale",
         "⭐  Nivel ușor, mediu și greu în fiecare joc",
         "🇷🇴🇬🇧  Română și engleză",
         "🎁  Toate jocurile și actualizările viitoare, gratuit",
@@ -559,6 +591,7 @@ object RomanianStrings : Strings {
     override val appName = "Bufnița Isteață"
     override val licenses = "Licențe open-source"
     override val licensesIntro = "Aplicația este construită cu aceste biblioteci. Mulțumim autorilor lor!"
+    override val soundCredits = "Sunete de animale: înregistrări reale cu licențe libere (scurtate)."
     override val backHome = "Înapoi la jocuri"
 
     override val contactTitle = "Contactează-ne"

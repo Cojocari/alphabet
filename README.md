@@ -3,7 +3,7 @@
 An Android learning game for children aged 2 to 6, in **Romanian and English**.
 Everything is big, colourful and spoken aloud, so children who can't read yet can play on their own.
 
-## Six worlds, 21 games
+## Seven worlds, 24 games
 
 | World | Games |
 |---|---|
@@ -13,6 +13,7 @@ Everything is big, colourful and spoken aloud, so children who can't read yet ca
 | ✏️ Writing | Trace ABC · Trace abc · Trace 0–10 · Spell it |
 | ➕ Math | Add · Take away · More or less |
 | 🎨 Colours & Shapes | Free draw · Colours · Shapes |
+| 🐾 Animals | Farm & pets · Wild · All: 28 animals with real sounds |
 
 Every game (except cards and free drawing) has **Easy / Medium / Hard** levels, and rounds are
 generated from the chosen level. The Romanian version uses the full 31-letter alphabet.
@@ -22,7 +23,7 @@ generated from the chosen level. The Romanian version uses the full 31-letter al
 limit, progress, and contact the developer.
 
 ## Monetisation
-One-time in-app purchase `unlock_all` (Google Play Billing). 7 games are free at Easy and Medium;
+One-time in-app purchase `unlock_all` (Google Play Billing). 8 games are free at Easy and Medium (the farm animals have no levels);
 the other 14 can be played as a short demo with fixed rounds; Hard is part of the unlock.
 No ads, no subscriptions, no data collection.
 
@@ -43,6 +44,7 @@ Release signing reads `keystore.properties` (git-ignored). Debug builds have a
 - [Store listing](docs/store-listing.md): titles, descriptions and graphics, in RO and EN
 - [Privacy policy](docs/privacy-policy.md)
 - [Romanian voice recording script](docs/recording-script-ro.md)
+- [Animal sound credits](docs/sound-credits.md)
 - [branding/](branding/): logo (`logo.svg`), Play Store icon and feature graphics. The owl is drawn in
   `owl.svgpart`; the launcher icon (`res/drawable/ic_launcher_foreground.xml`) uses the same shapes.
   The PNGs are rendered from the `.html` files with a headless browser. Text uses the Nunito font
