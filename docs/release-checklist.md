@@ -52,7 +52,7 @@ Google needs a public link (URL). The text is in `docs/privacy-policy.md`. Pick 
 
 ## 5. Create the app
 *Play Console → Create app*
-- [ ] App name: **Bufnița Isteață: ABC și 123**, default language **Romanian (ro-RO)**
+- [ ] App name: **Clever Owl: ABC & 123 for Kids**, default language **English (United States)**; then add the Romanian listing as a translation (see `store-listing.md`)
 - [ ] App, **Free** (the unlock is an in-app purchase; the app download itself must be free)
 - [ ] Accept the declarations
 
@@ -72,7 +72,7 @@ Google needs a public link (URL). The text is in `docs/privacy-policy.md`. Pick 
 - [ ] Government app → No · Financial features → None · Health → No · News → No
 
 ## 7. Store listing (*Grow users → Store presence → Main store listing*)
-- [ ] Texts from `docs/store-listing.md`, Romanian main plus English translation
+- [ ] Texts from `docs/store-listing.md`, English as the main listing, Romanian as a translation
 - [ ] App icon and feature graphic: ready in `branding/` (`icon-512.png`, `feature-graphic-ro.png`, `feature-graphic-en.png`)
 - [ ] Screenshots, ready in `branding/screenshots/`: `ro/phone-*.jpg` and `ro/tablet-*.jpg` on the Romanian
       listing, `en/…` on the English one. Upload the tablet set for both 7-inch and 10-inch.

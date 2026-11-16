@@ -1,7 +1,7 @@
 # Google Play store listing
 
 Copy these into Play Console → *Grow users → Store presence → Main store listing*.
-The default language is Romanian; add English as a translation (*Manage translations → English (United States)*).
+The default language is English (United States), shown in every country without its own translation; add Romanian as a translation (*Manage translations → Romanian*), which Romanian phones see automatically.
 Character limits are Google's: app name 30, short description 80, full description 4000.
 
 ---
