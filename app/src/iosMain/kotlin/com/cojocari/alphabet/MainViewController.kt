@@ -13,6 +13,8 @@ import platform.AVFAudio.AVAudioSessionCategoryPlayback
 import platform.AVFAudio.setActive
 import platform.Foundation.NSNotificationCenter
 import platform.Foundation.NSOperationQueue
+import platform.Foundation.NSUserDefaults
+import com.cojocari.alphabet.platform.isDebugBuild
 import platform.UIKit.UIApplication
 import platform.UIKit.UIApplicationDidBecomeActiveNotification
 import platform.UIKit.UIApplicationState
@@ -40,6 +42,8 @@ fun MainViewController(): UIViewController {
         UIApplicationDidBecomeActiveNotification, null, NSOperationQueue.mainQueue,
     ) { _ -> progress.onAppOpen() }
 
+    // Launch arguments like "-route home" show up as user defaults.
+    val launchArgs = NSUserDefaults.standardUserDefaults
     return ComposeUIViewController {
         CleverOwlApp(
             progress = progress,
@@ -47,6 +51,9 @@ fun MainViewController(): UIViewController {
             billing = billing,
             sfx = sfx,
             isVisible = { UIApplication.sharedApplication.applicationState == UIApplicationState.UIApplicationStateActive },
+            // Debug builds can open any screen directly: xcrun simctl launch <device> com.cojocari.alphabet -route story:30 -step 5
+            startRoute = if (isDebugBuild) launchArgs.stringForKey("route") ?: "home" else "home",
+            startStep = if (isDebugBuild) launchArgs.integerForKey("step").toInt() else 0,
         )
     }
 }

@@ -1,6 +1,6 @@
-# Builds the iOS app on a GitHub-hosted Mac (free for public repositories).
-# For now: a simulator build, to check that everything compiles. Signing and TestFlight
-# uploads come once the Apple Developer account exists (see docs/ios.md).
+# Builds the iOS app on a GitHub-hosted Mac (free for public repositories), runs it in the
+# iPhone simulator and takes screenshots of a few screens (pushed to the ci-screenshots branch).
+# Signing and TestFlight uploads come once the Apple Developer account exists (docs/ios.md).
 name: iOS
 
 on:
@@ -11,6 +11,9 @@ on:
 concurrency:
   group: ios-${{ github.ref }}
   cancel-in-progress: true
+
+permissions:
+  contents: write # only to push the screenshots branch
 
 jobs:
   simulator:
@@ -36,7 +39,6 @@ jobs:
         run: |
           brew install xcodegen ffmpeg
           xcodebuild -version
-          ls /Applications | grep -i xcode || true
 
       - name: Prepare sounds and generate the Xcode project
         run: |
@@ -47,22 +49,59 @@ jobs:
         run: |
           set -o pipefail
           xcodebuild -project iosApp/iosApp.xcodeproj -scheme iosApp -configuration Debug \
-            -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' \
-            ARCHS=arm64 CODE_SIGNING_ALLOWED=NO build 2>&1 | tee build.log | grep -E "^e: |error:|warning: .*\.kt|BUILD" || true
+            -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' -derivedDataPath build/dd \
+            ARCHS=arm64 CODE_SIGNING_ALLOWED=NO build 2>&1 | tee build.log | grep -E "^e: |error:|BUILD" || true
           grep -q "BUILD SUCCEEDED" build.log
+
+      - name: Run in the simulator and take screenshots
+        run: |
+          app=build/dd/Build/Products/Debug-iphonesimulator/CleverOwl.app
+          udid=$(xcrun simctl list devices available -j | python3 -c '
+          import json, sys
+          devices = [d for rt, ds in json.load(sys.stdin)["devices"].items() if "iOS" in rt for d in ds]
+          phones = [d for d in devices if d["name"].startswith("iPhone")]
+          print(phones[-1]["udid"])')
+          echo "Simulator: $(xcrun simctl list devices | grep "$udid")"
+          xcrun simctl boot "$udid"
+          xcrun simctl bootstatus "$udid" -b
+          xcrun simctl install "$udid" "$app"
+          mkdir -p shots
+          shot() { # name, then launch arguments
+            name=$1; shift
+            xcrun simctl terminate "$udid" com.cojocari.alphabet 2>/dev/null || true
+            xcrun simctl launch "$udid" com.cojocari.alphabet "$@" > /dev/null
+            sleep 12
+            xcrun simctl io "$udid" screenshot "shots/$name.png" > /dev/null
+            echo "shot $name"
+          }
+          shot 1-home -route home
+          shot 2-trace -route game:TraceUpper
+          shot 3-animals -route game:AnimalsFarm
+          shot 4-story -route story:1 -step 3
+          shot 5-draw -route game:FreeDraw
+          shot 6-parent -route parent
+          shot 7-home-ro -route home -AppleLanguages "(ro)"
+          shot 8-letters-ro -route game:LetterCards -AppleLanguages "(ro)"
+          # Crash reports, if any, go into the job log.
+          for f in ~/Library/Logs/DiagnosticReports/CleverOwl*; do
+            [ -e "$f" ] && { echo "CRASH $f"; head -c 6000 "$f"; echo; } >> crash.log
+          done
+          [ -e crash.log ] && cat crash.log || echo "No crash reports"
+
+      - name: Publish screenshots to the ci-screenshots branch
+        run: |
+          cd shots
+          echo "iOS simulator screenshots of ${GITHUB_SHA}" > README.md
+          [ -e ../crash.log ] && cp ../crash.log .
+          git init -q -b ci-screenshots
+          git add .
+          git -c user.name="github-actions" -c user.email="github-actions@users.noreply.github.com" commit -q -m "iOS screenshots ${GITHUB_SHA}"
+          git push -q -f "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" ci-screenshots
 
       - name: Report errors as annotations
         if: failure()
         run: |
-          # One annotation with the first compiler errors, readable without signing in to GitHub.
-          msg=$(grep -E "^e: |error:|FAILURE|What went wrong|^> " build.log | grep -v "^error: Command PhaseScriptExecution" | head -40 \
-            | sed 's/%/%25/g' | awk '{printf "%s%%0A", $0}')
+          # One annotation with the first errors, readable without signing in to GitHub.
+          msg=$(cat build.log crash.log 2>/dev/null | grep -E "^e: |error:|FAILURE|What went wrong|^> |Exception|CRASH|reason" \
+            | grep -v "^error: Command PhaseScriptExecution" | head -40 | sed 's/%/%25/g' | awk '{printf "%s%%0A", $0}')
           echo "::error title=Build errors::${msg:-No compiler errors found; see the log.}"
-
-      - name: Upload the build log
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: ios-build-log
-          path: build.log
-          if-no-files-found: ignore
