@@ -68,7 +68,7 @@ class IosSpeaker(private var language: Language) : Speaker {
         .filterIsInstance<AVSpeechSynthesisVoice>()
         .filter { it.language.startsWith(language.code) }
         .filter { "speech.synthesis.voice" !in it.identifier && "eloquence" !in it.identifier }
-        .sortedWith(compareBy({ it.language != language.tag }, { -it.quality.value }, { it.name }))
+        .sortedWith(compareBy({ it.language != language.tag }, { -it.quality }, { it.name }))
 
     private fun voiceKey() = "voice_${language.code}"
 

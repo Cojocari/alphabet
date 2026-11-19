@@ -34,8 +34,13 @@ Kotlin, Jetpack Compose, Material 3, Google Play Billing 8. See `README.md` for 
   Romanian; speech is device text-to-speech (default English voice `en-us-x-iom`).
 
 ## Architecture in brief
-- `MainActivity.kt`: string routes ("home", "world:X", "game:X", "stickers", "scene", "parent",
-  "unlock"), parental gate, play-time limit, billing wiring.
+- Kotlin Multiplatform (branch `ios`, see `docs/ios.md`): the game is in `app/src/commonMain`, shared by Android
+  (`app/src/androidMain`: `MainActivity`, res/, Play Billing, TTS) and iOS (`app/src/iosMain` + `iosApp/`, built by
+  GitHub Actions on a Mac). What each platform provides: `platform/Platform.kt`, plus the `Speaker`,
+  `AnimalSoundPlayer`, `Billing` and `GlyphFont` interfaces. `compileCommonMainKotlinMetadata` catches Android-only
+  APIs in shared code. Paths below are under `commonMain` unless they say otherwise.
+- `App.kt` (`CleverOwlApp`): string routes ("home", "world:X", "game:X", "stickers", "scene", "parent",
+  "unlock"), parental gate, play-time limit. `MainActivity` / `MainViewController` only wire up the platform.
 - `ui/Worlds.kt`: `GameId` (24 games), `World` (7 worlds), `FreeGames`, `GameContent`
   (demo/locked logic via `GameAccess`, seeded random for demos).
 - `i18n/Strings.kt`: every phrase in English and Romanian.

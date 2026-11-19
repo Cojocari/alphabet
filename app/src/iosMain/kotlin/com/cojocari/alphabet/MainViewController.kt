@@ -10,6 +10,7 @@ import com.cojocari.alphabet.story.StoryProgress
 import kotlinx.cinterop.ExperimentalForeignApi
 import platform.AVFAudio.AVAudioSession
 import platform.AVFAudio.AVAudioSessionCategoryPlayback
+import platform.AVFAudio.setActive
 import platform.Foundation.NSNotificationCenter
 import platform.Foundation.NSOperationQueue
 import platform.UIKit.UIApplication
