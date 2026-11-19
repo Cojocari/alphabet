@@ -1,0 +1,6 @@
+# Generated on the Mac (GitHub Actions) by xcodegen and scripts/prepare-resources.sh.
+iosApp.xcodeproj/
+Generated/
+iosApp/Info.plist
+build/
+xcuserdata/

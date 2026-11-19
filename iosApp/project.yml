@@ -1,0 +1,61 @@
+# The Xcode project for the iOS app, generated with XcodeGen (`xcodegen generate` in this folder).
+# The game itself is Kotlin: Gradle builds it into Shared.framework (see app/build.gradle.kts).
+name: iosApp
+options:
+  bundleIdPrefix: com.cojocari
+  deploymentTarget:
+    iOS: "15.0"
+  developmentLanguage: en
+settings:
+  base:
+    MARKETING_VERSION: "4.1"
+    CURRENT_PROJECT_VERSION: "7"
+    SWIFT_VERSION: "5.0"
+targets:
+  iosApp:
+    type: application
+    platform: iOS
+    sources:
+      - path: iosApp
+      - path: Generated
+        buildPhase: resources
+    settings:
+      base:
+        PRODUCT_NAME: CleverOwl
+        PRODUCT_BUNDLE_IDENTIFIER: com.cojocari.alphabet
+        TARGETED_DEVICE_FAMILY: "1,2"
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.education
+        ENABLE_USER_SCRIPT_SANDBOXING: NO
+        FRAMEWORK_SEARCH_PATHS: "$(inherited) $(SRCROOT)/../app/build/xcode-frameworks/$(CONFIGURATION)/$(SDK_NAME)"
+        OTHER_LDFLAGS: "$(inherited) -framework Shared"
+    info:
+      path: iosApp/Info.plist
+      properties:
+        CFBundleDisplayName: Clever Owl
+        CFBundleDevelopmentRegion: en
+        CFBundleLocalizations: [en, ro]
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        LSApplicationCategoryType: public.app-category.education
+        ITSAppUsesNonExemptEncryption: false
+        CADisableMinimumFrameDurationOnPhone: true
+        UILaunchScreen:
+          UIColorName: ""
+        UIApplicationSupportsIndirectInputEvents: true
+        # Phones stay upright so everything stays big; tablets can be held either way.
+        UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait]
+        UISupportedInterfaceOrientations~ipad:
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationPortraitUpsideDown
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
+        UIRequiresFullScreen: true
+        LSApplicationQueriesSchemes: [mailto]
+        NSPhotoLibraryAddUsageDescription: To save your child's drawings to Photos.
+    preBuildScripts:
+      - name: Build the Kotlin game (Shared.framework)
+        basedOnDependencyAnalysis: false
+        script: |
+          cd "$SRCROOT/.."
+          ./gradlew :app:embedAndSignAppleFrameworkForXcode
