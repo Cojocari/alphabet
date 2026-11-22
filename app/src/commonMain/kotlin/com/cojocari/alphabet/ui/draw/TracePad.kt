@@ -105,6 +105,7 @@ private val DoneGreen = Color(0xFF43AA8B)
  * the strokes with a finger; each stroke counts once enough of its checkpoints have been
  * passed (see [TraceRules]). The stroke to draw next is highlighted and a dot travels along
  * it; finished strokes turn green. [onDone] fires once when every stroke is traced.
+ * [dotted]: no outline, each stroke shown as dots with direction arrows (the second round).
  */
 @Composable
 fun TracePad(
@@ -114,6 +115,7 @@ fun TracePad(
     crayon: Color,
     state: TraceState,
     modifier: Modifier = Modifier,
+    dotted: Boolean = false,
     onDone: () -> Unit,
 ) {
     val density = LocalDensity.current
@@ -240,13 +242,16 @@ fun TracePad(
     ) {
         Canvas(Modifier.fillMaxSize()) {
             val g = glyph ?: return@Canvas
-            drawPath(g.path, color = color.copy(alpha = 0.15f))
-            drawPath(
-                g.path,
-                color = color.copy(alpha = 0.6f),
-                style = Stroke(width = 4.dp.toPx(), pathEffect = PathEffect.dashPathEffect(floatArrayOf(18f, 14f))),
-            )
-            drawGuides(g.guides, finished, current, color, labels)
+            // Dotted round: no outline, only the dotted strokes (unless there are no strokes to show).
+            if (!dotted || g.guides.isEmpty()) {
+                drawPath(g.path, color = color.copy(alpha = 0.15f))
+                drawPath(
+                    g.path,
+                    color = color.copy(alpha = 0.6f),
+                    style = Stroke(width = 4.dp.toPx(), pathEffect = PathEffect.dashPathEffect(floatArrayOf(18f, 14f))),
+                )
+            }
+            drawGuides(g.guides, finished, current, color, labels, dotted)
             state.strokes.forEach { s ->
                 if (s.points.size == 1) {
                     drawCircle(s.color, radius = brushPx / 2, center = s.points[0])
@@ -309,19 +314,43 @@ private class Guide(val points: List<Offset>) {
 /**
  * Stroke guides: strokes already traced turn green; the one to draw next is dark with
  * arrowheads and a big number; the others stay faint. Numbers of strokes that start at the
- * same spot are nudged apart.
+ * same spot are nudged apart. [dotted]: each stroke is a row of dots with direction arrows
+ * along it, for the second round with no outline.
  */
-private fun DrawScope.drawGuides(guides: List<Guide>, finished: List<Boolean>, current: Int, color: Color, labels: StrokeLabels) {
+private fun DrawScope.drawGuides(
+    guides: List<Guide>,
+    finished: List<Boolean>,
+    current: Int,
+    color: Color,
+    labels: StrokeLabels,
+    dotted: Boolean = false,
+) {
     guides.forEachIndexed { k, g ->
         val isDone = finished.getOrElse(k) { false }
         val isNext = k == current
         val ink = when {
             isDone -> DoneGreen
             isNext -> GuideInk.copy(alpha = 0.75f)
-            else -> GuideInk.copy(alpha = 0.25f)
+            else -> GuideInk.copy(alpha = if (dotted) 0.45f else 0.25f)
         }
         if (g.points.size == 1) {
             drawCircle(ink, radius = 9.dp.toPx(), center = g.points[0])
+            return@forEachIndexed
+        }
+        if (dotted) {
+            val n = (g.length / 16.dp.toPx()).toInt().coerceAtLeast(1)
+            val dot = (if (isNext) 5 else 4).dp.toPx()
+            for (j in 0..n) drawCircle(ink, radius = dot, center = g.at(g.length * j / n).first)
+            if (!isDone) {
+                val size = minOf(16.dp.toPx(), g.length * 0.5f)
+                val every = 90.dp.toPx()
+                var d = every
+                while (d < g.length - every / 2) {
+                    drawArrowHead(g, d, size, ink)
+                    d += every
+                }
+                drawArrowHead(g, g.length, size, ink)
+            }
             return@forEachIndexed
         }
         drawPath(

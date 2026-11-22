@@ -242,8 +242,11 @@ fun buildScene(
                 if (level != Difficulty.Hard) steps += Step.Ask(it, AskMode.Together, firstLetter)
             }
             items.shuffled(rnd).forEach { steps += Step.Ask(it, AskMode.Normal, firstLetter) }
-            items.firstOrNull { catchable(it) && !firstLetter }?.let { if (scene % 2 == 0) steps += Step.Catch(it) }
-            items.randomOrNull(rnd)?.let { steps += Step.Teach(it, firstLetter) }
+            // One Hupi game per lesson, to keep lessons short: catching him on even scenes,
+            // teaching him on odd ones (or when nothing can be caught).
+            val catchItem = items.firstOrNull { catchable(it) && !firstLetter }?.takeIf { scene % 2 == 0 }
+            if (catchItem != null) steps += Step.Catch(catchItem)
+            else items.randomOrNull(rnd)?.let { steps += Step.Teach(it, firstLetter) }
         }
     }
 
@@ -261,9 +264,13 @@ fun buildScene(
     return steps
 }
 
-/** Letters and words belong to one language; other things to every language. */
+/**
+ * Letters and words belong to one language; other things to every language. Letters no longer
+ * taught (Ă, Â, Î, Ș, Ț, left in old saved progress) belong to none, so they don't come back.
+ */
 fun Item.belongsTo(language: Language) =
-    (kind != Kind.Letter && kind != Kind.Word) || key.startsWith("${language.name}/")
+    (kind != Kind.Letter && kind != Kind.Word) ||
+        (key.startsWith("${language.name}/") && (kind != Kind.Letter || letter(language) != null))
 
 /** The morning warm-up: three quick questions about things due for review. */
 fun buildWarmup(language: Language, story: StoryProgress, rnd: Random = Random.Default): List<Step> {

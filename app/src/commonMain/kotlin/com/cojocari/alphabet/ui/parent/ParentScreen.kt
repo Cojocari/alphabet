@@ -152,7 +152,8 @@ fun ParentScreen(onBack: () -> Unit) {
                     Text(t.progressTitle, fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Ink)
                     LearningDiary()
                     Text("⭐ ${progress.stars}   ·   📒 ${progress.stickersWon} / ${Stickers.size}", fontSize = 18.sp, color = Ink)
-                    val learned = progress.learned(language)
+                    // Only letters still taught count (old progress may hold Ă, Â, Î, Ș, Ț).
+                    val learned = progress.learned(language).filter { c -> language.alphabet.any { it.char == c } }
                     Text(t.lettersLearned(learned.size, language.alphabet.size), fontSize = 16.sp, color = Ink)
                     // The alphabet, with letters already found in games highlighted.
                     Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {

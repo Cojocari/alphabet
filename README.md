@@ -16,7 +16,7 @@ Everything is big, colourful and spoken aloud, so children who can't read yet ca
 | 🐾 Animals | Farm & pets · Wild · All: 28 animals with real sounds |
 
 Every game (except cards and free drawing) has **Easy / Medium / Hard** levels, and rounds are
-generated from the chosen level. The Romanian version uses the full 31-letter alphabet.
+generated from the chosen level. The Romanian version teaches the 26 base letters (Ă, Â, Î, Ș, Ț appear only inside words).
 
 **Rewards:** stars, a 40-sticker album, sticker scenes, a daily gift, a day streak and an owl mascot.
 **Grown-ups' corner** (behind a parental gate): unlock, voice, sound, child's name, daily play-time

@@ -103,6 +103,9 @@ private class SceneContext(
     val setPrompt: (String) -> Unit,
 )
 
+/** An animal friend's sound in a scene is cut after this long, so the story keeps moving. */
+private const val AnimalSoundInScene = 1800L
+
 /**
  * Plays one scene of Hupi's Adventure (or the morning warm-up) step by step. Hupi stays at
  * the side and reacts; the chapter's scenery is behind. The level can be changed at the top
@@ -300,10 +303,13 @@ private fun NarrateStep(step: Step.Narrate, ctx: SceneContext) {
     LaunchedEffect(Unit) {
         ctx.setPrompt(step.text)
         ctx.setMood(step.mood)
-        if (step.sound && friend != null) delay(ctx.player.play(friend.key).coerceAtMost(2500) + 150)
+        if (step.sound && friend != null) {
+            delay(ctx.player.play(friend.key).coerceAtMost(AnimalSoundInScene) + 150)
+            ctx.player.stop()
+        }
         speaker.sayAndWait(step.text)
         speaker.awaitQuiet()
-        delay(800)
+        delay(400)
         ctx.next()
     }
     Column(
@@ -372,19 +378,15 @@ private fun HatchStep(ctx: SceneContext) {
 private fun MeetStep(item: Item, ctx: SceneContext) {
     val speaker = LocalSpeaker.current
     val language = LocalLanguage.current
-    val s = language.story
     var ready by remember { mutableStateOf(false) }
     LaunchedEffect(Unit) {
         ctx.setPrompt(item.meetLine(language))
         ctx.setMood(Mood.Normal)
         speaker.sayAndWait(item.meetLine(language))
-        item.wrongShort(language, Random.Default)?.let { wrong ->
-            ctx.setMood(Mood.Puzzled)
-            speaker.sayAndWait(s.hupiTries(wrong, item.short(language)))
-        }
         ctx.setMood(Mood.Happy)
         ready = true
-        delay(7000)
+        // A short look at the new thing, then on (the arrow skips ahead).
+        delay(3000)
         ctx.next()
     }
     Column(
@@ -509,9 +511,12 @@ private fun AskStep(step: Step.Ask, ctx: SceneContext) {
             sfx.success()
             ctx.celebrate()
             ctx.setMood(Mood.Happy)
-            speaker.say(quest.right(t.praise.random()))
+            // One right answer in three, Hupi cheers too.
+            val cheer = if (Random.nextInt(3) == 0) " " + s.hupiCheers.random() else ""
+            speaker.say(quest.right(t.praise.random()) + cheer)
             scope.launch {
-                delay(2200)
+                delay(1500)
+                speaker.awaitQuiet(4000)
                 ctx.next()
             }
         } else {
@@ -520,7 +525,8 @@ private fun AskStep(step: Step.Ask, ctx: SceneContext) {
             sfx.wrong()
             ctx.setMood(Mood.Puzzled)
             speaker.say(quest.wrong(i))
-            if (wrong.size >= 2) hint = true
+            // Easy: the right tile glows after one mistake; otherwise after two.
+            if (wrong.size >= level.pick(1, 2, 2)) hint = true
         }
     }
 
@@ -610,7 +616,8 @@ private fun TeachStep(step: Step.Teach, ctx: SceneContext) {
     }
 
     if (fixing) {
-        QuestView(quest, wrong, solved, hint = wrong.size >= 3, onPick = ::pick)
+        // [wrong] starts with Hupi's guess: Easy glows after one mistake of the child's, others after two.
+        QuestView(quest, wrong, solved, hint = wrong.size >= 1 + progress.difficulty.pick(1, 2, 2), onPick = ::pick)
         return
     }
     Column(
@@ -853,19 +860,20 @@ private fun RewardStep(step: Step.Reward, ctx: SceneContext) {
     LaunchedEffect(Unit) {
         ctx.setMood(Mood.Happy)
         if (friend != null) {
-            delay(ctx.player.play(friend.key).coerceAtMost(2500) + 100)
+            delay(ctx.player.play(friend.key).coerceAtMost(AnimalSoundInScene) + 100)
+            ctx.player.stop()
             speaker.sayAndWait(s.friendThanks(s.friendName(friend)))
         }
         sfx.fanfare()
         ctx.celebrate()
         step.stage?.let {
-            delay(600)
+            delay(400)
             grown = true
             ctx.setStage(it)
             ctx.celebrate()
             speaker.sayAndWait(s.gotItem(it))
         }
-        delay(900)
+        delay(500)
         ctx.next()
     }
     Column(

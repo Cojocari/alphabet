@@ -30,7 +30,7 @@ Bufnița Isteață transformă primele lecții în joacă! Copilul învață lit
 
 🔊 N-a auzit ce trebuie făcut? Atinge-l pe Hupi și îl spune din nou.
 
-🔤 LITERE – toate cele 31 de litere ale alfabetului românesc, inclusiv Ă, Â, Î, Ș și Ț, cu imagini și cuvinte („Be de la banană!”), baloane de spart, perechi de memorie și „Cu ce literă începe?”
+🔤 LITERE – literele alfabetului, cu imagini și cuvinte („Be de la banană!”), baloane de spart, perechi de memorie și „Cu ce literă începe?”
 
 🔢 NUMERE – cartonașe de la 1 la 20, numărare cu degetul („unu, doi, trei…”), găsește numărul și baloane cu cifre
 

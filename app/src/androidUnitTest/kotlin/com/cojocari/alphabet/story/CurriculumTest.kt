@@ -3,6 +3,7 @@ package com.cojocari.alphabet.story
 import com.cojocari.alphabet.data.Difficulty
 import com.cojocari.alphabet.i18n.Language
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -72,6 +73,16 @@ class CurriculumTest {
         // Free chapters stay free; a paid chapter offers only its first lesson.
         assertTrue(pathScenes(Paths.Art).all { pathFree(it, Paths.Art) })
         assertEquals(1, pathScenes(Paths.Letters).count { pathFree(it, Paths.Letters) })
+    }
+
+    @Test
+    fun romanianAlphabetTeachesOnlyTheBaseLetters() {
+        assertEquals(26, Language.Romanian.alphabet.size)
+        assertTrue(Language.Romanian.alphabet.none { it.char in "ĂÂÎȘȚ" })
+        // Old saved progress may still hold Ș: it is ignored, but words keep their diacritics.
+        assertFalse(Item(Kind.Letter, "Romanian/Ș").belongsTo(Language.Romanian))
+        assertTrue(Item(Kind.Letter, "Romanian/S").belongsTo(Language.Romanian))
+        assertTrue(Item(Kind.Word, "Romanian/pește").belongsTo(Language.Romanian))
     }
 
     @Test

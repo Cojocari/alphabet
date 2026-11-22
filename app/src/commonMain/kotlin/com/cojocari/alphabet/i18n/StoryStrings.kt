@@ -43,8 +43,6 @@ interface StoryStrings {
     fun meetColor(name: String): String
     fun meetWord(word: String): String
     fun meetMath(kind: String): String
-    /** Hupi's funny first try: "Hupi tries: N? No, no! M!" */
-    fun hupiTries(wrong: String, right: String): String
     fun together(thing: String): String
     fun forgot(thing: String): String
     fun teachAsk(thing: String): String
@@ -53,6 +51,8 @@ interface StoryStrings {
     fun teachMissedWrong(thing: String): String
     fun teachMissedRight(thing: String): String
     fun teachThanks(thing: String): String
+    /** Hupi's happy reactions, added to one right answer in three. */
+    val hupiCheers: List<String>
     fun catchAsk(kind: String, short: String): String
     val catchDone: String
     val showIntro: String
@@ -167,7 +167,6 @@ object EnglishStory : StoryStrings {
         "sub" -> "Let's take away!"
         else -> "Where are there more?"
     }
-    override fun hupiTries(wrong: String, right: String) = "Hupi tries: $wrong? No, no! $right!"
     override fun together(thing: String) = "Let's find $thing together. Look where Hupi points!"
     override fun forgot(thing: String) = "Oh no, Hupi forgot $thing! Can you help him remember?"
     override fun teachAsk(thing: String) = "Hupi thinks this is $thing. Is he right?"
@@ -176,6 +175,10 @@ object EnglishStory : StoryStrings {
     override fun teachMissedWrong(thing: String) = "Hmm, let's look again. That's not $thing. Let's show Hupi the right one!"
     override fun teachMissedRight(thing: String) = "This time Hupi was right! That is $thing."
     override fun teachThanks(thing: String) = "Thank you! Now Hupi knows $thing!"
+    override val hupiCheers = listOf(
+        "Hupi dances with joy!", "Hupi does a somersault!", "Hupi flaps his wings: hooray!",
+        "Hupi hoots with joy: hoo-hoo!", "Hupi gives you a high five!",
+    )
     override fun catchAsk(kind: String, short: String) = when (kind) {
         "letter" -> "Tap every letter $short!"
         "number" -> "Tap every number $short!"
@@ -321,7 +324,6 @@ object RomanianStory : StoryStrings {
         "sub" -> "Hai să scădem!"
         else -> "Unde sunt mai multe?"
     }
-    override fun hupiTries(wrong: String, right: String) = "Hupi încearcă: $wrong? Nu, nu! $right!"
     override fun together(thing: String) = "Hai să găsim împreună $thing. Uite unde arată Hupi!"
     override fun forgot(thing: String) = "Vai, Hupi a uitat $thing! Îl ajuți să-și amintească?"
     override fun teachAsk(thing: String) = "Hupi crede că aici este $thing. Are dreptate?"
@@ -330,6 +332,10 @@ object RomanianStory : StoryStrings {
     override fun teachMissedWrong(thing: String) = "Hmm, hai să ne uităm din nou. Nu este $thing. Hai să-i arătăm lui Hupi răspunsul corect!"
     override fun teachMissedRight(thing: String) = "De data asta Hupi a avut dreptate! Aici este $thing."
     override fun teachThanks(thing: String) = "Mulțumesc! Acum Hupi știe $thing!"
+    override val hupiCheers = listOf(
+        "Hupi dansează de bucurie!", "Hupi face o tumbă de bucurie!", "Hupi bate din aripi: ura!",
+        "Hupi strigă de bucurie: hu-hu!", "Hupi bate palma cu tine!",
+    )
     override fun catchAsk(kind: String, short: String) = when (kind) {
         "letter" -> "Atinge toate literele $short!"
         "number" -> "Atinge toate numerele $short!"

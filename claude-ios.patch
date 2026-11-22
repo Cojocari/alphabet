@@ -1,0 +1,552 @@
+diff --git a/CLAUDE.md b/CLAUDE.md
+index 46ccb32..1cabc81 100644
+--- a/CLAUDE.md
++++ b/CLAUDE.md
+@@ -86,6 +86,16 @@ the store screenshots. Earlier in v4.0: Animals world, real sounds, stroke arrow
+ Hupi's Adventure (story mode, tested on the tablet: map, hatch, all step types, show, growing up, diploma,
+ warm-up, house, age picker) and a "Learn with Hupi" story path in every world except Animals.
+ 
++Not yet built or tested on the tablet (2026-11-22): the Romanian alphabet now teaches only the 26 base letters
++(Ă, Â, Î, Ș, Ț removed from `RomanianAlphabet`; texts keep their diacritics; old saved letters are ignored via
++`belongsTo`). Story: Meet no longer says Hupi's wrong guess ("Hupi încearcă: albastră? Nu, nu!" confused the
++owner and kids), shorter waits, hint after 1 mistake on Easy, Teach Hupi only on odd scenes on Easy, and
++`hupiCheers` sometimes after a right answer. TTS may say "Hupi" like "Buti": check on the tablet.
++Tracing game (`DrawScreen`): two rounds per letter/number. Round 1 as before (outline + stroke guides); round 2
++`TracePad(dotted = true)` hides the outline and draws each stroke as dots with arrowheads (`drawDottedStroke`),
++numbers and the guide dot stay. Stars fill half per round; the letter counts (star, fanfare, demo) after round 2.
++The story's Trace step still uses one round.
++
+ To do / to check with the owner:
+ 1. Owner to play the story with a child and report pace, humour and difficulty.
+ 2. Owner to listen to all animal sounds and check the tracing arrows on letters like a, g, 5, 8.
+diff --git a/README.md b/README.md
+index b036376..386ed81 100644
+--- a/README.md
++++ b/README.md
+@@ -16,7 +16,7 @@ Everything is big, colourful and spoken aloud, so children who can't read yet ca
+ | 🐾 Animals | Farm & pets · Wild · All: 28 animals with real sounds |
+ 
+ Every game (except cards and free drawing) has **Easy / Medium / Hard** levels, and rounds are
+-generated from the chosen level. The Romanian version uses the full 31-letter alphabet.
++generated from the chosen level. The Romanian version teaches the 26 base letters (no Ă, Â, Î, Ș, Ț); texts keep correct spelling.
+ 
+ **Rewards:** stars, a 40-sticker album, sticker scenes, a daily gift, a day streak and an owl mascot.
+ **Grown-ups' corner** (behind a parental gate): unlock, voice, sound, child's name, daily play-time
+diff --git a/app/src/androidUnitTest/kotlin/com/cojocari/alphabet/story/CurriculumTest.kt b/app/src/androidUnitTest/kotlin/com/cojocari/alphabet/story/CurriculumTest.kt
+index 935f2c8..8e3f871 100644
+--- a/app/src/androidUnitTest/kotlin/com/cojocari/alphabet/story/CurriculumTest.kt
++++ b/app/src/androidUnitTest/kotlin/com/cojocari/alphabet/story/CurriculumTest.kt
+@@ -86,4 +86,14 @@ class CurriculumTest {
+             }
+         }
+     }
++
++    @Test
++    fun romanianAlphabetHasNoDiacriticLetters() {
++        val chars = Language.Romanian.alphabet.map { it.char }
++        assertEquals(26, chars.size)
++        assertTrue(chars.none { it in "ĂÂÎȘȚ" })
++        // A removed letter from old saved progress is no longer asked about.
++        assertTrue(!Item(Kind.Letter, "Romanian/Ș").belongsTo(Language.Romanian))
++        assertTrue(Item(Kind.Letter, "Romanian/S").belongsTo(Language.Romanian))
++    }
+ }
+diff --git a/app/src/commonMain/kotlin/com/cojocari/alphabet/data/Letters.kt b/app/src/commonMain/kotlin/com/cojocari/alphabet/data/Letters.kt
+index 2254246..fef4350 100644
+--- a/app/src/commonMain/kotlin/com/cojocari/alphabet/data/Letters.kt
++++ b/app/src/commonMain/kotlin/com/cojocari/alphabet/data/Letters.kt
+@@ -74,14 +74,13 @@ val EnglishAlphabet: List<Letter> = build(
+ )
+ 
+ /**
+- * The 31-letter Romanian alphabet. No Romanian word starts with Ă or Â, so (like school
+- * primers do) those use a word that contains the letter, and the app says so out loud.
++ * The Romanian alphabet without the letters with diacritics (Ă, Â, Î, Ș, Ț): the owner
++ * chose to teach only the 26 base letters. Words and sentences keep their correct spelling.
++ * [Letter.inside] stays for a letter that only appears inside its word, should one return.
+  */
+ val RomanianAlphabet: List<Letter> = build(
+     listOf(
+         Entry('A', "Albină", "🐝", "a"),
+-        Entry('Ă', "Rață", "🦆", "ă", inside = true),
+-        Entry('Â', "Pâine", "🍞", "â din a", inside = true),
+         Entry('B', "Banană", "🍌", "be"),
+         Entry('C', "Casă", "🏠", "ce"),
+         Entry('D', "Delfin", "🐬", "de"),
+@@ -90,7 +89,6 @@ val RomanianAlphabet: List<Letter> = build(
+         Entry('G', "Girafă", "🦒", "ge"),
+         Entry('H', "Hipopotam", "🦛", "haș"),
+         Entry('I', "Iepure", "🐰", "i"),
+-        Entry('Î', "Înghețată", "🍦", "î din i"),
+         Entry('J', "Jucărie", "🧸", "je"),
+         Entry('K', "Koala", "🐨", "ca"),
+         Entry('L', "Leu", "🦁", "le"),
+@@ -101,9 +99,7 @@ val RomanianAlphabet: List<Letter> = build(
+         Entry('Q', "Quiz", "❓", "chiu"),
+         Entry('R', "Rachetă", "🚀", "re"),
+         Entry('S', "Soare", "☀️", "se"),
+-        Entry('Ș', "Șoarece", "🐭", "șe"),
+         Entry('T', "Tren", "🚂", "te"),
+-        Entry('Ț', "Țestoasă", "🐢", "țe"),
+         Entry('U', "Urs", "🐻", "u"),
+         Entry('V', "Vapor", "🚢", "ve"),
+         Entry('W', "Wafă", "🧇", "dublu ve"),
+diff --git a/app/src/commonMain/kotlin/com/cojocari/alphabet/i18n/StoryStrings.kt b/app/src/commonMain/kotlin/com/cojocari/alphabet/i18n/StoryStrings.kt
+index 891c406..2486861 100644
+--- a/app/src/commonMain/kotlin/com/cojocari/alphabet/i18n/StoryStrings.kt
++++ b/app/src/commonMain/kotlin/com/cojocari/alphabet/i18n/StoryStrings.kt
+@@ -43,8 +43,8 @@ interface StoryStrings {
+     fun meetColor(name: String): String
+     fun meetWord(word: String): String
+     fun meetMath(kind: String): String
+-    /** Hupi's funny first try: "Hupi tries: N? No, no! M!" */
+-    fun hupiTries(wrong: String, right: String): String
++    /** Hupi's happy reactions, sometimes added after a right answer. */
++    val hupiCheers: List<String>
+     fun together(thing: String): String
+     fun forgot(thing: String): String
+     fun teachAsk(thing: String): String
+@@ -167,7 +167,13 @@ object EnglishStory : StoryStrings {
+         "sub" -> "Let's take away!"
+         else -> "Where are there more?"
+     }
+-    override fun hupiTries(wrong: String, right: String) = "Hupi tries: $wrong? No, no! $right!"
++    override val hupiCheers = listOf(
++        "Hupi does a happy dance!",
++        "Hoo-hoo! Hupi flaps his wings!",
++        "Hupi does a somersault for joy!",
++        "Hooray! Hupi wants to give you a hug!",
++        "Hupi is so happy his feathers wiggle!",
++    )
+     override fun together(thing: String) = "Let's find $thing together. Look where Hupi points!"
+     override fun forgot(thing: String) = "Oh no, Hupi forgot $thing! Can you help him remember?"
+     override fun teachAsk(thing: String) = "Hupi thinks this is $thing. Is he right?"
+@@ -321,7 +327,13 @@ object RomanianStory : StoryStrings {
+         "sub" -> "Hai să scădem!"
+         else -> "Unde sunt mai multe?"
+     }
+-    override fun hupiTries(wrong: String, right: String) = "Hupi încearcă: $wrong? Nu, nu! $right!"
++    override val hupiCheers = listOf(
++        "Hupi dansează de bucurie!",
++        "Hu-hu! Hupi bate din aripi!",
++        "Hupi face o tumbă de bucurie!",
++        "Ura! Hupi vrea să te îmbrățișeze!",
++        "Hupi e atât de fericit, încât i se înfoaie penele!",
++    )
+     override fun together(thing: String) = "Hai să găsim împreună $thing. Uite unde arată Hupi!"
+     override fun forgot(thing: String) = "Vai, Hupi a uitat $thing! Îl ajuți să-și amintească?"
+     override fun teachAsk(thing: String) = "Hupi crede că aici este $thing. Are dreptate?"
+diff --git a/app/src/commonMain/kotlin/com/cojocari/alphabet/i18n/Strings.kt b/app/src/commonMain/kotlin/com/cojocari/alphabet/i18n/Strings.kt
+index da91076..8dccf42 100644
+--- a/app/src/commonMain/kotlin/com/cojocari/alphabet/i18n/Strings.kt
++++ b/app/src/commonMain/kotlin/com/cojocari/alphabet/i18n/Strings.kt
+@@ -76,6 +76,8 @@ interface Strings {
+     fun drawNumberDone(n: Int): String
+     /** Hard tracing: the child drew a later stroke first. */
+     fun traceStartWith(stroke: Int): String
++    /** Before the second round of tracing, where only dots and arrows are shown. */
++    val traceDots: String
+     fun spellAsk(word: String): String
+     fun spellDone(praise: String, word: String): String
+ 
+@@ -264,6 +266,7 @@ object EnglishStrings : Strings {
+     override fun drawNumberStart(n: Int) = "Let's write the number ${num(n)}!"
+     override fun drawNumberDone(n: Int) = "Wow! You wrote the number ${num(n)}!"
+     override fun traceStartWith(stroke: Int) = "Start with line number ${num(stroke)}!"
++    override val traceDots = "Great! Now write it again on the dots!"
+     override fun spellAsk(word: String) = "Spell the word $word!"
+     override fun spellDone(praise: String, word: String) = "$praise You spelled $word!"
+ 
+@@ -475,6 +478,7 @@ object RomanianStrings : Strings {
+     override fun drawNumberStart(n: Int) = "Hai să scriem numărul ${num(n)}!"
+     override fun drawNumberDone(n: Int) = "Uau! Ai scris numărul ${num(n)}!"
+     override fun traceStartWith(stroke: Int) = "Începe cu linia cu numărul ${num(stroke)}!"
++    override val traceDots = "Bravo! Acum scrie din nou, pe puncte!"
+     override fun spellAsk(word: String) = "Formează cuvântul $word!"
+     override fun spellDone(praise: String, word: String) = "$praise Ai format cuvântul $word!"
+ 
+diff --git a/app/src/commonMain/kotlin/com/cojocari/alphabet/story/Curriculum.kt b/app/src/commonMain/kotlin/com/cojocari/alphabet/story/Curriculum.kt
+index 246b994..7725e70 100644
+--- a/app/src/commonMain/kotlin/com/cojocari/alphabet/story/Curriculum.kt
++++ b/app/src/commonMain/kotlin/com/cojocari/alphabet/story/Curriculum.kt
+@@ -75,7 +75,7 @@ private fun color(i: Int) = Item(Kind.Color, "$i")
+ private fun shape(i: Int) = Item(Kind.Shape, "$i")
+ private fun math(key: String) = Item(Kind.Math, key)
+ 
+-/** Letters little ones start with: no Q, W, X, Y and no Ă, Â (they never start a word). */
++/** Letters little ones start with: no Q, W, X, Y (and none that only appear inside a word). */
+ private fun easyLetters(language: Language) =
+     language.alphabet.filter { !it.inside && it.char !in "QWXY" }.map { it.char }
+ 
+@@ -243,7 +243,8 @@ fun buildScene(
+             }
+             items.shuffled(rnd).forEach { steps += Step.Ask(it, AskMode.Normal, firstLetter) }
+             items.firstOrNull { catchable(it) && !firstLetter }?.let { if (scene % 2 == 0) steps += Step.Catch(it) }
+-            items.randomOrNull(rnd)?.let { steps += Step.Teach(it, firstLetter) }
++            // Little ones get Catch and Teach Hupi on alternate scenes, so their lessons stay short.
++            if (level != Difficulty.Easy || scene % 2 == 1) items.randomOrNull(rnd)?.let { steps += Step.Teach(it, firstLetter) }
+         }
+     }
+ 
+@@ -261,9 +262,15 @@ fun buildScene(
+     return steps
+ }
+ 
+-/** Letters and words belong to one language; other things to every language. */
+-fun Item.belongsTo(language: Language) =
+-    (kind != Kind.Letter && kind != Kind.Word) || key.startsWith("${language.name}/")
++/**
++ * Letters and words belong to one language; other things to every language. A letter or word
++ * from old saved progress that the app no longer teaches (Ă, Â, Î, Ș, Ț) belongs nowhere.
++ */
++fun Item.belongsTo(language: Language) = when (kind) {
++    Kind.Letter -> key.startsWith("${language.name}/") && letter(language) != null
++    Kind.Word -> key.startsWith("${language.name}/") && word(language) != null
++    else -> true
++}
+ 
+ /** The morning warm-up: three quick questions about things due for review. */
+ fun buildWarmup(language: Language, story: StoryProgress, rnd: Random = Random.Default): List<Step> {
+diff --git a/app/src/commonMain/kotlin/com/cojocari/alphabet/story/Quests.kt b/app/src/commonMain/kotlin/com/cojocari/alphabet/story/Quests.kt
+index c8d8e65..10d708d 100644
+--- a/app/src/commonMain/kotlin/com/cojocari/alphabet/story/Quests.kt
++++ b/app/src/commonMain/kotlin/com/cojocari/alphabet/story/Quests.kt
+@@ -100,18 +100,6 @@ fun Item.meetLine(language: Language): String {
+     }
+ }
+ 
+-/** A plausible wrong short name, for Hupi's funny first try (null when it doesn't fit). */
+-fun Item.wrongShort(language: Language, rnd: Random): String? {
+-    val t = language.strings
+-    return when (kind) {
+-        Kind.Letter -> language.alphabet.filter { it.char != letter(language)?.char && !it.inside }.random(rnd).name
+-        Kind.Number -> t.num((int() + if (int() == 0 || rnd.nextBoolean()) 1 else -1).coerceIn(0, 20))
+-        Kind.Color -> t.colorNames[(0..5).filter { it != int() }.random(rnd)]
+-        Kind.Shape -> language.story.shapeShort[(0..5).filter { it != int() }.random(rnd)]
+-        else -> null
+-    }
+-}
+-
+ private fun <T> options(answer: T, pool: List<T>, n: Int, rnd: Random): Pair<List<T>, Int> {
+     val list = (listOf(answer) + pool.filter { it != answer }.distinct().shuffled(rnd).take(n - 1)).shuffled(rnd)
+     return list to list.indexOf(answer)
+diff --git a/app/src/commonMain/kotlin/com/cojocari/alphabet/story/ScenePlayer.kt b/app/src/commonMain/kotlin/com/cojocari/alphabet/story/ScenePlayer.kt
+index e0241db..3a48ed4 100644
+--- a/app/src/commonMain/kotlin/com/cojocari/alphabet/story/ScenePlayer.kt
++++ b/app/src/commonMain/kotlin/com/cojocari/alphabet/story/ScenePlayer.kt
+@@ -300,10 +300,10 @@ private fun NarrateStep(step: Step.Narrate, ctx: SceneContext) {
+     LaunchedEffect(Unit) {
+         ctx.setPrompt(step.text)
+         ctx.setMood(step.mood)
+-        if (step.sound && friend != null) delay(ctx.player.play(friend.key).coerceAtMost(2500) + 150)
++        if (step.sound && friend != null) delay(ctx.player.play(friend.key).coerceAtMost(1800) + 150)
+         speaker.sayAndWait(step.text)
+         speaker.awaitQuiet()
+-        delay(800)
++        delay(400)
+         ctx.next()
+     }
+     Column(
+@@ -372,19 +372,16 @@ private fun HatchStep(ctx: SceneContext) {
+ private fun MeetStep(item: Item, ctx: SceneContext) {
+     val speaker = LocalSpeaker.current
+     val language = LocalLanguage.current
+-    val s = language.story
+     var ready by remember { mutableStateOf(false) }
+     LaunchedEffect(Unit) {
+         ctx.setPrompt(item.meetLine(language))
+         ctx.setMood(Mood.Normal)
++        // Only the right name here: a funny wrong guess ("blue? no, no!") while the child sees the
++        // colour for the first time confused little ones. Hupi's mistakes stay in Teach Hupi.
+         speaker.sayAndWait(item.meetLine(language))
+-        item.wrongShort(language, Random.Default)?.let { wrong ->
+-            ctx.setMood(Mood.Puzzled)
+-            speaker.sayAndWait(s.hupiTries(wrong, item.short(language)))
+-        }
+         ctx.setMood(Mood.Happy)
+         ready = true
+-        delay(7000)
++        delay(3000)
+         ctx.next()
+     }
+     Column(
+@@ -509,9 +506,16 @@ private fun AskStep(step: Step.Ask, ctx: SceneContext) {
+             sfx.success()
+             ctx.celebrate()
+             ctx.setMood(Mood.Happy)
+-            speaker.say(quest.right(t.praise.random()))
++            // Now and then Hupi cheers too; otherwise move on quickly.
++            val cheer = if (!together && Random.nextInt(3) == 0) s.hupiCheers.random() else null
+             scope.launch {
+-                delay(2200)
++                if (cheer != null) {
++                    speaker.sayAndWait(quest.right(t.praise.random()) + " " + cheer)
++                    delay(300)
++                } else {
++                    speaker.say(quest.right(t.praise.random()))
++                    delay(1500)
++                }
+                 ctx.next()
+             }
+         } else {
+@@ -520,7 +524,8 @@ private fun AskStep(step: Step.Ask, ctx: SceneContext) {
+             sfx.wrong()
+             ctx.setMood(Mood.Puzzled)
+             speaker.say(quest.wrong(i))
+-            if (wrong.size >= 2) hint = true
++            // Little ones see the glowing hint after one mistake, the others after two.
++            if (wrong.size >= level.pick(1, 2, 2)) hint = true
+         }
+     }
+ 
+@@ -610,7 +615,8 @@ private fun TeachStep(step: Step.Teach, ctx: SceneContext) {
+     }
+ 
+     if (fixing) {
+-        QuestView(quest, wrong, solved, hint = wrong.size >= 3, onPick = ::pick)
++        // [wrong] already holds Hupi's guess: Easy glows after one more mistake, the others after two.
++        QuestView(quest, wrong, solved, hint = wrong.size >= progress.difficulty.pick(2, 3, 3), onPick = ::pick)
+         return
+     }
+     Column(
+@@ -853,7 +859,7 @@ private fun RewardStep(step: Step.Reward, ctx: SceneContext) {
+     LaunchedEffect(Unit) {
+         ctx.setMood(Mood.Happy)
+         if (friend != null) {
+-            delay(ctx.player.play(friend.key).coerceAtMost(2500) + 100)
++            delay(ctx.player.play(friend.key).coerceAtMost(1800) + 100)
+             speaker.sayAndWait(s.friendThanks(s.friendName(friend)))
+         }
+         sfx.fanfare()
+@@ -865,7 +871,7 @@ private fun RewardStep(step: Step.Reward, ctx: SceneContext) {
+             ctx.celebrate()
+             speaker.sayAndWait(s.gotItem(it))
+         }
+-        delay(900)
++        delay(600)
+         ctx.next()
+     }
+     Column(
+diff --git a/app/src/commonMain/kotlin/com/cojocari/alphabet/ui/draw/DrawScreen.kt b/app/src/commonMain/kotlin/com/cojocari/alphabet/ui/draw/DrawScreen.kt
+index 4deca4a..cbdc6a1 100644
+--- a/app/src/commonMain/kotlin/com/cojocari/alphabet/ui/draw/DrawScreen.kt
++++ b/app/src/commonMain/kotlin/com/cojocari/alphabet/ui/draw/DrawScreen.kt
+@@ -69,6 +69,7 @@ fun DrawScreen(onHome: () -> Unit, items: List<TraceItem>) {
+     val sfx = LocalSfx.current
+     val stars = LocalProgress.current
+     val access = LocalGameAccess.current
++    val t = com.cojocari.alphabet.i18n.LocalLanguage.current.strings
+     var demoOver by remember { mutableStateOf(false) }
+     var demoDone by remember { mutableIntStateOf(0) }
+     // A demo is two traced letters.
+@@ -82,16 +83,26 @@ fun DrawScreen(onHome: () -> Unit, items: List<TraceItem>) {
+     var index by rememberSaveable { mutableIntStateOf(0) }
+     val letter = items[index.coerceAtMost(items.lastIndex)]
+     var crayon by remember { mutableStateOf(Crayons.first()) }
+-    val trace = remember(letter.text) { TraceState() }
++    // Round 0: the letter's outline is shown. Round 1: only dots and arrows along the strokes.
++    var round by remember(letter.text) { mutableIntStateOf(0) }
++    val trace = remember(letter.text, round) { TraceState() }
++    val finished = round == 1 && trace.done
+     var celebrate by remember { mutableIntStateOf(0) }
+ 
+     LaunchedEffect(letter.text) { speaker.say(letter.start) }
++    // After the first round, a short pause to enjoy it, then the same letter on dots.
++    LaunchedEffect(trace.done, round) {
++        if (round == 0 && trace.done) {
++            kotlinx.coroutines.delay(1800)
++            round = 1
++        }
++    }
+ 
+     Box(Modifier.fillMaxSize()) {
+         Column(Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
+             TopBar(onBack = onHome) {
+                 Text(letter.emoji, fontSize = 48.sp, modifier = Modifier.bouncyClick { speaker.say(letter.start) })
+-                StarMeter(trace.progress)
++                StarMeter((round + trace.progress) / 2f)
+             }
+ 
+             TracePad(
+@@ -100,16 +111,22 @@ fun DrawScreen(onHome: () -> Unit, items: List<TraceItem>) {
+                 level = access.level,
+                 crayon = crayon,
+                 state = trace,
++                dotted = round == 1,
+                 modifier = Modifier
+                     .weight(1f)
+                     .fillMaxWidth()
+                     .padding(horizontal = 16.dp),
+             ) {
+-                celebrate++
+-                demoDone++
+-                sfx.fanfare()
+-                stars.addStar()
+-                speaker.say(letter.done)
++                if (round == 0) {
++                    sfx.success()
++                    speaker.say(t.traceDots)
++                } else {
++                    celebrate++
++                    demoDone++
++                    sfx.fanfare()
++                    stars.addStar()
++                    speaker.say(letter.done)
++                }
+             }
+ 
+             CrayonBox(crayon) { crayon = it }
+@@ -124,7 +141,7 @@ fun DrawScreen(onHome: () -> Unit, items: List<TraceItem>) {
+                     index = (index - 1 + items.size) % items.size
+                 }, size = 68.dp)
+                 RoundButton("🧽", Color(0xFFFFD6E0), onClick = { trace.clear() }, size = 68.dp)
+-                NextButton(pulse = trace.done) { index = (index + 1) % items.size }
++                NextButton(pulse = finished) { index = (index + 1) % items.size }
+             }
+         }
+         Celebration(trigger = celebrate)
+diff --git a/app/src/commonMain/kotlin/com/cojocari/alphabet/ui/draw/TracePad.kt b/app/src/commonMain/kotlin/com/cojocari/alphabet/ui/draw/TracePad.kt
+index 2c73bd7..cea0a13 100644
+--- a/app/src/commonMain/kotlin/com/cojocari/alphabet/ui/draw/TracePad.kt
++++ b/app/src/commonMain/kotlin/com/cojocari/alphabet/ui/draw/TracePad.kt
+@@ -114,6 +114,8 @@ fun TracePad(
+     crayon: Color,
+     state: TraceState,
+     modifier: Modifier = Modifier,
++    // Second round: no outline, the strokes shown only as dots with direction arrows.
++    dotted: Boolean = false,
+     onDone: () -> Unit,
+ ) {
+     val density = LocalDensity.current
+@@ -128,11 +130,11 @@ fun TracePad(
+ 
+     // Checkpoints along each stroke and which ones have been passed.
+     val checks = remember(glyph) { glyph?.guides?.map { it.checkpoints(tolerance * 0.8f) }.orEmpty() }
+-    val hits = remember(glyph, state.generation) { checks.map { BooleanArray(it.size) } }
+-    val furthest = remember(glyph, state.generation) { IntArray(checks.size) { -1 } }
+-    val finished = remember(glyph, state.generation) { mutableStateListOf<Boolean>().apply { repeat(checks.size) { add(false) } } }
++    val hits = remember(glyph, state, state.generation) { checks.map { BooleanArray(it.size) } }
++    val furthest = remember(glyph, state, state.generation) { IntArray(checks.size) { -1 } }
++    val finished = remember(glyph, state, state.generation) { mutableStateListOf<Boolean>().apply { repeat(checks.size) { add(false) } } }
+     // Fallback for characters without stroke data: colour in most of the shape.
+-    val covered = remember(glyph, state.generation) { BooleanArray(glyph?.targets?.size ?: 0) }
++    val covered = remember(glyph, state, state.generation) { BooleanArray(glyph?.targets?.size ?: 0) }
+     val current = finished.indexOfFirst { !it }
+     val latestOnDone by rememberUpdatedState(onDone)
+ 
+@@ -214,7 +216,7 @@ fun TracePad(
+             .clip(RoundedCornerShape(32.dp))
+             .background(Color.White)
+             .onSizeChanged { canvasSize = it }
+-            .pointerInput(glyph, crayon, state.generation, level) {
++            .pointerInput(glyph, crayon, state, state.generation, level) {
+                 awaitEachGesture {
+                     val down = awaitFirstDown()
+                     val stroke = CrayonStroke(crayon, mutableStateListOf(down.position))
+@@ -240,13 +242,15 @@ fun TracePad(
+     ) {
+         Canvas(Modifier.fillMaxSize()) {
+             val g = glyph ?: return@Canvas
+-            drawPath(g.path, color = color.copy(alpha = 0.15f))
+-            drawPath(
+-                g.path,
+-                color = color.copy(alpha = 0.6f),
+-                style = Stroke(width = 4.dp.toPx(), pathEffect = PathEffect.dashPathEffect(floatArrayOf(18f, 14f))),
+-            )
+-            drawGuides(g.guides, finished, current, color, labels)
++            if (!dotted || g.guides.isEmpty()) {
++                drawPath(g.path, color = color.copy(alpha = if (dotted) 0f else 0.15f))
++                drawPath(
++                    g.path,
++                    color = color.copy(alpha = 0.6f),
++                    style = Stroke(width = 4.dp.toPx(), pathEffect = PathEffect.dashPathEffect(floatArrayOf(18f, 14f))),
++                )
++            }
++            drawGuides(g.guides, finished, current, color, labels, dotted)
+             state.strokes.forEach { s ->
+                 if (s.points.size == 1) {
+                     drawCircle(s.color, radius = brushPx / 2, center = s.points[0])
+@@ -311,19 +315,23 @@ private class Guide(val points: List<Offset>) {
+  * arrowheads and a big number; the others stay faint. Numbers of strokes that start at the
+  * same spot are nudged apart.
+  */
+-private fun DrawScope.drawGuides(guides: List<Guide>, finished: List<Boolean>, current: Int, color: Color, labels: StrokeLabels) {
++private fun DrawScope.drawGuides(guides: List<Guide>, finished: List<Boolean>, current: Int, color: Color, labels: StrokeLabels, dotted: Boolean) {
+     guides.forEachIndexed { k, g ->
+         val isDone = finished.getOrElse(k) { false }
+         val isNext = k == current
+         val ink = when {
+             isDone -> DoneGreen
+             isNext -> GuideInk.copy(alpha = 0.75f)
+-            else -> GuideInk.copy(alpha = 0.25f)
++            else -> GuideInk.copy(alpha = if (dotted) 0.4f else 0.25f)
+         }
+         if (g.points.size == 1) {
+             drawCircle(ink, radius = 9.dp.toPx(), center = g.points[0])
+             return@forEachIndexed
+         }
++        if (dotted) {
++            drawDottedStroke(g, if (isNext) color else ink, isDone)
++            return@forEachIndexed
++        }
+         drawPath(
+             g.path,
+             ink,
+@@ -357,6 +365,30 @@ private fun DrawScope.drawGuides(guides: List<Guide>, finished: List<Boolean>, c
+     }
+ }
+ 
++/**
++ * Second round: the stroke as a row of dots to follow, with arrowheads every so often
++ * (and at the end) pointing the way the line is drawn. Gaps are left where the arrows sit.
++ */
++private fun DrawScope.drawDottedStroke(g: Guide, ink: Color, isDone: Boolean) {
++    val gap = 16.dp.toPx()
++    val dot = 5.dp.toPx()
++    val arrowEvery = 90.dp.toPx()
++    val arrow = minOf(20.dp.toPx(), g.length * 0.5f)
++    // Arrows: at least one in the middle of short strokes, then about every [arrowEvery], and at the end.
++    val arrows = if (isDone) emptyList() else buildList {
++        val n = (g.length / arrowEvery).toInt().coerceAtLeast(1)
++        for (i in 1..n) add(g.length * i / (n + 1))
++        add(g.length - arrow * 0.5f)
++    }
++    val count = (g.length / gap).toInt().coerceAtLeast(1)
++    for (i in 0..count) {
++        val d = g.length * i / count
++        if (arrows.any { kotlin.math.abs(it - d) < arrow * 0.8f }) continue
++        drawCircle(ink, radius = dot, center = g.at(d).first)
++    }
++    arrows.forEach { drawArrowHead(g, it, arrow, ink) }
++}
++
+ private fun DrawScope.drawArrowHead(g: Guide, distance: Float, size: Float, ink: Color) {
+     val (pos, dir) = g.at(distance)
+     val perp = Offset(-dir.y, dir.x)
+diff --git a/app/src/commonMain/kotlin/com/cojocari/alphabet/ui/parent/ParentScreen.kt b/app/src/commonMain/kotlin/com/cojocari/alphabet/ui/parent/ParentScreen.kt
+index ac9fd03..6cfbdfa 100644
+--- a/app/src/commonMain/kotlin/com/cojocari/alphabet/ui/parent/ParentScreen.kt
++++ b/app/src/commonMain/kotlin/com/cojocari/alphabet/ui/parent/ParentScreen.kt
+@@ -152,7 +152,8 @@ fun ParentScreen(onBack: () -> Unit) {
+                     Text(t.progressTitle, fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Ink)
+                     LearningDiary()
+                     Text("⭐ ${progress.stars}   ·   📒 ${progress.stickersWon} / ${Stickers.size}", fontSize = 18.sp, color = Ink)
+-                    val learned = progress.learned(language)
++                    // Only letters still taught (old progress may hold Ă, Â, Î, Ș, Ț).
++                    val learned = progress.learned(language).filter { c -> language.alphabet.any { it.char == c } }
+                     Text(t.lettersLearned(learned.size, language.alphabet.size), fontSize = 16.sp, color = Ink)
+                     // The alphabet, with letters already found in games highlighted.
+                     Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+diff --git a/docs/store-listing.md b/docs/store-listing.md
+index 464d553..66a7f40 100644
+--- a/docs/store-listing.md
++++ b/docs/store-listing.md
+@@ -30,7 +30,7 @@ Bufnița Isteață transformă primele lecții în joacă! Copilul învață lit
+ 
+ 🔊 N-a auzit ce trebuie făcut? Atinge-l pe Hupi și îl spune din nou.
+ 
+-🔤 LITERE – toate cele 31 de litere ale alfabetului românesc, inclusiv Ă, Â, Î, Ș și Ț, cu imagini și cuvinte („Be de la banană!”), baloane de spart, perechi de memorie și „Cu ce literă începe?”
++🔤 LITERE – literele alfabetului, cu imagini și cuvinte („Be de la banană!”), baloane de spart, perechi de memorie și „Cu ce literă începe?”
+ 
+ 🔢 NUMERE – cartonașe de la 1 la 20, numărare cu degetul („unu, doi, trei…”), găsește numărul și baloane cu cifre
+ 

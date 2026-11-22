@@ -100,18 +100,6 @@ fun Item.meetLine(language: Language): String {
     }
 }
 
-/** A plausible wrong short name, for Hupi's funny first try (null when it doesn't fit). */
-fun Item.wrongShort(language: Language, rnd: Random): String? {
-    val t = language.strings
-    return when (kind) {
-        Kind.Letter -> language.alphabet.filter { it.char != letter(language)?.char && !it.inside }.random(rnd).name
-        Kind.Number -> t.num((int() + if (int() == 0 || rnd.nextBoolean()) 1 else -1).coerceIn(0, 20))
-        Kind.Color -> t.colorNames[(0..5).filter { it != int() }.random(rnd)]
-        Kind.Shape -> language.story.shapeShort[(0..5).filter { it != int() }.random(rnd)]
-        else -> null
-    }
-}
-
 private fun <T> options(answer: T, pool: List<T>, n: Int, rnd: Random): Pair<List<T>, Int> {
     val list = (listOf(answer) + pool.filter { it != answer }.distinct().shuffled(rnd).take(n - 1)).shuffled(rnd)
     return list to list.indexOf(answer)

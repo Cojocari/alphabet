@@ -74,14 +74,13 @@ val EnglishAlphabet: List<Letter> = build(
 )
 
 /**
- * The 31-letter Romanian alphabet. No Romanian word starts with Ă or Â, so (like school
- * primers do) those use a word that contains the letter, and the app says so out loud.
+ * The Romanian alphabet as the app teaches it: the 26 base letters. Ă, Â, Î, Ș and Ț are left
+ * out of letter games, tracing and story lessons (decided 2026-11-22); words and texts keep
+ * their correct spelling, and [RomanianDiacriticNames] names those letters when spelling words.
  */
 val RomanianAlphabet: List<Letter> = build(
     listOf(
         Entry('A', "Albină", "🐝", "a"),
-        Entry('Ă', "Rață", "🦆", "ă", inside = true),
-        Entry('Â', "Pâine", "🍞", "â din a", inside = true),
         Entry('B', "Banană", "🍌", "be"),
         Entry('C', "Casă", "🏠", "ce"),
         Entry('D', "Delfin", "🐬", "de"),
@@ -90,7 +89,6 @@ val RomanianAlphabet: List<Letter> = build(
         Entry('G', "Girafă", "🦒", "ge"),
         Entry('H', "Hipopotam", "🦛", "haș"),
         Entry('I', "Iepure", "🐰", "i"),
-        Entry('Î', "Înghețată", "🍦", "î din i"),
         Entry('J', "Jucărie", "🧸", "je"),
         Entry('K', "Koala", "🐨", "ca"),
         Entry('L', "Leu", "🦁", "le"),
@@ -101,9 +99,7 @@ val RomanianAlphabet: List<Letter> = build(
         Entry('Q', "Quiz", "❓", "chiu"),
         Entry('R', "Rachetă", "🚀", "re"),
         Entry('S', "Soare", "☀️", "se"),
-        Entry('Ș', "Șoarece", "🐭", "șe"),
         Entry('T', "Tren", "🚂", "te"),
-        Entry('Ț', "Țestoasă", "🐢", "țe"),
         Entry('U', "Urs", "🐻", "u"),
         Entry('V', "Vapor", "🚢", "ve"),
         Entry('W', "Wafă", "🧇", "dublu ve"),
@@ -115,3 +111,9 @@ val RomanianAlphabet: List<Letter> = build(
 
 /** Bright colours reused by the games for buttons and crayons. */
 val FunColors: List<Color> = palette
+
+/**
+ * How the voice names the Romanian letters with diacritics. They aren't in [RomanianAlphabet],
+ * but words contain them, e.g. when a child spells "pește" letter by letter.
+ */
+val RomanianDiacriticNames = mapOf('Ă' to "ă", 'Â' to "â din a", 'Î' to "î din i", 'Ș' to "șe", 'Ț' to "țe")

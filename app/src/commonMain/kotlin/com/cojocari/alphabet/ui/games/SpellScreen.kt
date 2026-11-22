@@ -88,7 +88,8 @@ fun SpellScreen(onHome: () -> Unit) {
     val placed = remember(word) { mutableStateListOf<Char>() }
     var celebrate by remember { mutableIntStateOf(0) }
 
-    fun nameOf(c: Char) = language.alphabet.firstOrNull { it.char == c }?.name ?: c.toString()
+    fun nameOf(c: Char) = language.alphabet.firstOrNull { it.char == c }?.name
+        ?: com.cojocari.alphabet.data.RomanianDiacriticNames[c] ?: c.toString()
 
     LaunchedEffect(word) {
         delay(350)

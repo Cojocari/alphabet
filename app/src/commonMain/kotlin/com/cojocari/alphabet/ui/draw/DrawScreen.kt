@@ -23,6 +23,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -36,7 +37,10 @@ import androidx.compose.ui.unit.sp
 import com.cojocari.alphabet.audio.LocalSfx
 import com.cojocari.alphabet.audio.LocalSpeaker
 import com.cojocari.alphabet.data.LocalProgress
+import com.cojocari.alphabet.i18n.LocalLanguage
 import com.cojocari.alphabet.ui.components.Celebration
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import com.cojocari.alphabet.ui.components.DemoEnd
 import com.cojocari.alphabet.ui.components.LocalGameAccess
 import com.cojocari.alphabet.ui.components.RoundButton
@@ -84,6 +88,11 @@ fun DrawScreen(onHome: () -> Unit, items: List<TraceItem>) {
     var crayon by remember { mutableStateOf(Crayons.first()) }
     val trace = remember(letter.text) { TraceState() }
     var celebrate by remember { mutableIntStateOf(0) }
+    // Each letter is traced twice: first over its outline, then on dots only (round 2).
+    var round by remember(letter.text) { mutableIntStateOf(1) }
+    val finished = round == 2 && trace.done
+    val scope = rememberCoroutineScope()
+    val t = LocalLanguage.current.strings
 
     LaunchedEffect(letter.text) { speaker.say(letter.start) }
 
@@ -91,7 +100,8 @@ fun DrawScreen(onHome: () -> Unit, items: List<TraceItem>) {
         Column(Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
             TopBar(onBack = onHome) {
                 Text(letter.emoji, fontSize = 48.sp, modifier = Modifier.bouncyClick { speaker.say(letter.start) })
-                StarMeter(trace.progress)
+                // Each round fills half the stars.
+                StarMeter((round - 1 + trace.progress) / 2f)
             }
 
             TracePad(
@@ -100,16 +110,27 @@ fun DrawScreen(onHome: () -> Unit, items: List<TraceItem>) {
                 level = access.level,
                 crayon = crayon,
                 state = trace,
+                dotted = round == 2,
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp),
             ) {
-                celebrate++
-                demoDone++
-                sfx.fanfare()
-                stars.addStar()
-                speaker.say(letter.done)
+                if (round == 1) {
+                    sfx.success()
+                    speaker.say(t.traceAgainDots)
+                    scope.launch {
+                        delay(1800)
+                        round = 2
+                        trace.clear()
+                    }
+                } else {
+                    celebrate++
+                    demoDone++
+                    sfx.fanfare()
+                    stars.addStar()
+                    speaker.say(letter.done)
+                }
             }
 
             CrayonBox(crayon) { crayon = it }
@@ -124,7 +145,7 @@ fun DrawScreen(onHome: () -> Unit, items: List<TraceItem>) {
                     index = (index - 1 + items.size) % items.size
                 }, size = 68.dp)
                 RoundButton("🧽", Color(0xFFFFD6E0), onClick = { trace.clear() }, size = 68.dp)
-                NextButton(pulse = trace.done) { index = (index + 1) % items.size }
+                NextButton(pulse = finished) { index = (index + 1) % items.size }
             }
         }
         Celebration(trigger = celebrate)

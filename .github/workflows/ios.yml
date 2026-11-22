@@ -1,5 +1,6 @@
 # Builds the iOS app on a GitHub-hosted Mac (free for public repositories), runs it in the
-# iPhone simulator and takes screenshots of a few screens (pushed to the ci-screenshots branch).
+# iPhone simulator and takes screenshots of a few screens (pushed to the ci-screenshots branch),
+# then builds an unsigned .ipa for sideloading (pushed to the ci-ipa branch).
 # Signing and TestFlight uploads come once the Apple Developer account exists (docs/ios.md).
 name: iOS
 
@@ -18,7 +19,7 @@ permissions:
 jobs:
   simulator:
     runs-on: macos-15
-    timeout-minutes: 60
+    timeout-minutes: 90
     steps:
       - uses: actions/checkout@v5
 
@@ -97,6 +98,31 @@ jobs:
           git add .
           git -c user.name="github-actions" -c user.email="github-actions@users.noreply.github.com" commit -q -m "iOS screenshots ${GITHUB_SHA}"
           git push -q -f "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" ci-screenshots
+
+      - name: Build the unsigned iPhone app (.ipa) for sideloading
+        run: |
+          set -o pipefail
+          xcodebuild -project iosApp/iosApp.xcodeproj -scheme iosApp -configuration Release \
+            -sdk iphoneos -destination 'generic/platform=iOS' -derivedDataPath build/dd-device \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" build 2>&1 \
+            | tee -a build.log | grep -E "^e: |error:|BUILD" || true
+          app=build/dd-device/Build/Products/Release-iphoneos/CleverOwl.app
+          test -d "$app"
+          mkdir -p ipa/Payload
+          cp -R "$app" ipa/Payload/
+          (cd ipa && zip -qry ../CleverOwl.ipa Payload)
+          ls -la CleverOwl.ipa
+          [ "$(stat -f%z CleverOwl.ipa)" -lt 95000000 ] || { echo "::error::IPA too big for a branch"; exit 1; }
+
+      - name: Publish the .ipa to the ci-ipa branch
+        run: |
+          mkdir -p out && cp CleverOwl.ipa out/
+          cd out
+          echo "Unsigned iOS build of ${GITHUB_SHA} (install with Sideloadly)" > README.md
+          git init -q -b ci-ipa
+          git add .
+          git -c user.name="github-actions" -c user.email="github-actions@users.noreply.github.com" commit -q -m "iOS build ${GITHUB_SHA}"
+          git push -q -f "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" ci-ipa
 
       - name: Report errors as annotations
         if: failure()
