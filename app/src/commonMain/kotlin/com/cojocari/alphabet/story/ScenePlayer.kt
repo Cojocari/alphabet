@@ -103,7 +103,7 @@ private class SceneContext(
     val setPrompt: (String) -> Unit,
 )
 
-/** An animal friend's sound in a scene is cut after this long, so the story keeps moving. */
+/** The story waits at most this long for an animal friend's sound before going on. */
 private const val AnimalSoundInScene = 1800L
 
 /**
@@ -305,7 +305,6 @@ private fun NarrateStep(step: Step.Narrate, ctx: SceneContext) {
         ctx.setMood(step.mood)
         if (step.sound && friend != null) {
             delay(ctx.player.play(friend.key).coerceAtMost(AnimalSoundInScene) + 150)
-            ctx.player.stop()
         }
         speaker.sayAndWait(step.text)
         speaker.awaitQuiet()
@@ -511,8 +510,8 @@ private fun AskStep(step: Step.Ask, ctx: SceneContext) {
             sfx.success()
             ctx.celebrate()
             ctx.setMood(Mood.Happy)
-            // One right answer in three, Hupi cheers too.
-            val cheer = if (Random.nextInt(3) == 0) " " + s.hupiCheers.random() else ""
+            // One right answer in three (the child's own, not the ones done together), Hupi cheers too.
+            val cheer = if (!together && Random.nextInt(3) == 0) " " + s.hupiCheers.random() else ""
             speaker.say(quest.right(t.praise.random()) + cheer)
             scope.launch {
                 delay(1500)
@@ -861,19 +860,18 @@ private fun RewardStep(step: Step.Reward, ctx: SceneContext) {
         ctx.setMood(Mood.Happy)
         if (friend != null) {
             delay(ctx.player.play(friend.key).coerceAtMost(AnimalSoundInScene) + 100)
-            ctx.player.stop()
             speaker.sayAndWait(s.friendThanks(s.friendName(friend)))
         }
         sfx.fanfare()
         ctx.celebrate()
         step.stage?.let {
-            delay(400)
+            delay(600)
             grown = true
             ctx.setStage(it)
             ctx.celebrate()
             speaker.sayAndWait(s.gotItem(it))
         }
-        delay(500)
+        delay(600)
         ctx.next()
     }
     Column(

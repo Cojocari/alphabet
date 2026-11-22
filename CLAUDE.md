@@ -86,6 +86,19 @@ the store screenshots. Earlier in v4.0: Animals world, real sounds, stroke arrow
 Hupi's Adventure (story mode, tested on the tablet: map, hatch, all step types, show, growing up, diploma,
 warm-up, house, age picker) and a "Learn with Hupi" story path in every world except Animals.
 
+## 2026-11-22, branch `ios` (not yet merged into `develop`, not tested on the tablet)
+- iOS port (Kotlin Multiplatform, see `docs/ios.md`). GitHub Actions builds it, takes simulator screenshots
+  (`ci-screenshots` branch) and an unsigned Release `.ipa` for Sideloadly (`ci-ipa` branch). Launch arguments
+  `-route story:30 -step 5` open any screen in debug builds, like the adb helpers.
+- Romanian alphabet teaches only the 26 base letters (Ă, Â, Î, Ș, Ț removed from `RomanianAlphabet`; words keep
+  them; `RomanianDiacriticNames` names them when spelling; old saved letters ignored via `belongsTo`).
+- Story: Meet no longer says Hupi's wrong guess and moves on after 3 s; next question 1.5 s after a right answer;
+  the story waits at most 1.8 s for an animal sound; Easy: hint after 1 mistake, and one Hupi game per lesson
+  (Catch on even scenes, Teach on odd); `hupiCheers` after one own right answer in three.
+- Tracing game (`DrawScreen`): two rounds per letter; round 2 is `TracePad(dotted = true)` (no outline, dots with
+  arrowheads). Story trace step unchanged.
+- Planning board: Trello "Clever Owl / Bufnița Isteață" (private, the owner's Momentum workspace).
+
 To do / to check with the owner:
 1. Owner to play the story with a child and report pace, humour and difficulty.
 2. Owner to listen to all animal sounds and check the tracing arrows on letters like a, g, 5, 8.

@@ -242,11 +242,11 @@ fun buildScene(
                 if (level != Difficulty.Hard) steps += Step.Ask(it, AskMode.Together, firstLetter)
             }
             items.shuffled(rnd).forEach { steps += Step.Ask(it, AskMode.Normal, firstLetter) }
-            // One Hupi game per lesson, to keep lessons short: catching him on even scenes,
-            // teaching him on odd ones (or when nothing can be caught).
             val catchItem = items.firstOrNull { catchable(it) && !firstLetter }?.takeIf { scene % 2 == 0 }
             if (catchItem != null) steps += Step.Catch(catchItem)
-            else items.randomOrNull(rnd)?.let { steps += Step.Teach(it, firstLetter) }
+            // Little ones get one Hupi game per lesson (catch on even scenes, teach on odd ones),
+            // so their lessons stay short; Medium and Hard get both.
+            if (level != Difficulty.Easy || catchItem == null) items.randomOrNull(rnd)?.let { steps += Step.Teach(it, firstLetter) }
         }
     }
 
@@ -268,9 +268,11 @@ fun buildScene(
  * Letters and words belong to one language; other things to every language. Letters no longer
  * taught (Ă, Â, Î, Ș, Ț, left in old saved progress) belong to none, so they don't come back.
  */
-fun Item.belongsTo(language: Language) =
-    (kind != Kind.Letter && kind != Kind.Word) ||
-        (key.startsWith("${language.name}/") && (kind != Kind.Letter || letter(language) != null))
+fun Item.belongsTo(language: Language) = when (kind) {
+    Kind.Letter -> key.startsWith("${language.name}/") && letter(language) != null
+    Kind.Word -> key.startsWith("${language.name}/") && word(language) != null
+    else -> true
+}
 
 /** The morning warm-up: three quick questions about things due for review. */
 fun buildWarmup(language: Language, story: StoryProgress, rnd: Random = Random.Default): List<Step> {
