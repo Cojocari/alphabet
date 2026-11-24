@@ -30,6 +30,11 @@ for lang in "$@"; do
     done_=$((done_ + 1))
     [ -s "$out/$clip.mp3" ] && continue
     text=$(printf '%s' "$sentence" | sed -e 's/&/\&amp;/g' -e 's/</\&lt;/g' -e 's/>/\&gt;/g')
+    # English: a lone capital is a letter name ("A is for Apple!", "That's B."); without this
+    # the voice reads "A" as the article and it sounds like another letter. "A" or "I" before a
+    # word other than "is" stays a word ("A treasure chest!", "I can…"), unless after "letter".
+    [ "$lang" = en ] && text=$(printf '%s' "$text" | perl -CSD -pe \
+      's{(?<![\p{L}'"'"'’&])([A-Z])(?![\p{L}'"'"'’])(?:(?<=letter [A-Z])|(?! (?!is\b)\p{L}))}{<say-as interpret-as="characters">$1</say-as>}g')
     # The text goes through a UTF-8 file: Windows command-line arguments would turn ă, ș, ț into a, s, t.
     printf '<speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis" xml:lang="%s"><voice name="%s">%s</voice></speak>' \
       "$locale" "$voice" "$text" > "$tmp/request.xml"
