@@ -1,6 +1,8 @@
 package com.cojocari.alphabet.story
 
+import com.cojocari.alphabet.data.ArtColors
 import com.cojocari.alphabet.data.Difficulty
+import com.cojocari.alphabet.platform.KeyValueStore
 import com.cojocari.alphabet.i18n.Language
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -96,5 +98,61 @@ class CurriculumTest {
                 q.choices.forEach { c -> c.text.toIntOrNull()?.let { assertTrue("$key choice $it", it in 0..max.coerceAtLeast(4)) } }
             }
         }
+    }
+    @Test
+    fun everyLevelTeachesAllColoursAndAllLetters() {
+        for (language in Language.entries) for (level in Difficulty.entries) {
+            val colors = chapterItems(Subject.ColorsShapes, level, language).filter { it.kind == Kind.Color }.map { it.key.toInt() }
+            assertEquals("$level colours", ArtColors.indices.toSet(), colors.toSet())
+            val letters = (chapterItems(Subject.LettersRiver, level, language) + chapterItems(Subject.LettersLibrary, level, language))
+                .map { it.letter(language)!!.char }
+            assertEquals("$language $level letters", language.alphabet.map { it.char }, letters)
+        }
+    }
+
+    @Test
+    fun everyLessonHasItsOwnTreasureAndTheMagpieComesOnceAChapter() {
+        val treasures = (0 until TotalScenes).filter { !isShow(it) }.map { treasureOf(it) }
+        assertTrue(treasures.none { it == null })
+        assertEquals(treasures.size, treasures.toSet().size)
+        assertTrue((0 until TotalScenes).filter { isShow(it) }.all { treasureOf(it) == null })
+        val story = StoryProgress(MemoryStore())
+        for (language in Language.entries) for (level in Difficulty.entries) for (scene in 0 until TotalScenes) {
+            val steps = buildScene(scene, language, level, story, premium = true, rnd = Random(scene))
+            val magpies = steps.count { it is Step.Magpie }
+            assertEquals("scene $scene magpie", if (scene % ScenesPerChapter == MagpieLesson) 1 else 0, magpies)
+            if (!isShow(scene)) assertEquals(treasureOf(scene), (steps.last { it is Step.Reward } as Step.Reward).treasure)
+            // World paths have no magpie plot.
+            val path = Paths.all.first { chapterOf(scene) in it }
+            assertTrue(buildScene(scene, language, level, story, true, Random(scene), path).none { it is Step.Magpie })
+        }
+    }
+
+    @Test
+    fun savedProgressMovesToTheSameLessonInLongerChapters() {
+        // Old layout: 7 scenes a chapter. 16 = chapter 3, lesson 3 (2 × 7 + 2 scenes done).
+        val store = MemoryStore().apply { putInt("done", 16); putInt("path1", 7); putInt("path5", 3) }
+        val story = StoryProgress(store)
+        assertEquals(2 * ScenesPerChapter + 2, story.done)
+        assertEquals(2, story.stage)
+        assertEquals(ScenesPerChapter, story.chapterDone(1))
+        assertEquals(3, story.chapterDone(5))
+        // Moved only once.
+        assertEquals(2 * ScenesPerChapter + 2, StoryProgress(store).done)
+        assertEquals(0, StoryProgress(MemoryStore()).done)
+    }
+
+    private class MemoryStore : KeyValueStore {
+        private val map = HashMap<String, Any>()
+        override fun getInt(key: String, default: Int) = map[key] as? Int ?: default
+        override fun getLong(key: String, default: Long) = map[key] as? Long ?: default
+        override fun getBoolean(key: String, default: Boolean) = map[key] as? Boolean ?: default
+        override fun getString(key: String) = map[key] as? String
+        override fun putInt(key: String, value: Int) { map[key] = value }
+        override fun putLong(key: String, value: Long) { map[key] = value }
+        override fun putBoolean(key: String, value: Boolean) { map[key] = value }
+        override fun putString(key: String, value: String) { map[key] = value }
+        override fun remove(key: String) { map.remove(key) }
+        override fun clear() = map.clear()
     }
 }

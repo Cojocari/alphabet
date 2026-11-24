@@ -1,6 +1,7 @@
 package com.cojocari.alphabet.story
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -287,7 +288,7 @@ fun MeetCard(item: Item, language: Language) {
         Kind.Color -> {
             val c = ArtColors[item.int()]
             Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                Box(Modifier.size(160.dp).clip(CircleShape).background(c.color))
+                Box(Modifier.size(160.dp).clip(CircleShape).background(c.color).border(3.dp, Color(0xFFDDDDDD), CircleShape))
                 Text(c.example, fontSize = 80.sp)
                 Text(t.colorNames[item.int()].replaceFirstChar { it.uppercase() }, fontSize = 40.sp, fontWeight = FontWeight.Bold, color = Ink)
             }
@@ -331,7 +332,11 @@ fun CatchFace(item: Item, language: Language, size: Int) {
             Text(it.char.toString(), fontSize = (size * 0.55f).sp, fontWeight = FontWeight.Black, color = it.color)
         }
         Kind.Number -> Text(item.key, fontSize = (size * (if (item.key.length > 1) 0.42f else 0.55f)).sp, fontWeight = FontWeight.Black, color = numberColor(item.key.toInt()))
-        else -> Box(Modifier.size((size * 0.62f).dp).clip(CircleShape).background(ArtColors[item.key.toInt()].color))
+        // A grey ring so white shows on the white tile.
+        else -> Box(
+            Modifier.size((size * 0.62f).dp).clip(CircleShape).background(ArtColors[item.key.toInt()].color)
+                .border(3.dp, Color(0xFFBBBBBB), CircleShape),
+        )
     }
 }
 

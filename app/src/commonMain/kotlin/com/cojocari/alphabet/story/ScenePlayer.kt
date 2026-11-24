@@ -264,6 +264,7 @@ private fun StepContent(step: Step, ctx: SceneContext, stage: Int) {
         is Step.Catch -> CatchStep(step.item, ctx)
         is Step.Trace -> TraceStep(step.item, ctx)
         is Step.ShowOff -> ShowOffStep(step.items, ctx, stage)
+        is Step.Magpie -> MagpieStep(step.item, ctx)
         is Step.Reward -> RewardStep(step, ctx)
         Step.Diploma -> DiplomaStep(ctx)
     }
@@ -322,8 +323,10 @@ private fun NarrateStep(step: Step.Narrate, ctx: SceneContext) {
                 fontSize = 130.sp,
                 modifier = Modifier.bouncyClick { scope.launch { ctx.player.play(friend.key) } },
             )
-        } else if (step.text.contains("🎓").not() && step.mood == Mood.Surprised) {
-            Text("🪶", fontSize = 110.sp)
+        } else if (step.mood == Mood.Surprised) {
+            // The magpie's news (her mischief, the clues she leaves): she flaps by.
+            val flap by rememberInfiniteTransition(label = "flap").animateFloat(0f, 1f, infiniteRepeatable(tween(300), RepeatMode.Reverse), label = "f")
+            Magpie(flap, Modifier.size(200.dp))
         }
         Bubble(step.text, Modifier.bouncyClick { speaker.say(step.text) })
         NextArrow { speaker.stop(); ctx.next() }
@@ -847,15 +850,125 @@ private fun ShowOffStep(items: List<Item>, ctx: SceneContext, stage: Int) {
     }
 }
 
+/**
+ * The magpie flies around in a loop with something shiny in her beak. Each tap makes her
+ * squawk; after a few she drops it (one of today's things) and flies away.
+ */
+@Composable
+private fun MagpieStep(item: Item, ctx: SceneContext) {
+    val speaker = LocalSpeaker.current
+    val sfx = LocalSfx.current
+    val language = LocalLanguage.current
+    val level = LocalProgress.current.difficulty
+    val s = language.story
+    val needed = level.pick(2, 3, 4)
+    var hits by remember { mutableIntStateOf(0) }
+    val done = hits >= needed
+    val shake = remember { Animatable(0f) }
+    val leave = remember { Animatable(0f) }
+    val scope = rememberCoroutineScope()
+    // Where she was when she dropped it (fractions of the play area).
+    var dropAt by remember { mutableStateOf(Offset(0.5f, 0.4f)) }
+
+    LaunchedEffect(Unit) {
+        ctx.setPrompt(s.magpieAppears)
+        ctx.setMood(Mood.Surprised)
+        speaker.say(s.magpieAppears)
+    }
+    LaunchedEffect(done) {
+        if (!done) return@LaunchedEffect
+        sfx.fanfare()
+        ctx.celebrate()
+        ctx.setMood(Mood.Happy)
+        launch { leave.animateTo(1f, tween(1600)) }
+        speaker.sayAndWait(s.magpieGone)
+        delay(1800)
+        ctx.next()
+    }
+    val time by rememberInfiniteTransition(label = "fly").animateFloat(
+        0f, 2f * PI.toFloat(), infiniteRepeatable(tween(level.pick(16000, 12000, 9000), easing = LinearEasing)), label = "t",
+    )
+    val flap by rememberInfiniteTransition(label = "flap").animateFloat(0f, 1f, infiniteRepeatable(tween(260), RepeatMode.Reverse), label = "f")
+
+    BoxWithConstraints(Modifier.fillMaxSize()) {
+        val bird = (minOf(maxWidth, maxHeight) * 0.42f).coerceIn(120.dp, 230.dp)
+        // A figure of eight across the play area.
+        val fx = 0.5f + 0.34f * sin(time)
+        val fy = 0.42f + 0.26f * sin(2 * time + 0.6f)
+        val right = kotlin.math.cos(time) > 0
+        if (!done) {
+            Box(
+                Modifier
+                    .offset(x = maxWidth * fx - bird / 2, y = maxHeight * fy - bird / 2)
+                    .size(bird)
+                    .rotate(shake.value)
+                    .bouncyClick {
+                        if (hits >= needed) return@bouncyClick
+                        dropAt = Offset(fx, fy)
+                        hits++
+                        sfx.pop()
+                        if (hits < needed) speaker.say(s.magpieHits[(hits - 1) % s.magpieHits.size])
+                        scope.launch { for (a in listOf(-18f, 18f, -10f, 10f, 0f)) shake.animateTo(a, tween(50)) }
+                    },
+            ) { Magpie(flap, Modifier.fillMaxSize().scale(scaleX = if (right) 1f else -1f, scaleY = 1f)) }
+        } else {
+            // She flies off to the top right without the shiny thing…
+            Box(
+                Modifier
+                    .offset(
+                        x = maxWidth * (dropAt.x + (1.2f - dropAt.x) * leave.value) - bird / 2,
+                        y = maxHeight * (dropAt.y - (dropAt.y + 0.5f) * leave.value) - bird / 2,
+                    )
+                    .size(bird),
+            ) { Magpie(flap, Modifier.fillMaxSize(), shiny = false) }
+            // …and what she took lands in the middle.
+            Box(
+                Modifier
+                    .offset(
+                        x = maxWidth * (dropAt.x + (0.5f - dropAt.x) * leave.value) - 110.dp,
+                        y = maxHeight * (dropAt.y + (0.5f - dropAt.y) * leave.value) - 110.dp,
+                    )
+                    .size(220.dp)
+                    .scale(0.3f + 0.7f * leave.value)
+                    .shadow(10.dp, RoundedCornerShape(36.dp))
+                    .clip(RoundedCornerShape(36.dp))
+                    .background(Color.White),
+                contentAlignment = Alignment.Center,
+            ) { Box(Modifier.scale(0.6f)) { MeetCard(item, language) } }
+        }
+        // How many taps are still needed: one feather each.
+        Row(Modifier.align(Alignment.BottomCenter), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            repeat(needed) { i -> Text("🪶", fontSize = 36.sp, modifier = Modifier.alpha(if (i < hits) 1f else 0.25f)) }
+        }
+    }
+}
+
+/**
+ * The end of a scene. A lesson: the friend says thank you and gives a treasure chest; the
+ * child taps it open and the treasure goes to Hupi's house. A show: Hupi grows up and gets
+ * his new thing while the chapter's friends dance around him.
+ */
 @Composable
 private fun RewardStep(step: Step.Reward, ctx: SceneContext) {
     val speaker = LocalSpeaker.current
     val sfx = LocalSfx.current
     val language = LocalLanguage.current
     val story = LocalStory.current
+    val level = LocalProgress.current.difficulty
     val s = language.story
     val friend = step.friend
+    val treasure = step.treasure
     var grown by remember { mutableStateOf(false) }
+    // 0 = thanks, 1 = the chest waits to be tapped, 2 = open.
+    var phase by remember { mutableIntStateOf(0) }
+    var taps by remember { mutableIntStateOf(0) }
+    val tapsNeeded = level.pick(2, 3, 3)
+    val shake = remember { Animatable(0f) }
+    val lid = remember { Animatable(0f) }
+    val rise = remember { Animatable(0f) }
+    val scope = rememberCoroutineScope()
+    val bounce by rememberInfiniteTransition(label = "dance").animateFloat(0f, 2f * PI.toFloat(), infiniteRepeatable(tween(1400, easing = LinearEasing)), label = "b")
+
     LaunchedEffect(Unit) {
         ctx.setMood(Mood.Happy)
         if (friend != null) {
@@ -869,27 +982,88 @@ private fun RewardStep(step: Step.Reward, ctx: SceneContext) {
             grown = true
             ctx.setStage(it)
             ctx.celebrate()
+            launch { repeat(3) { delay(900); ctx.celebrate() } }
             speaker.sayAndWait(s.gotItem(it))
+            delay(1200)
+        }
+        if (treasure != null) {
+            phase = 1
+            ctx.setPrompt(s.chestAsk)
+            speaker.say(s.chestAsk)
+            return@LaunchedEffect
         }
         delay(600)
         ctx.next()
     }
+    LaunchedEffect(phase) {
+        if (phase != 2) return@LaunchedEffect
+        sfx.fanfare()
+        ctx.celebrate()
+        lid.animateTo(1f, tween(450))
+        rise.animateTo(1f, androidx.compose.animation.core.spring(dampingRatio = 0.45f, stiffness = 90f))
+        speaker.sayAndWait(s.treasureFound)
+        delay(2500)
+        ctx.next()
+    }
+
+    fun tapChest() {
+        if (phase != 1) return
+        taps++
+        sfx.pop()
+        scope.launch { for (a in listOf(-8f, 8f, -5f, 5f, 0f)) shake.animateTo(a, tween(55)) }
+        if (taps >= tapsNeeded) phase = 2
+    }
+
     Column(
         Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically),
     ) {
-        if (friend != null) Text(friend.emoji, fontSize = 120.sp)
+        if (friend != null) Text(friend.emoji, fontSize = if (phase == 0) 120.sp else 64.sp)
         val stage = step.stage
         if (stage != null) {
             Box(contentAlignment = Alignment.Center) {
-                Hupi(if (grown) stage else stage - 1, Mood.Happy, Modifier.size(300.dp), ScarfColors[story.scarf])
+                Hupi(if (grown) stage else stage - 1, Mood.Happy, Modifier.size(280.dp), ScarfColors[story.scarf])
                 if (grown) Text("✨", fontSize = 70.sp, modifier = Modifier.align(Alignment.TopStart))
                 if (grown) Text("✨", fontSize = 56.sp, modifier = Modifier.align(Alignment.BottomEnd))
             }
+            // The chapter's friends dance for Hupi.
+            if (grown) {
+                com.cojocari.alphabet.ui.components.ScaleToFit {
+                    Row(horizontalArrangement = Arrangement.spacedBy(6.dp), modifier = Modifier.padding(top = 14.dp)) {
+                        castOf(stage - 1).forEachIndexed { i, a ->
+                            Text(a.emoji, fontSize = 44.sp, modifier = Modifier.offset(y = (-14 * kotlin.math.abs(sin(bounce + i * 0.8f))).dp))
+                        }
+                    }
+                }
+            }
         }
-        Text("⭐ ⭐ ⭐", fontSize = 56.sp)
-        NextArrow { speaker.stop(); ctx.next() }
+        if (treasure != null && phase > 0) {
+            BoxWithConstraints(Modifier.weight(1f, fill = false).fillMaxWidth(), contentAlignment = Alignment.Center) {
+                val chest = (minOf(maxWidth, maxHeight) * 0.62f).coerceIn(150.dp, 300.dp)
+                Box(Modifier.size(chest), contentAlignment = Alignment.Center) {
+                    TreasureChest(lid.value, Modifier.fillMaxSize().rotate(shake.value).bouncyClick { tapChest() })
+                    if (phase == 2) {
+                        Text(
+                            treasure,
+                            fontSize = (chest.value * 0.42f).sp,
+                            modifier = Modifier
+                                .offset(y = -chest * 0.32f * rise.value)
+                                .scale(0.2f + 0.9f * rise.value)
+                                .rotate(360f * (1f - rise.value)),
+                        )
+                    }
+                }
+            }
+            if (phase == 1) {
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    repeat(tapsNeeded) { i -> Text("👆", fontSize = 30.sp, modifier = Modifier.alpha(if (i < taps) 0.25f else 1f)) }
+                }
+            }
+        } else {
+            Text("⭐ ⭐ ⭐", fontSize = 56.sp)
+        }
+        if (treasure == null || phase == 2) NextArrow { speaker.stop(); ctx.next() } else Box(Modifier.size(80.dp))
     }
 }
 

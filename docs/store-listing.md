@@ -22,7 +22,7 @@ Povești cu Hupi: litere, cifre, citire și socoteli, 2–6 ani. Fără reclame.
 ```
 Bufnița Isteață transformă primele lecții în joacă! Copilul învață literele, cifrele, primele cuvinte și matematica de bază împreună cu Hupi, o bufniță mică și curioasă, prin povești și 24 de jocuri colorate, cu voce în limba română.
 
-🦉 AVENTURA LUI HUPI – un mod poveste în 7 capitole. Coțofana cea năzdrăvană a furat culorile, cifrele și literele pădurii, iar copilul îl ajută pe Hupi să le aducă înapoi. Copilul nu doar învață, ci îl învață și pe Hupi: îl prinde când greșește și îi arată răspunsul corect. Hupi crește cu fiecare capitol și primește ghiozdan, ochelari și pălărie de absolvent, iar la final copilul primește o diplomă.
+🦉 AVENTURA LUI HUPI – un mod poveste în 7 capitole. Coțofana cea năzdrăvană a furat culorile, cifrele și literele pădurii, iar copilul îl ajută pe Hupi să le aducă înapoi. Copilul nu doar învață, ci îl învață și pe Hupi: îl prinde când greșește și îi arată răspunsul corect. După fiecare lecție, copilul deschide un cufăr cu o comoară pentru căsuța lui Hupi, iar în fiecare capitol coțofana apare în zbor și trebuie prinsă. Hupi crește cu fiecare capitol și primește ghiozdan, ochelari și pălărie de absolvent, iar la final copilul primește o diplomă.
 
 🧠 ÎNVĂȚARE ADEVĂRATĂ – fiecare lucru nou revine în zile diferite. Un lucru e considerat învățat abia când copilul răspunde corect din prima în 3 zile diferite, iar ce a fost uitat revine la recapitulare, la „trezirea de dimineață” a lui Hupi.
 
@@ -46,7 +46,7 @@ Bufnița Isteață transformă primele lecții în joacă! Copilul învață lit
 
 ⭐ TREI NIVELURI – Ușor, Mediu și Greu. Părintele alege vârsta copilului, iar nivelul se potrivește singur; se poate schimba oricând.
 
-🏆 RECOMPENSE – stele, un album cu 40 de abțibilduri, scene în care copilul își așază abțibildurile, un cadou zilnic și căsuța lui Hupi, cu rafturi pe care strălucește tot ce a învățat copilul
+🏆 RECOMPENSE – stele, un album cu 40 de abțibilduri, scene în care copilul își așază abțibildurile, un cadou zilnic și căsuța lui Hupi, cu 56 de comori de adunat și rafturi pe care strălucește tot ce a învățat copilul
 
 🗣️ FĂRĂ CITIT – totul este rostit cu voce tare, deci și copiii care nu știu încă să citească se pot juca singuri
 
@@ -78,7 +78,7 @@ Story adventure with Hupi: letters, numbers, reading & math, ages 2–6. No ads.
 ```
 Clever Owl turns first lessons into play! Children learn letters, numbers, first words and simple math with Hupi, a curious little owl, through stories and 24 colourful games, all spoken aloud.
 
-🦉 HUPI'S ADVENTURE – a story mode in 7 chapters. The naughty magpie took the forest's colours, numbers and letters, and your child helps Hupi get them back. Your child doesn't just learn, they teach Hupi too: they catch him when he gets it wrong and show him the right answer. Hupi grows with every chapter and earns a backpack, glasses and a graduation cap, and at the end your child gets a diploma.
+🦉 HUPI'S ADVENTURE – a story mode in 7 chapters. The naughty magpie took the forest's colours, numbers and letters, and your child helps Hupi get them back. Your child doesn't just learn, they teach Hupi too: they catch him when he gets it wrong and show him the right answer. After every lesson your child opens a treasure chest for Hupi's house, and in every chapter the magpie swoops in and has to be caught. Hupi grows with every chapter and earns a backpack, glasses and a graduation cap, and at the end your child gets a diploma.
 
 🧠 REAL LEARNING – everything new comes back on different days. Something only counts as learned when your child gets it right first time on 3 different days, and anything forgotten returns for review in Hupi's morning wake-up.
 
@@ -102,7 +102,7 @@ Clever Owl turns first lessons into play! Children learn letters, numbers, first
 
 ⭐ THREE LEVELS – Easy, Medium and Hard. Set your child's age and the level follows; change it at any time.
 
-🏆 REWARDS – stars, a 40-sticker album, sticker scenes to decorate, a daily gift and Hupi's house, with shelves where everything your child learned shines
+🏆 REWARDS – stars, a 40-sticker album, sticker scenes to decorate, a daily gift and Hupi's house, with 56 treasures to collect and shelves where everything your child learned shines
 
 🗣️ NO READING NEEDED – everything is spoken, so even pre-readers can play on their own
 

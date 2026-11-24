@@ -8,8 +8,11 @@ import kotlin.random.Random
 
 const val ChapterCount = 7
 
-/** Six lessons and Hupi's show at the end of each chapter. */
-const val ScenesPerChapter = 7
+/** Eight lessons and Hupi's show at the end of each chapter. */
+const val ScenesPerChapter = 9
+
+/** Lessons per chapter (the scenes before the show). */
+const val LessonsPerChapter = ScenesPerChapter - 1
 const val TotalScenes = ChapterCount * ScenesPerChapter
 
 /** Chapters 1 and 2 are free; the rest come with the unlock. */
@@ -52,14 +55,34 @@ object Subject {
 
 /** The animal friend of each lesson, by chapter (the last scene, Hupi's show, has the whole cast). */
 private val Friends = listOf(
-    listOf("bird", "bee", "mouse", "frog", "cricket", "owl"),
-    listOf("cow", "pig", "sheep", "hen", "dog", "goat"),
-    listOf("duck", "frog", "bear", "cat", "horse", "mouse"),
-    listOf("owl", "mouse", "cat", "parrot", "monkey", "elephant"),
-    listOf("donkey", "rooster", "chick", "pig", "goat", "horse"),
-    listOf("wolf", "bear", "goat", "sheep", "bird", "cricket"),
-    listOf("elephant", "lion", "monkey", "parrot", "tiger", "dolphin"),
+    listOf("bird", "bee", "mouse", "frog", "cricket", "owl", "snake", "bear"),
+    listOf("cow", "pig", "sheep", "hen", "dog", "goat", "horse", "rooster"),
+    listOf("duck", "frog", "bear", "cat", "horse", "mouse", "snake", "dog"),
+    listOf("owl", "mouse", "cat", "parrot", "monkey", "elephant", "bird", "dog"),
+    listOf("donkey", "rooster", "chick", "pig", "goat", "horse", "hen", "cow"),
+    listOf("wolf", "bear", "goat", "sheep", "bird", "cricket", "tiger", "owl"),
+    listOf("elephant", "lion", "monkey", "parrot", "tiger", "dolphin", "whale", "cat"),
 )
+
+/**
+ * The treasure in each lesson's chest (by chapter, then lesson), things from that place.
+ * They fill the treasure shelf in Hupi's house. Only emoji every supported device can draw.
+ */
+val Treasures = listOf(
+    listOf("🌸", "🍄", "🦋", "🐞", "🌈", "🍀", "🌻", "🌰"),
+    listOf("🥕", "🌽", "🥚", "🍯", "🧀", "🍓", "🌾", "🐣"),
+    listOf("🐚", "🐠", "🦀", "⛵", "🐢", "💧", "🎣", "🦆"),
+    listOf("📕", "🔖", "🖍️", "🔭", "🗺️", "📜", "🧩", "🎨"),
+    listOf("🍎", "🍌", "🍉", "🍒", "🧁", "🍭", "🎈", "🍪"),
+    listOf("❄️", "⛄", "🧣", "🛷", "💎", "🔔", "🌙", "🦔"),
+    listOf("✏️", "📏", "🎒", "🏅", "🧸", "🎺", "🔬", "🌍"),
+)
+
+/** The treasure won in [scene], or null for a show. */
+fun treasureOf(scene: Int): String? = Treasures[chapterOf(scene)].getOrNull(scene % ScenesPerChapter)
+
+/** The lesson of each chapter where the magpie swoops in and must be chased away. */
+const val MagpieLesson = 3
 
 fun friendOf(scene: Int): Animal? {
     val key = Friends[chapterOf(scene)].getOrNull(scene % ScenesPerChapter) ?: return null
@@ -75,68 +98,68 @@ private fun color(i: Int) = Item(Kind.Color, "$i")
 private fun shape(i: Int) = Item(Kind.Shape, "$i")
 private fun math(key: String) = Item(Kind.Math, key)
 
-/** Letters little ones start with: no Q, W, X, Y and no Ă, Â (they never start a word). */
+/** Letters little ones start with: no Q, W, X, Y (few words start with them). */
 private fun easyLetters(language: Language) =
     language.alphabet.filter { !it.inside && it.char !in "QWXY" }.map { it.char }
 
-/** The whole alphabet spread over 12 lessons (chapters 3 and 4). */
-private fun letterLesson(language: Language, level: Difficulty, lesson: Int): List<Char> {
-    if (level == Difficulty.Easy) return listOfNotNull(easyLetters(language).getOrNull(lesson))
-    val all = language.alphabet.map { it.char }
-    return all.subList(lesson * all.size / 12, (lesson + 1) * all.size / 12)
-}
+/** Part [part] of [all] cut into [parts] nearly equal pieces, in order. */
+private fun <T> slice(all: List<T>, part: Int, parts: Int) = all.subList(part * all.size / parts, (part + 1) * all.size / parts)
+
+/** The whole alphabet spread over the 16 lessons of chapters 3 and 4, at every level. */
+private fun letterLesson(language: Language, lesson: Int): List<Char> =
+    slice(language.alphabet.map { it.char }, lesson, 2 * LessonsPerChapter)
 
 /** New things taught in a lesson ([scene] must not be a show). */
 fun lessonItems(scene: Int, level: Difficulty, language: Language): List<Item> {
     val lesson = scene % ScenesPerChapter
     return when (chapterOf(scene)) {
+        // All ten colours at every level (red, yellow, blue, green, orange, purple, pink,
+        // brown, black, white); the bigger ones also learn the six shapes.
         Subject.ColorsShapes -> when (level) {
-            // Red, yellow, blue, green, orange, purple.
-            Difficulty.Easy -> listOf(color(listOf(0, 2, 4, 3, 1, 5)[lesson]))
+            Difficulty.Easy -> listOf(listOf(0), listOf(2), listOf(4), listOf(3), listOf(1), listOf(5), listOf(6, 7), listOf(8, 9))[lesson].map(::color)
             else -> listOf(
-                listOf(color(0), color(2)), listOf(color(4), color(3)), listOf(color(1), color(5)),
-                listOf(shape(0), shape(1)), listOf(shape(2), shape(3)), listOf(shape(4), shape(5)),
+                listOf(color(0), color(2)), listOf(color(4), color(3)), listOf(color(1), color(5)), listOf(color(6), color(7)),
+                listOf(color(8), color(9)), listOf(shape(0), shape(1)), listOf(shape(2), shape(3)), listOf(shape(4), shape(5)),
             )[lesson]
         }
         Subject.Numbers -> when (level) {
-            Difficulty.Easy -> if (lesson < 5) listOf(number(lesson + 1)) else listOf(math("count:5"))
-            Difficulty.Medium -> listOf(listOf(1, 2), listOf(3, 4), listOf(5, 6), listOf(7, 8), listOf(9, 10), listOf(0))[lesson].map(::number)
+            Difficulty.Easy -> listOf(number(1), number(2), number(3), number(4), number(5), number(0), math("count:5"), math("more:5"))
+                .let { listOf(it[lesson]) }
+            Difficulty.Medium -> listOf(
+                listOf(number(1), number(2)), listOf(number(3), number(4)), listOf(number(5), number(6)), listOf(number(7), number(8)),
+                listOf(number(9), number(10)), listOf(number(0)), listOf(math("count:10")), listOf(math("compare:10")),
+            )[lesson]
             Difficulty.Hard -> listOf(
-                listOf(1, 2, 3), listOf(4, 5, 6), listOf(7, 8, 9), listOf(10, 11, 12), listOf(13, 14, 15, 16), listOf(17, 18, 19, 20),
+                listOf(1, 2, 3), listOf(4, 5, 6), listOf(7, 8, 9), listOf(10, 0), listOf(11, 12), listOf(13, 14, 15),
+                listOf(16, 17, 18), listOf(19, 20),
             )[lesson].map(::number)
         }
-        Subject.LettersRiver -> letterLesson(language, level, lesson).map { letter(language, it) }
-        Subject.LettersLibrary -> letterLesson(language, level, lesson + 6).map { letter(language, it) }
+        Subject.LettersRiver -> letterLesson(language, lesson).map { letter(language, it) }
+        Subject.LettersLibrary -> letterLesson(language, lesson + LessonsPerChapter).map { letter(language, it) }
         Subject.Math -> listOf(
             level.pick(
-                listOf("count:5", "more:5", "add:3", "count:5", "more:5", "add:3"),
-                listOf("count:10", "add:5", "sub:5", "compare:10", "add:10", "sub:10"),
-                listOf("add:10", "sub:10", "compare:10", "add:20", "sub:20", "add:20"),
+                listOf("count:5", "more:5", "add:3", "count:5", "more:5", "add:3", "count:5", "add:5"),
+                listOf("count:10", "add:5", "sub:5", "compare:10", "add:10", "sub:10", "add:10", "sub:10"),
+                listOf("add:10", "sub:10", "compare:10", "add:20", "sub:20", "add:20", "sub:20", "compare:10"),
             )[lesson]
         ).map(::math)
+        // Numbers and letters take turns: Easy one at a time, Medium two, Hard three.
         Subject.Writing -> {
-            val letters = easyLetters(language)
-            when (level) {
-                Difficulty.Easy -> listOf(number(1), number(2), number(3), letter(language, letters[0]), letter(language, letters[1]), letter(language, letters[2]))
-                    .let { listOf(it[lesson]) }
-                Difficulty.Medium -> listOf(
-                    listOf(number(1), number(2)), listOf(number(3), number(4)), listOf(number(5), letter(language, letters[0])),
-                    listOf(letter(language, letters[1]), letter(language, letters[2])), listOf(letter(language, letters[3]), letter(language, letters[4])),
-                    listOf(letter(language, letters[5]), letter(language, letters[6])),
-                )[lesson]
-                Difficulty.Hard -> {
-                    val n = listOf(1..3, 4..6, 7..9)
-                    if (lesson < 3) n[lesson].map(::number)
-                    else letters.subList((lesson - 3) * 3, (lesson - 3) * 3 + 3).map { letter(language, it) }
-                }
+            val size = level.pick(1, 2, 3)
+            val turn = lesson / 2
+            if (lesson % 2 == 0) {
+                val digits = (1..9).toList() + 0
+                digits.drop(turn * size).take(size).map(::number)
+            } else {
+                language.alphabet.drop(turn * size).take(size).map { letter(language, it.char) }
             }
         }
         else -> when (level) {
-            // Little ones: which letter does the picture start with?
-            Difficulty.Easy -> listOf(letter(language, easyLetters(language)[lesson]))
-            Difficulty.Medium -> language.words.filter { it.text.length <= 4 }.chunked(2).getOrElse(lesson) { emptyList() }
+            // Little ones: which letter does the picture start with? Letters from all over the alphabet.
+            Difficulty.Easy -> listOf(letter(language, slice(easyLetters(language), lesson, LessonsPerChapter).first()))
+            Difficulty.Medium -> slice(language.words.filter { it.text.length <= 4 }, lesson, LessonsPerChapter)
                 .map { Item(Kind.Word, "${language.name}/${it.text}") }
-            Difficulty.Hard -> language.words.chunked(3).getOrElse(lesson) { emptyList() }
+            Difficulty.Hard -> slice(language.words, lesson, LessonsPerChapter)
                 .map { Item(Kind.Word, "${language.name}/${it.text}") }
         }
     }
@@ -144,7 +167,7 @@ fun lessonItems(scene: Int, level: Difficulty, language: Language): List<Item> {
 
 /** Everything taught in a chapter. */
 fun chapterItems(chapter: Int, level: Difficulty, language: Language): List<Item> =
-    (0 until ScenesPerChapter - 1).flatMap { lessonItems(chapter * ScenesPerChapter + it, level, language) }.distinct()
+    (0 until LessonsPerChapter).flatMap { lessonItems(chapter * ScenesPerChapter + it, level, language) }.distinct()
 
 // ---------------------------------------------------------------- scene steps
 
@@ -160,7 +183,10 @@ sealed interface Step {
     class Catch(val item: Item) : Step
     class Trace(val item: Item) : Step
     class ShowOff(val items: List<Item>) : Step
-    class Reward(val friend: Animal?, val stage: Int?) : Step
+    /** The magpie flies around with something shiny; tapping her makes her drop [item]. */
+    class Magpie(val item: Item) : Step
+    /** The friend's thanks; a lesson's treasure chest ([treasure]); Hupi growing up after a show ([stage]). */
+    class Reward(val friend: Animal?, val stage: Int?, val treasure: String? = null) : Step
     data object Diploma : Step
 }
 
@@ -170,7 +196,8 @@ private fun catchable(item: Item) = item.kind == Kind.Letter || item.kind == Kin
  * The steps of a scene. A lesson goes: story intro, the friend's problem, meet each new thing
  * (Hupi gets it funny-wrong), find it together (Hupi points; skipped on Hard), find it alone,
  * sometimes catch it among floating tiles, teach Hupi (he guesses, the child judges),
- * remind Hupi of something learned earlier, then the friend's thanks.
+ * remind Hupi of something learned earlier, then the friend's thanks and a treasure chest.
+ * Once a chapter (lesson [MagpieLesson]) the magpie swoops in and must be tapped away.
  * The last scene of a chapter is Hupi's show: a mixed review, Hupi performing, a new item
  * for Hupi and the next clue about the magpie.
  */
@@ -220,7 +247,8 @@ fun buildScene(
     if (scene % ScenesPerChapter == 0) {
         steps += if (path == null) Step.Narrate(s.chapterIntro(chapter), Mood.Puzzled) else Step.Narrate(s.pathIntro(chapter), Mood.Happy)
     }
-    if (friend != null) steps += Step.Narrate(s.friendAsk(chapter, s.friendName(friend)), Mood.Normal, friend, sound = true)
+    val lesson = scene % ScenesPerChapter
+    if (friend != null) steps += Step.Narrate(s.friendAsk(chapter, lesson, s.friendName(friend)), Mood.Normal, friend, sound = true)
 
     val items = lessonItems(scene, level, language)
     val firstLetter = chapter == Subject.Reading && level == Difficulty.Easy
@@ -257,7 +285,9 @@ fun buildScene(
     story.due { it.id !in current && it.belongsTo(language) && (kinds == null || it.kind in kinds) }.take(level.pick(1, 1, 2)).forEach {
         steps += Step.Ask(it, AskMode.Forgot)
     }
-    steps += Step.Reward(friend, null)
+    // Once a chapter, in the big adventure, the magpie swoops in with one of today's things.
+    if (path == null && lesson == MagpieLesson) items.firstOrNull()?.let { steps += Step.Magpie(it) }
+    steps += Step.Reward(friend, null, treasureOf(scene))
     if (path != null && !premium && scene + 1 in pathScenes(path) && !pathFree(scene + 1, path)) {
         steps += Step.Narrate(s.pathLocked, Mood.Normal)
     }

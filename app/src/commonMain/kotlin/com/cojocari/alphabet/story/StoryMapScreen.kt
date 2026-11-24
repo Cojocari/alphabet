@@ -57,19 +57,19 @@ import com.cojocari.alphabet.ui.components.TopBar
 import com.cojocari.alphabet.ui.components.bouncyClick
 import com.cojocari.alphabet.ui.theme.Ink
 
-private val ChapterEmoji = listOf("🪺", "🐄", "🌊", "📚", "🧺", "🏔️", "🏫")
+internal val ChapterEmoji = listOf("🪺", "🐄", "🌊", "📚", "🧺", "🏔️", "🏫")
 private val ChapterColors = listOf(
     Color(0xFF52B788), Color(0xFFF4A261), Color(0xFF4CC9F0), Color(0xFFB5838D),
     Color(0xFFE9C46A), Color(0xFF9D8DF1), Color(0xFF43AA8B),
 )
 
 /** Where each stop sits across the path (0 = left edge, 1 = right edge). */
-private val StopX = listOf(0.5f, 0.7f, 0.78f, 0.6f, 0.38f, 0.24f, 0.5f)
+private val StopX = listOf(0.5f, 0.7f, 0.8f, 0.66f, 0.44f, 0.26f, 0.22f, 0.36f, 0.5f)
 private val StopGap = 104.dp
 
 /**
- * The adventure map: a winding path through the seven chapters. Finished scenes show a star
- * and can be replayed; the next one pulses with Hupi beside it; later ones wait. Chapters
+ * The adventure map: a winding path through the seven chapters. Finished lessons show the
+ * treasure won there (shows a star) and can be replayed; the next one pulses with Hupi beside it; later ones wait. Chapters
  * after the free ones show a lock until the unlock is bought.
  */
 @Composable
@@ -233,7 +233,7 @@ internal fun ChapterSection(
                         else -> friendOf(scene)?.emoji ?: "⭐"
                     }
                     Text(face, fontSize = if (show) 46.sp else 36.sp, modifier = Modifier.alpha(if (done || isNext) 1f else 0.4f))
-                    if (done) Text("⭐", fontSize = 22.sp, modifier = Modifier.align(Alignment.TopEnd))
+                    if (done) Text(treasureOf(scene) ?: "⭐", fontSize = 24.sp, modifier = Modifier.align(Alignment.TopEnd))
                     if (lockedHere) Text("🔒", fontSize = 20.sp, modifier = Modifier.align(Alignment.BottomEnd))
                 }
                 if (isNext && !lockedHere) {

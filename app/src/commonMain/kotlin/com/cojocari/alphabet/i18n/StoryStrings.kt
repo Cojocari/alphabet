@@ -21,8 +21,8 @@ interface StoryStrings {
 
     // ---- Chapters ----
     fun chapterIntro(chapter: Int): String
-    /** "The cow has lost the colours…": what the scene's animal friend needs. */
-    fun friendAsk(chapter: Int, friend: String): String
+    /** "The cow has lost the colours…": what the lesson's animal friend needs (four per chapter, by lesson). */
+    fun friendAsk(chapter: Int, lesson: Int, friend: String): String
     fun friendThanks(friend: String): String
     fun friendName(a: Animal): String
     fun cliffhanger(chapter: Int): String
@@ -55,6 +55,13 @@ interface StoryStrings {
     val hupiCheers: List<String>
     fun catchAsk(kind: String, short: String): String
     val catchDone: String
+    /** The magpie swoops in once a chapter: tap her until she drops what she took. */
+    val magpieAppears: String
+    val magpieHits: List<String>
+    val magpieGone: String
+    /** The treasure chest at the end of a lesson. */
+    val chestAsk: String
+    val treasureFound: String
     val showIntro: String
     val showApplause: String
     fun gotItem(stage: Int): String
@@ -79,6 +86,7 @@ interface StoryStrings {
     val shelfShapes: String
     val shelfWords: String
     val shelfMath: String
+    val shelfTreasures: String
     val legend: String
     val scarf: String
     /** What Hupi says when tapped; grows as he learns ([stage] = chapters finished). */
@@ -120,16 +128,50 @@ object EnglishStory : StoryStrings {
         "At last, the forest school! Hupi wants to read his first words. And look... the magpie is here!",
     )[chapter]
 
-    override fun friendAsk(chapter: Int, friend: String) = when (chapter) {
-        0 -> "$friend has lost the colours of the forest. Let's help Hupi find them!"
-        1 -> "$friend wants to count the animals, but the numbers are gone!"
-        2 -> "$friend found letters floating on the water. Let's see which ones!"
-        3 -> "$friend has a book with missing letters. Let's put them back!"
-        4 -> "$friend is selling fruit at the market. Let's count together!"
-        5 -> "$friend wants to write in the snow. Let's write together!"
-        else -> "$friend is the teacher today. Let's read together!"
-    }
-
+    override fun friendAsk(chapter: Int, lesson: Int, friend: String) = listOf(
+        listOf(
+            "$friend has lost the colours of the forest. Let's help Hupi find them!",
+            "$friend wants to paint a rainbow, but the paint pots are empty!",
+            "$friend has flowers that turned grey. Let's bring their colours back!",
+            "$friend sees only grey all around. Let's bring the colours back!",
+        ),
+        listOf(
+            "$friend wants to count the animals, but the numbers are gone!",
+            "$friend can't remember how many eggs are in the basket. Let's count!",
+            "$friend has lost the numbers from the barn door. Let's find them!",
+            "$friend wants to play hide and seek, but can't count. Let's help!",
+        ),
+        listOf(
+            "$friend found letters floating on the water. Let's see which ones!",
+            "$friend is fishing, and look: letters on the hook! Which ones?",
+            "$friend saw letters jumping like little fish. Let's catch them!",
+            "$friend found a bottle with letters inside. Let's open it!",
+        ),
+        listOf(
+            "$friend has a book with missing letters. Let's put them back!",
+            "$friend wants to read a story, but the letters ran away!",
+            "$friend found letters under the shelves. Let's tidy them up!",
+            "$friend is looking after the library today and needs help with the letters!",
+        ),
+        listOf(
+            "$friend is selling fruit at the market. Let's count together!",
+            "$friend has a basket full of apples. Let's do the sums!",
+            "$friend wants to share the fruit with friends. Let's help!",
+            "$friend is buying carrots and needs a little help with the sums!",
+        ),
+        listOf(
+            "$friend wants to write in the snow. Let's write together!",
+            "$friend is making a sign for the mountain hut. Let's write on it!",
+            "$friend found a frosty window. Let's write on it with a finger!",
+            "$friend is writing a letter to the magpie. Let's help!",
+        ),
+        listOf(
+            "$friend is the teacher today. Let's read together!",
+            "$friend brought a new picture book. Let's read the words!",
+            "$friend wrote words on the blackboard. Can you read them?",
+            "$friend is playing a word game. Let's play too!",
+        ),
+    )[chapter][lesson % 4]
     override fun friendThanks(friend: String) = "$friend says thank you!"
     override fun friendName(a: Animal) = "The ${a.en}"
 
@@ -185,6 +227,11 @@ object EnglishStory : StoryStrings {
         else -> "Tap all the $short dots!"
     }
     override val catchDone = "You caught them all!"
+    override val magpieAppears = "Look! The magpie is back, with something shiny in her beak! Tap her to make her drop it!"
+    override val magpieHits = listOf("Caw, caw!", "Hey, that tickles!", "Oh no, I'm dropping it!")
+    override val magpieGone = "Hooray! The magpie dropped it and flew away!"
+    override val chestAsk = "A treasure chest! Tap it to open it!"
+    override val treasureFound = "Wow, a treasure! It goes in Hupi's house."
     override val showIntro = "It's Hupi's show! Let's see what he learned with you!"
     override val showApplause = "Well done, Hupi! And well done you, for teaching him!"
     private val items = listOf(
@@ -218,6 +265,7 @@ object EnglishStory : StoryStrings {
     override val shelfShapes = "Shapes"
     override val shelfWords = "Words"
     override val shelfMath = "Math"
+    override val shelfTreasures = "Treasures"
     override val legend = "✨ learned   ·   🕸️ practising   ·   ▫️ not yet"
     override val scarf = "Hupi's scarf"
     override fun hupiLines(stage: Int) = buildList {
@@ -277,16 +325,50 @@ object RomanianStory : StoryStrings {
         "În sfârșit, școala din pădure! Hupi vrea să citească primele cuvinte. Și uite... coțofana e aici!",
     )[chapter]
 
-    override fun friendAsk(chapter: Int, friend: String) = when (chapter) {
-        0 -> "$friend a pierdut culorile pădurii. Hai să-l ajutăm pe Hupi să le găsească!"
-        1 -> "$friend vrea să numere animalele, dar cifrele au dispărut!"
-        2 -> "$friend a găsit litere care plutesc pe apă. Hai să vedem care sunt!"
-        3 -> "$friend are o carte căreia îi lipsesc litere. Hai să le punem la loc!"
-        4 -> "$friend vinde fructe la piață. Hai să socotim împreună!"
-        5 -> "$friend vrea să scrie pe zăpadă. Hai să scriem împreună!"
-        else -> "$friend este profesorul de azi. Hai să citim împreună!"
-    }
-
+    override fun friendAsk(chapter: Int, lesson: Int, friend: String) = listOf(
+        listOf(
+            "$friend a pierdut culorile pădurii. Hai să-l ajutăm pe Hupi să le găsească!",
+            "$friend vrea să picteze un curcubeu, dar borcanele cu vopsea sunt goale!",
+            "$friend are niște flori care s-au făcut gri. Hai să le dăm culorile înapoi!",
+            "$friend vede numai gri în jur. Hai să aducem culorile înapoi!",
+        ),
+        listOf(
+            "$friend vrea să numere animalele, dar cifrele au dispărut!",
+            "$friend nu mai știe câte ouă sunt în coș. Hai să numărăm!",
+            "$friend a pierdut numerele de pe ușa grajdului. Hai să le găsim!",
+            "$friend vrea să se joace de-a v-ați ascunselea, dar nu știe să numere. Hai să ajutăm!",
+        ),
+        listOf(
+            "$friend a găsit litere care plutesc pe apă. Hai să vedem care sunt!",
+            "$friend pescuiește și, uite, litere în cârlig! Care sunt?",
+            "$friend a văzut litere sărind ca peștișorii. Hai să le prindem!",
+            "$friend a găsit o sticlă cu litere înăuntru. Hai s-o deschidem!",
+        ),
+        listOf(
+            "$friend are o carte căreia îi lipsesc litere. Hai să le punem la loc!",
+            "$friend vrea să citească o poveste, dar literele au fugit!",
+            "$friend a găsit litere sub rafturi. Hai să le punem în ordine!",
+            "$friend are grijă azi de bibliotecă și are nevoie de ajutor cu literele!",
+        ),
+        listOf(
+            "$friend vinde fructe la piață. Hai să socotim împreună!",
+            "$friend are un coș plin cu mere. Hai să socotim!",
+            "$friend vrea să împartă fructele cu prietenii. Hai să ajutăm!",
+            "$friend cumpără morcovi și are nevoie de puțin ajutor la socoteli!",
+        ),
+        listOf(
+            "$friend vrea să scrie pe zăpadă. Hai să scriem împreună!",
+            "$friend face o tăbliță pentru cabana de pe munte. Hai să scriem pe ea!",
+            "$friend a găsit o fereastră înghețată. Hai să scriem pe ea cu degetul!",
+            "$friend îi scrie o scrisoare coțofenei. Hai să ajutăm!",
+        ),
+        listOf(
+            "$friend ține lecția azi. Hai să citim împreună!",
+            "$friend a adus o carte nouă cu poze. Hai să citim cuvintele!",
+            "$friend a scris cuvinte pe tablă. Le poți citi?",
+            "$friend se joacă un joc cu cuvinte. Hai să ne jucăm și noi!",
+        ),
+    )[chapter][lesson % 4]
     override fun friendThanks(friend: String) = "$friend îți mulțumește!"
     override fun friendName(a: Animal) = a.ro.replaceFirstChar { it.uppercase() }
 
@@ -342,6 +424,11 @@ object RomanianStory : StoryStrings {
         else -> "Atinge toate bulinele de culoare $short!"
     }
     override val catchDone = "Le-ai prins pe toate!"
+    override val magpieAppears = "Uite! Coțofana s-a întors, cu ceva strălucitor în cioc! Atinge-o ca să-l scape!"
+    override val magpieHits = listOf("Cra, cra!", "Hei, mă gâdili!", "Vai, îl scap!")
+    override val magpieGone = "Ura! Coțofana l-a scăpat și a zburat!"
+    override val chestAsk = "Un cufăr cu comori! Atinge-l ca să-l deschizi!"
+    override val treasureFound = "Ura, o comoară! O ducem în căsuța lui Hupi."
     override val showIntro = "Este spectacolul lui Hupi! Hai să vedem ce a învățat cu tine!"
     override val showApplause = "Bravo, Hupi! Și bravo ție, că l-ai învățat!"
     private val items = listOf(
@@ -375,6 +462,7 @@ object RomanianStory : StoryStrings {
     override val shelfShapes = "Forme"
     override val shelfWords = "Cuvinte"
     override val shelfMath = "Matematică"
+    override val shelfTreasures = "Comori"
     override val legend = "✨ învățat   ·   🕸️ în exercițiu   ·   ▫️ încă nu"
     override val scarf = "Fularul lui Hupi"
     override fun hupiLines(stage: Int) = buildList {

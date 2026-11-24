@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
@@ -102,6 +103,7 @@ fun StoryHouseScreen(onBack: () -> Unit) {
                         modifier.verticalScroll(rememberScrollState()).padding(16.dp),
                         verticalArrangement = Arrangement.spacedBy(14.dp),
                     ) {
+                        TreasureShelf(s.shelfTreasures)
                         Text(s.legend, fontSize = 15.sp, color = Ink.copy(alpha = 0.7f))
                         Shelf(s.shelfLetters, language.alphabet.map { Item(Kind.Letter, "${language.name}/${it.char}") to it.char.toString() })
                         Shelf(s.shelfNumbers, (0..20).map { Item(Kind.Number, "$it") to "$it" })
@@ -118,6 +120,67 @@ fun StoryHouseScreen(onBack: () -> Unit) {
                     Column(Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
                         hupi(200)
                         shelves(Modifier.weight(1f).fillMaxWidth())
+                    }
+                }
+            }
+        }
+    }
+}
+
+/**
+ * The treasures from the lessons' chests, a row per chapter: the ones won so far, and a
+ * closed chest for each one still to find. Tapping a treasure makes it jump.
+ */
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun TreasureShelf(title: String) {
+    val story = LocalStory.current
+    val sfx = LocalSfx.current
+    val won = (0 until TotalScenes).count { !isShow(it) && story.sceneDone(it) }
+    Column(
+        Modifier
+            .widthIn(max = 760.dp)
+            .fillMaxWidth()
+            .shadow(4.dp, RoundedCornerShape(20.dp))
+            .clip(RoundedCornerShape(20.dp))
+            .background(Brush.verticalGradient(listOf(Color(0xFFFFF3C4), Color(0xFFFFE29A))))
+            .padding(14.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        Text("$title  $won / ${ChapterCount * LessonsPerChapter}", fontSize = 20.sp, fontWeight = FontWeight.Black, color = Color(0xFF8D5524))
+        // A row per chapter, up to the furthest one reached (in the adventure or a world's path).
+        val reached = (0 until ChapterCount).filter { c -> c == 0 || story.chapterDone(c) > 0 || story.done >= c * ScenesPerChapter }.max()
+        for (chapter in 0..reached) {
+            FlowRow(
+                horizontalArrangement = Arrangement.spacedBy(6.dp),
+                verticalArrangement = Arrangement.spacedBy(6.dp),
+                itemVerticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(ChapterEmoji[chapter], fontSize = 22.sp, modifier = Modifier.padding(end = 2.dp))
+                for (lesson in 0 until LessonsPerChapter) {
+                    val scene = chapter * ScenesPerChapter + lesson
+                    val treasure = treasureOf(scene) ?: continue
+                    val owned = story.sceneDone(scene)
+                    var jump by remember { mutableStateOf(0) }
+                    val lift by androidx.compose.animation.core.animateFloatAsState(
+                        if (jump % 2 == 1) -10f else 0f,
+                        androidx.compose.animation.core.spring(dampingRatio = 0.3f),
+                        label = "jump",
+                        finishedListener = { if (jump % 2 == 1) jump++ },
+                    )
+                    Box(
+                        Modifier
+                            .size(40.dp)
+                            .clip(RoundedCornerShape(12.dp))
+                            .background(if (owned) Color.White else Color.White.copy(alpha = 0.35f))
+                            .bouncyClick { if (owned) { sfx.pop(); jump++ } },
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Text(
+                            if (owned) treasure else "🎁",
+                            fontSize = 22.sp,
+                            modifier = Modifier.alpha(if (owned) 1f else 0.3f).offset(y = lift.dp),
+                        )
                     }
                 }
             }

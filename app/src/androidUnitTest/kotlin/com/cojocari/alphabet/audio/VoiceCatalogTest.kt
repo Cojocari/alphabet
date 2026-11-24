@@ -12,7 +12,11 @@ import com.cojocari.alphabet.i18n.Strings
 import com.cojocari.alphabet.story.ChapterCount
 import com.cojocari.alphabet.story.Item
 import com.cojocari.alphabet.story.Kind
+import com.cojocari.alphabet.story.ScenesPerChapter
+import com.cojocari.alphabet.story.TotalScenes
 import com.cojocari.alphabet.story.chapterItems
+import com.cojocari.alphabet.story.chapterOf
+import com.cojocari.alphabet.story.friendOf
 import com.cojocari.alphabet.story.meetLine
 import com.cojocari.alphabet.story.name
 import com.cojocari.alphabet.story.questFor
@@ -54,8 +58,8 @@ class VoiceCatalogTest {
         "unlockBodyFor", "playedToday", "cap",
         // Names used inside other sentences, never said on their own.
         "letterName", "numberName", "colorName", "wordName", "mathName", "friendName", "animalName", "animalSound",
-        // Built from story items below, with only the combinations that exist.
-        "catchAsk",
+        // Built from story items and lessons below, with only the combinations that exist.
+        "catchAsk", "friendAsk",
     )
 
     /** Phrases that include the child's name: recorded without it (see [stripName]). */
@@ -120,6 +124,12 @@ class VoiceCatalogTest {
                 quest.choices.indices.forEach { add(quest.wrong(it)) }
                 things += quest.names.filter { it.isNotBlank() }
             }
+        }
+
+        // Each lesson's friend and what they need.
+        for (scene in 0 until TotalScenes) {
+            val friend = friendOf(scene) ?: continue
+            add(s.friendAsk(chapterOf(scene), scene % ScenesPerChapter, s.friendName(friend)))
         }
 
         // Mini-game rounds.

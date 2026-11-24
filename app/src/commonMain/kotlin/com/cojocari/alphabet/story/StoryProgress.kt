@@ -42,6 +42,27 @@ const val DaysToLearn = 3
  */
 class StoryProgress(private val prefs: KeyValueStore = keyValueStore("story")) {
 
+    init {
+        migrate()
+    }
+
+    /**
+     * Chapters used to have 7 scenes (6 lessons and the show); now they have
+     * [ScenesPerChapter]. Saved places move to the same lesson of the same chapter; a child
+     * who was before a show now first plays the new lessons.
+     */
+    private fun migrate() {
+        val old = prefs.getInt("perChapter", 7)
+        if (old == ScenesPerChapter) return
+        val done = prefs.getInt("done", 0)
+        if (done > 0) prefs.putInt("done", (done / old) * ScenesPerChapter + done % old)
+        for (c in 0 until ChapterCount) {
+            val p = prefs.getInt("path$c", 0)
+            if (p > 0) prefs.putInt("path$c", if (p >= old) ScenesPerChapter else p)
+        }
+        prefs.putInt("perChapter", ScenesPerChapter)
+    }
+
     /** Scenes finished, in order. The next scene to play is [done]. */
     var done by mutableIntStateOf(prefs.getInt("done", 0))
         private set
@@ -145,6 +166,7 @@ class StoryProgress(private val prefs: KeyValueStore = keyValueStore("story")) {
         records.clear()
         pathDone.clear()
         prefs.clear()
+        prefs.putInt("perChapter", ScenesPerChapter)
         warmupDay = -1
     }
 

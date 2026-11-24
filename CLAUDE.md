@@ -57,7 +57,7 @@ Kotlin, Jetpack Compose, Material 3, Google Play Billing 8. See `README.md` for 
   tools and rules in `tools/sounds/README.md`.
 
 ## Hupi's Adventure (story mode), added 2026-11-16
-- Package `story/`: `Curriculum.kt` (7 chapters × 7 scenes, what each lesson teaches per level, scene steps),
+- Package `story/`: `Curriculum.kt` (7 chapters × 9 scenes: 8 lessons and a show; what each lesson teaches per level, scene steps; `Treasures`),
   `Quests.kt` (questions per item), `ScenePlayer.kt` (plays steps: narrate, hatch, meet, ask together/alone,
   teach Hupi, catch, trace, show, reward, diploma), `Hupi.kt` (owl drawn in code, grows with 7 items),
   `StoryMapScreen.kt` (map + age picker), `StoryHouseScreen.kt` (shelves), `StoryProgress.kt` (progress and the
@@ -108,6 +108,18 @@ warm-up, house, age picker) and a "Learn with Hupi" story path in every world ex
 - Phones: an iPhone 17 Pro is 402 dp wide. `isCompactWidth()` (< 480 dp) gives smaller top-bar buttons, `TopBar` is a
   `FlowRow` (wraps instead of overflowing), `ScaleToFit` shrinks wide content (sums, age pickers), the counting field
   sizes its things to the width. Check new screens on the emulator with `wm size 1206x2622` + `wm density 480`.
+
+## 2026-11-24, branch `ios`: longer story
+- Chapters have 8 lessons + the show (`ScenesPerChapter = 9`, 63 scenes). Saved progress from the old 7-scene
+  chapters moves to the same lesson (`StoryProgress.migrate`, key `perChapter`).
+- Every level learns all 10 colours (chapter 1; Medium/Hard also the 6 shapes) and all 26 letters (chapters 3–4,
+  16 lessons). Writing alternates numbers and letters. `CurriculumTest` checks the coverage.
+- Each lesson ends with a treasure chest (tap to open, `TreasureChest` in `story/StoryArt.kt`); the 56 treasures
+  (`Treasures`) fill a shelf in Hupi's house and mark finished stops on the map. Owned = scene done, no new storage.
+- Once a chapter (lesson 4, `MagpieLesson`) the magpie (`Magpie`, drawn in code) flies around with something shiny:
+  tap her 2–4 times (by level) and she drops it. Not in world paths. She also appears in her narrations.
+- Friends' requests vary by lesson (`friendAsk(chapter, lesson, friend)`, four per chapter); the voice catalogue
+  takes them from the real lessons. The show's reward: the chapter's friends dance and confetti repeats.
 
 To do / to check with the owner:
 1. Owner to play the story with a child and report pace, humour and difficulty.
