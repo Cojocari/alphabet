@@ -270,7 +270,7 @@ fun MeetCard(item: Item, language: Language) {
     when (item.kind) {
         Kind.Letter -> item.letter(language)?.let { l ->
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text("${l.char}${l.char.lowercaseChar()}", fontSize = 120.sp, fontWeight = FontWeight.Black, color = l.color, lineHeight = 124.sp)
+                Text("${l.char} ${l.char.lowercaseChar()}", fontSize = 120.sp, fontWeight = FontWeight.Black, color = l.color, lineHeight = 124.sp)
                 Text(l.emoji, fontSize = 90.sp)
                 Text(l.word, fontSize = 40.sp, fontWeight = FontWeight.Bold, color = l.color)
             }

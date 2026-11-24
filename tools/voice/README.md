@@ -48,8 +48,15 @@ The child's name is never recorded: a sentence with the name plays the recording
    about 20 requests a minute and 500,000 characters a month; all ~5,800 sentences are about
    150,000 characters and take about 5 hours.
 
+   At the end it runs `tools/voice/trim.sh`, which cuts the quiet tail off each clip (the voices
+   add up to 1.5 s of near-silence, which made "A." + "A is for Apple!" sound far apart). It
+   decodes with JLayer, downloaded from Maven Central into `build/` and not shipped in the app.
+
 ## Pitfalls
 
 - On Windows, text passed to `curl` as a command-line argument loses its diacritics (ă, ș, ț
   become a, s, t). The script writes each request to a UTF-8 file and sends that.
+- English reads a lone capital "A" as the article ("uh"), so "A is for Apple!" sounded like
+  another letter. The script marks lone capitals as letters (`say-as characters`), except "A"
+  or "I" before a word other than "is" ("A treasure chest!", "I can…").
 - The clip name is the FNV-1a hash of the sentence, so changing one comma means a new clip.

@@ -70,3 +70,6 @@ for lang in "$@"; do
   done
   echo "$lang done: recorded $made, failed $failed, removed $removed old clips, $(ls "$out" | wc -l) clips, $(du -sh "$out" | cut -f1)"
 done
+
+# The voices end each clip with up to 1.5 s of near-silence: cut it (see TrimClips.java).
+bash tools/voice/trim.sh "$@"

@@ -171,7 +171,7 @@ fun GameContent(id: GameId, onBack: () -> Unit, onUnlock: () -> Unit) {
                 val items = remember {
                     language.alphabet.map {
                         CardItem(
-                            "${it.char}${it.char.lowercaseChar()}", it.emoji, 110.sp, it.word,
+                            "${it.char} ${it.char.lowercaseChar()}", it.emoji, 110.sp, it.word,
                             t.letterCard(it), it.color, it.char.toString(),
                         )
                     }
