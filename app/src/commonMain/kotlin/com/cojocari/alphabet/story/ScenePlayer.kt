@@ -905,7 +905,8 @@ private fun DiplomaStep(ctx: SceneContext) {
     LaunchedEffect(Unit) {
         sfx.fanfare()
         ctx.celebrate()
-        speaker.sayAndWait(text)
+        // Recordings can't say the child's name: they say the version without it.
+        speaker.sayAndWait(if (speaker.usesRecordings) s.diploma("") else text)
     }
     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Column(

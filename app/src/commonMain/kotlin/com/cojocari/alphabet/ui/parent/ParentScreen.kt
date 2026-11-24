@@ -106,15 +106,18 @@ fun ParentScreen(onBack: () -> Unit) {
                     )
                     // The child's age sets the starting level.
                     Text(s.ageTitle, fontSize = 18.sp, color = Ink)
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        (2..6).forEach { age ->
-                            if (progress.childAge == age) {
-                                Button(onClick = {}) { Text("$age") }
-                            } else {
-                                OutlinedButton(onClick = { progress.updateChildAge(age) }) { Text("$age") }
+                    // Shrinks to fit on phones instead of squeezing "years" into one letter per line.
+                    com.cojocari.alphabet.ui.components.ScaleToFit {
+                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            (2..6).forEach { age ->
+                                if (progress.childAge == age) {
+                                    Button(onClick = {}) { Text("$age") }
+                                } else {
+                                    OutlinedButton(onClick = { progress.updateChildAge(age) }) { Text("$age") }
+                                }
                             }
+                            Text(s.years, fontSize = 16.sp, color = Ink, modifier = Modifier.align(Alignment.CenterVertically))
                         }
-                        Text(s.years, fontSize = 16.sp, color = Ink, modifier = Modifier.align(Alignment.CenterVertically))
                     }
                     Text(s.ageHint, fontSize = 14.sp, color = Ink.copy(alpha = 0.7f))
                     // Daily play-time limit.

@@ -3,6 +3,7 @@ package com.cojocari.alphabet.ui.games
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.offset
@@ -19,6 +20,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.min
 import androidx.compose.ui.unit.sp
 import com.cojocari.alphabet.audio.LocalSfx
 import com.cojocari.alphabet.audio.LocalSpeaker
@@ -36,40 +38,46 @@ fun CountingField(thing: String, n: Int) {
     val t = LocalLanguage.current.strings
     val counted = remember { mutableStateMapOf<Int, Int>() } // index -> its count number
 
-    Column(verticalArrangement = Arrangement.spacedBy(12.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-        (0 until n).chunked(5).forEach { row ->
-            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                row.forEach { i ->
-                    val number = counted[i]
-                    Box(
-                        modifier = Modifier
-                            .size(84.dp)
-                            .clip(CircleShape)
-                            .background(if (number != null) Color(0xFFFFF1C1) else Color.White)
-                            .bouncyClick {
-                                if (number == null) {
-                                    val next = counted.size + 1
-                                    counted[i] = next
-                                    sfx.tap()
-                                    speaker.say(t.num(next))
-                                } else {
-                                    speaker.say(t.num(number))
+    // Five per row must fit a phone (an iPhone 17 Pro is 402 dp wide): the things shrink to the
+    // width they have, up to 84 dp on tablets.
+    BoxWithConstraints(contentAlignment = Alignment.Center) {
+        val gap = min(12.dp, maxWidth / 30)
+        val cell = min(84.dp, (maxWidth - gap * 4) / 5)
+        Column(verticalArrangement = Arrangement.spacedBy(gap), horizontalAlignment = Alignment.CenterHorizontally) {
+            (0 until n).chunked(5).forEach { row ->
+                Row(horizontalArrangement = Arrangement.spacedBy(gap)) {
+                    row.forEach { i ->
+                        val number = counted[i]
+                        Box(
+                            modifier = Modifier
+                                .size(cell)
+                                .clip(CircleShape)
+                                .background(if (number != null) Color(0xFFFFF1C1) else Color.White)
+                                .bouncyClick {
+                                    if (number == null) {
+                                        val next = counted.size + 1
+                                        counted[i] = next
+                                        sfx.tap()
+                                        speaker.say(t.num(next))
+                                    } else {
+                                        speaker.say(t.num(number))
+                                    }
+                                },
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            Text(thing, fontSize = (cell.value * 0.6f).sp)
+                            if (number != null) {
+                                Box(
+                                    modifier = Modifier
+                                        .align(Alignment.TopEnd)
+                                        .offset(x = 4.dp, y = (-4).dp)
+                                        .size(32.dp)
+                                        .clip(CircleShape)
+                                        .background(Color(0xFFF77F00)),
+                                    contentAlignment = Alignment.Center,
+                                ) {
+                                    Text("$number", fontSize = 18.sp, fontWeight = FontWeight.Black, color = Color.White, modifier = Modifier.padding(0.dp))
                                 }
-                            },
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        Text(thing, fontSize = 50.sp)
-                        if (number != null) {
-                            Box(
-                                modifier = Modifier
-                                    .align(Alignment.TopEnd)
-                                    .offset(x = 4.dp, y = (-4).dp)
-                                    .size(32.dp)
-                                    .clip(CircleShape)
-                                    .background(Color(0xFFF77F00)),
-                                contentAlignment = Alignment.Center,
-                            ) {
-                                Text("$number", fontSize = 18.sp, fontWeight = FontWeight.Black, color = Color.White, modifier = Modifier.padding(0.dp))
                             }
                         }
                     }

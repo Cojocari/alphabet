@@ -12,6 +12,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.cojocari.alphabet.ui.components.ScaleToFit
 import com.cojocari.alphabet.data.ArtColors
 import com.cojocari.alphabet.data.CountingThings
 import com.cojocari.alphabet.data.Difficulty
@@ -237,25 +238,27 @@ fun compareRound(language: Language, d: Difficulty, rnd: Random = Random.Default
 @Composable
 internal fun Sum(thing: String, a: Int, b: Int, sign: String, result: String, crossed: Boolean, showThings: Boolean) {
     val emojiSize = if (a + b > 6) 34.sp else 46.sp
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(10.dp),
-    ) {
-        if (!showThings) {
-            Symbol("$a", numberColor(a))
-            Symbol(sign)
-            Symbol("$b", numberColor(b))
-        } else if (crossed) {
-            Group(objects(thing, a - b), a, emojiSize, extra = objects("❌", b))
-            Symbol(sign)
-            Symbol("$b", numberColor(b))
-        } else {
-            Group(objects(thing, a), a, emojiSize)
-            Symbol(sign)
-            Group(objects(thing, b), b, emojiSize)
+    ScaleToFit {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
+        ) {
+            if (!showThings) {
+                Symbol("$a", numberColor(a))
+                Symbol(sign)
+                Symbol("$b", numberColor(b))
+            } else if (crossed) {
+                Group(objects(thing, a - b), a, emojiSize, extra = objects("❌", b))
+                Symbol(sign)
+                Symbol("$b", numberColor(b))
+            } else {
+                Group(objects(thing, a), a, emojiSize)
+                Symbol(sign)
+                Group(objects(thing, b), b, emojiSize)
+            }
+            Symbol("=")
+            Symbol(result, Color(0xFF43AA8B))
         }
-        Symbol("=")
-        Symbol(result, Color(0xFF43AA8B))
     }
 }
 

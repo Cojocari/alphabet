@@ -53,24 +53,25 @@ fun StickersScreen(onBack: () -> Unit, onScene: () -> Unit) {
     LaunchedEffect(Unit) { speaker.say(t.stickerBook(won)) }
 
     Column(Modifier.fillMaxSize()) {
+        val compact = com.cojocari.alphabet.ui.components.isCompactWidth()
         TopBar(onBack = onBack) {
             Row(verticalAlignment = Alignment.CenterVertically) {
             // Stars towards the next sticker: ★★★☆☆ 🎁
             if (progress.starsToNextSticker > 0) {
-                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(end = 16.dp)) {
+                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(end = if (compact) 8.dp else 16.dp)) {
                     repeat(StarsPerSticker) { i ->
                         Text(
                             if (i < StarsPerSticker - progress.starsToNextSticker) "⭐" else "☆",
-                            fontSize = 30.sp,
+                            fontSize = if (compact) 20.sp else 30.sp,
                             color = Color(0xFFFFB703),
                             fontWeight = FontWeight.Bold,
                         )
                     }
-                    Text("🎁", fontSize = 34.sp, modifier = Modifier.padding(start = 8.dp))
+                    Text("🎁", fontSize = if (compact) 26.sp else 34.sp, modifier = Modifier.padding(start = if (compact) 4.dp else 8.dp))
                 }
             }
             // Play with the stickers in a picture.
-            com.cojocari.alphabet.ui.components.RoundButton("🏞️", Color(0xFF7BD389), onClick = { sfx.tap(); onScene() }, size = 72.dp)
+            com.cojocari.alphabet.ui.components.RoundButton("🏞️", Color(0xFF7BD389), onClick = { sfx.tap(); onScene() }, size = if (compact) 56.dp else 72.dp)
             }
         }
         LazyVerticalGrid(

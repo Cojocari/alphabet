@@ -9,6 +9,8 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -74,19 +76,25 @@ val LocalGoHome = staticCompositionLocalOf<() -> Unit> { {} }
  * Top bar with a back button (one step up: game → its world → home) and a home button
  * on the left, and optional extra content on the right.
  */
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun TopBar(onBack: () -> Unit, trailing: @Composable () -> Unit = {}) {
     val goHome = LocalGoHome.current
-    Row(
+    // Phones (an iPhone 17 Pro is 402 dp wide) get smaller buttons, and whatever still doesn't
+    // fit moves to a second line instead of running off the screen.
+    val compact = isCompactWidth()
+    val button = if (compact) 52.dp else 64.dp
+    FlowRow(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 12.dp),
+            .padding(horizontal = if (compact) 10.dp else 16.dp, vertical = if (compact) 8.dp else 12.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically,
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+        itemVerticalAlignment = Alignment.CenterVertically,
     ) {
-        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            RoundButton(emoji = "⬅️", color = Color(0xFFFFD6A5), onClick = onBack, size = 64.dp)
-            RoundButton(emoji = "🏠", color = Color(0xFF8ECAE6), onClick = goHome, size = 64.dp)
+        Row(horizontalArrangement = Arrangement.spacedBy(if (compact) 8.dp else 12.dp)) {
+            RoundButton(emoji = "⬅️", color = Color(0xFFFFD6A5), onClick = onBack, size = button)
+            RoundButton(emoji = "🏠", color = Color(0xFF8ECAE6), onClick = goHome, size = button)
         }
         if (LocalShowDifficulty.current) DifficultyPicker()
         trailing()
@@ -111,6 +119,7 @@ fun DifficultyPicker() {
     val sfx = com.cojocari.alphabet.audio.LocalSfx.current
     val t = com.cojocari.alphabet.i18n.LocalLanguage.current.strings
     val showWords = com.cojocari.alphabet.ui.components.windowWidthDp() >= 600
+    val compact = isCompactWidth()
     val pill = androidx.compose.foundation.shape.RoundedCornerShape(36.dp)
     Row(
         modifier = Modifier
@@ -141,7 +150,7 @@ fun DifficultyPicker() {
                             speaker.say(t.difficultyNames[d.ordinal])
                         }
                     }
-                    .padding(horizontal = 16.dp, vertical = 10.dp),
+                    .padding(horizontal = if (compact) 9.dp else 16.dp, vertical = if (compact) 8.dp else 10.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 LevelBars(level = d.ordinal + 1, color = if (selected) Color.White else color)
@@ -182,17 +191,22 @@ private fun LevelBars(level: Int, color: Color) {
 /** "⭐ 12": stars won in the current game. */
 @Composable
 fun StarCounter(stars: Int) {
+    val size = if (isCompactWidth()) 28.sp else 34.sp
     Row(verticalAlignment = Alignment.CenterVertically) {
-        Text("⭐", fontSize = 34.sp)
+        Text("⭐", fontSize = size)
         Text(
             "$stars",
-            fontSize = 34.sp,
+            fontSize = size,
             fontWeight = androidx.compose.ui.text.font.FontWeight.Black,
             color = Color(0xFFF77F00),
             modifier = Modifier.padding(start = 4.dp),
         )
     }
 }
+
+/** True on phone-width screens (under 480 dp), where top bars need smaller buttons. */
+@Composable
+fun isCompactWidth(): Boolean = windowWidthDp() < 480
 
 /** The app window's width in dp: 600 or more is a tablet-sized screen. */
 @Composable

@@ -19,6 +19,10 @@ targets:
       - path: iosApp
       - path: Generated
         buildPhase: resources
+      # The recorded voice (tools/voice): copied as the folder voice/<lang>/<clip>.mp3.
+      - path: ../app/src/androidMain/assets/voice
+        type: folder
+        buildPhase: resources
     settings:
       base:
         PRODUCT_NAME: CleverOwl

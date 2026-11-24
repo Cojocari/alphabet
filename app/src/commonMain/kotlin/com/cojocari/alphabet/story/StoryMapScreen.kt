@@ -276,18 +276,20 @@ fun AgePicker(onPick: (Int) -> Unit, onCancel: () -> Unit) {
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             Text(s.agePrompt, fontSize = 22.sp, fontWeight = FontWeight.Bold, color = Ink)
-            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                (2..6).forEach { age ->
-                    val selected = progress.childAge == age
-                    Box(
-                        Modifier
-                            .size(64.dp)
-                            .clip(CircleShape)
-                            .background(if (selected) Color(0xFF43AA8B) else Color(0xFFE9F5EF))
-                            .bouncyClick { onPick(age) },
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        Text("$age", fontSize = 28.sp, fontWeight = FontWeight.Black, color = if (selected) Color.White else Ink)
+            com.cojocari.alphabet.ui.components.ScaleToFit {
+                Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                    (2..6).forEach { age ->
+                        val selected = progress.childAge == age
+                        Box(
+                            Modifier
+                                .size(64.dp)
+                                .clip(CircleShape)
+                                .background(if (selected) Color(0xFF43AA8B) else Color(0xFFE9F5EF))
+                                .bouncyClick { onPick(age) },
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            Text("$age", fontSize = 28.sp, fontWeight = FontWeight.Black, color = if (selected) Color.White else Ink)
+                        }
                     }
                 }
             }

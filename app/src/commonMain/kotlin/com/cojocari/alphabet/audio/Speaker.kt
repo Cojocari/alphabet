@@ -19,6 +19,9 @@ interface Speaker {
     /** The child's name, set from the parent settings. Never sent to online voices. */
     var privateName: String
 
+    /** True when sentences are played from human-sounding recordings ([RecordedSpeaker]). */
+    val usesRecordings: Boolean get() = false
+
     /** Speaks [text], interrupting anything currently being said. */
     fun say(text: String)
 

@@ -99,9 +99,19 @@ warm-up, house, age picker) and a "Learn with Hupi" story path in every world ex
   arrowheads). Story trace step unchanged.
 - Planning board: Trello "Clever Owl / Bufnița Isteață" (private, the owner's Momentum workspace).
 
+## 2026-11-24, branch `ios`: recorded voice and phone layout
+- Recorded voice (`tools/voice/README.md`): every sentence pre-recorded with Azure AI Speech (free F0 tier) as
+  `app/src/androidMain/assets/voice/<lang>/<hash>.mp3`; EN `en-US-AnaNeural`, RO `ro-RO-Ioana:MAI-Voice-2.1`.
+  `audio/RecordedSpeaker.kt` plays them sentence by sentence, device TTS for anything missing (debug logcat
+  `VoiceMiss`). `VoiceCatalogTest` lists all sentences (`tools/voice/catalog-*.tsv`); `tools/voice/generate.sh`
+  records the missing ones. Key file `~/azure-speech.txt`, outside the repo, never committed.
+- Phones: an iPhone 17 Pro is 402 dp wide. `isCompactWidth()` (< 480 dp) gives smaller top-bar buttons, `TopBar` is a
+  `FlowRow` (wraps instead of overflowing), `ScaleToFit` shrinks wide content (sums, age pickers), the counting field
+  sizes its things to the width. Check new screens on the emulator with `wm size 1206x2622` + `wm density 480`.
+
 To do / to check with the owner:
 1. Owner to play the story with a child and report pace, humour and difficulty.
 2. Owner to listen to all animal sounds and check the tracing arrows on letters like a, g, 5, 8.
-3. Optional: record Romanian narration to replace text-to-speech in the story.
+3. Owner to listen to the recorded voice (Ana / Ioana) in both languages.
 4. Release: store screenshots (now with the story), privacy policy URL, TMview trademark check, then
    `docs/release-checklist.md`.

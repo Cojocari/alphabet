@@ -20,7 +20,7 @@ import androidx.compose.ui.Modifier
 import com.cojocari.alphabet.audio.LocalSfx
 import com.cojocari.alphabet.audio.LocalSpeaker
 import com.cojocari.alphabet.audio.Sfx
-import com.cojocari.alphabet.audio.rememberSpeaker
+import com.cojocari.alphabet.audio.rememberAppSpeaker
 import com.cojocari.alphabet.billing.Billing
 import com.cojocari.alphabet.billing.LocalBilling
 import com.cojocari.alphabet.data.LocalProgress
@@ -73,7 +73,7 @@ fun CleverOwlApp(
 ) {
     AlphabetTheme {
         var language by remember { mutableStateOf(loadLanguage()) }
-        val speaker = rememberSpeaker(language)
+        val speaker = rememberAppSpeaker(language)
         // Keep the child's name away from online voices (see Speaker.privateName).
         androidx.compose.runtime.SideEffect { speaker.privateName = progress.childName }
         var route by rememberSaveable {

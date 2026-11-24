@@ -39,6 +39,7 @@ private val SoundCredits = listOf(
     "Whale: U.S. National Park Service, Glacier Bay · public domain",
     "Monkey: \"Pant-hoot call made by a male chimpanzee\", Pawel Fedurek et al., Scientific Reports · CC BY 4.0",
     "Bear: \"Bear growl\", Shizhao, Wikimedia Commons · CC BY 3.0",
+    "Voice: synthetic voices by Microsoft Azure AI Speech (en-US Ana, ro-RO Ioana), recorded in advance",
 )
 
 /** Grown-ups' corner entry that expands into the list of libraries and the Apache 2.0 text. */

@@ -46,6 +46,8 @@ kotlin {
         }
         getByName("androidUnitTest").dependencies {
             implementation("junit:junit:4.13.2")
+            // VoiceCatalogTest calls every phrase by reflection.
+            implementation("org.jetbrains.kotlin:kotlin-reflect:2.2.21")
         }
     }
 }

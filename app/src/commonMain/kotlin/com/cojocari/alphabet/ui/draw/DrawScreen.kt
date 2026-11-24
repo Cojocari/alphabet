@@ -46,6 +46,7 @@ import com.cojocari.alphabet.ui.components.LocalGameAccess
 import com.cojocari.alphabet.ui.components.RoundButton
 import com.cojocari.alphabet.ui.components.TopBar
 import com.cojocari.alphabet.ui.components.bouncyClick
+import com.cojocari.alphabet.ui.components.isCompactWidth
 
 /** Crayon colours for tracing. */
 val Crayons = listOf(
@@ -92,6 +93,7 @@ fun DrawScreen(onHome: () -> Unit, items: List<TraceItem>) {
     var round by remember(letter.text) { mutableIntStateOf(1) }
     val finished = round == 2 && trace.done
     val scope = rememberCoroutineScope()
+    val compact = isCompactWidth()
     val t = LocalLanguage.current.strings
 
     LaunchedEffect(letter.text) { speaker.say(letter.start) }
@@ -99,7 +101,7 @@ fun DrawScreen(onHome: () -> Unit, items: List<TraceItem>) {
     Box(Modifier.fillMaxSize()) {
         Column(Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
             TopBar(onBack = onHome) {
-                Text(letter.emoji, fontSize = 48.sp, modifier = Modifier.bouncyClick { speaker.say(letter.start) })
+                Text(letter.emoji, fontSize = if (compact) 34.sp else 48.sp, modifier = Modifier.bouncyClick { speaker.say(letter.start) })
                 // Each round fills half the stars.
                 StarMeter((round - 1 + trace.progress) / 2f)
             }
@@ -180,10 +182,11 @@ fun CrayonBox(selectedCrayon: Color, onPick: (Color) -> Unit) {
 /** Five stars that light up as the strokes get traced. */
 @Composable
 fun StarMeter(progress: Float) {
+    val size = if (isCompactWidth()) 22.sp else 30.sp
     Row {
         repeat(5) { i ->
             val lit = progress >= (i + 1) / 5f - 0.001f
-            Text(if (lit) "⭐" else "☆", fontSize = 30.sp, color = Color(0xFFFFB703), fontWeight = FontWeight.Bold)
+            Text(if (lit) "⭐" else "☆", fontSize = size, color = Color(0xFFFFB703), fontWeight = FontWeight.Bold)
         }
     }
 }

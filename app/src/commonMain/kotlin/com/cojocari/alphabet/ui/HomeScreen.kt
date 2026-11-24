@@ -54,6 +54,7 @@ import com.cojocari.alphabet.data.LocalProgress
 import com.cojocari.alphabet.i18n.Language
 import com.cojocari.alphabet.i18n.LocalLanguage
 import com.cojocari.alphabet.ui.components.TopBar
+import com.cojocari.alphabet.ui.components.isCompactWidth
 import com.cojocari.alphabet.ui.components.bouncyClick
 import com.cojocari.alphabet.ui.theme.Ink
 
@@ -83,6 +84,10 @@ fun HomeScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         // Top bar: stars & sticker book on the left; language and grown-ups on the right.
+        // Phones get smaller buttons so the row fits (an iPhone 17 Pro is 402 dp wide).
+        val compact = isCompactWidth()
+        val gap = if (compact) 6.dp else 10.dp
+        val circle = if (compact) 48.dp else 56.dp
         Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             Row(
                 modifier = Modifier
@@ -90,10 +95,10 @@ fun HomeScreen(
                     .clip(RoundedCornerShape(32.dp))
                     .background(Color.White)
                     .bouncyClick { sfx.tap(); onStickers() }
-                    .padding(horizontal = 18.dp, vertical = 8.dp),
+                    .padding(horizontal = if (compact) 12.dp else 18.dp, vertical = 8.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                Text("📒", fontSize = 32.sp)
+                Text("📒", fontSize = if (compact) 26.sp else 32.sp)
                 Spacer(Modifier.width(8.dp))
                 Text("⭐", fontSize = 26.sp)
                 Text(
@@ -130,8 +135,8 @@ fun HomeScreen(
             if (progress.giftAvailable) {
                 Box(
                     modifier = Modifier
-                        .padding(start = 10.dp)
-                        .size(60.dp)
+                        .padding(start = gap)
+                        .size(if (compact) 52.dp else 60.dp)
                         .rotate(giftWiggle)
                         .bouncyClick {
                             sfx.fanfare()
@@ -139,7 +144,7 @@ fun HomeScreen(
                             progress.openGift()
                         },
                     contentAlignment = Alignment.Center,
-                ) { Text("🎁", fontSize = 44.sp) }
+                ) { Text("🎁", fontSize = if (compact) 38.sp else 44.sp) }
             }
             Spacer(Modifier.weight(1f))
             // The owl mascot: tap it for a friendly word.
@@ -157,8 +162,8 @@ fun HomeScreen(
                 val isSelected = lang == language
                 Box(
                     modifier = Modifier
-                        .padding(start = 10.dp)
-                        .size(56.dp)
+                        .padding(start = gap)
+                        .size(circle)
                         .clip(CircleShape)
                         .background(if (isSelected) Color.White else Color.Transparent)
                         .border(if (isSelected) 4.dp else 0.dp, Color(0xFF219EBC), CircleShape)
@@ -166,19 +171,19 @@ fun HomeScreen(
                         .bouncyClick { if (!isSelected) onLanguage(lang) },
                     contentAlignment = Alignment.Center,
                 ) {
-                    Text(lang.flag, fontSize = 30.sp)
+                    Text(lang.flag, fontSize = if (compact) 26.sp else 30.sp)
                 }
             }
             Box(
                 modifier = Modifier
-                    .padding(start = 10.dp)
-                    .size(56.dp)
+                    .padding(start = gap)
+                    .size(circle)
                     .clip(CircleShape)
                     .background(Color.White)
                     .bouncyClick(onParent),
                 contentAlignment = Alignment.Center,
             ) {
-                Text("⚙️", fontSize = 28.sp)
+                Text("⚙️", fontSize = if (compact) 24.sp else 28.sp)
             }
         }
 

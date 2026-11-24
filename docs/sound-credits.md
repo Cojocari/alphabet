@@ -41,3 +41,9 @@ bleats.
 
 CC BY recordings (monkey, bear) require this credit; it is shown in the app. CC0 and public
 domain recordings need no credit, but they are listed here too.
+
+## Voice
+
+The spoken sentences are synthetic voices from Microsoft Azure AI Speech (`en-US-AnaNeural`,
+`ro-RO-Ioana:MAI-Voice-2.1`), recorded in advance and shipped with the app; see
+`tools/voice/README.md`. Anything without a recording uses the device's text-to-speech.
