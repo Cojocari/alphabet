@@ -32,6 +32,12 @@ expect fun rememberVoiceClips(): VoiceClips
 /** Short pause between two recorded sentences, like a breath. */
 private const val SentencePauseMs = 120L
 
+/** Longer pause after a question, so the child takes it in before the instruction that follows. */
+private const val QuestionPauseMs = 450L
+
+/** One recorded sentence and the pause to leave after it. */
+private class VoiceClip(val name: String, val pauseAfter: Long)
+
 /**
  * The app's voice: a human-sounding recording of each sentence when there is one, otherwise the
  * device's text-to-speech ([tts]). A text is either played entirely from recordings or entirely
@@ -57,7 +63,7 @@ class RecordedSpeaker(private val tts: Speaker, private val voice: VoiceClips, v
         set(value) { tts.privateName = value }
 
     /** The clips for [text], or null if a sentence has no recording (the device voice says it all). */
-    private fun clipsFor(text: String): List<String>? {
+    private fun clipsFor(text: String): List<VoiceClip>? {
         val available = clipsHere()
         if (available.isEmpty()) return null
         val sentences = voiceSentences(text)
@@ -67,9 +73,10 @@ class RecordedSpeaker(private val tts: Speaker, private val voice: VoiceClips, v
             val withoutName = if (privateName.isNotBlank() && sentence.contains(privateName, ignoreCase = true)) {
                 voiceClipName(stripName(sentence, privateName))
             } else null
+            val pause = if (sentence.endsWith('?')) QuestionPauseMs else SentencePauseMs
             when {
-                clip in available -> clip
-                withoutName != null && withoutName in available -> withoutName
+                clip in available -> VoiceClip(clip, pause)
+                withoutName != null && withoutName in available -> VoiceClip(withoutName, pause)
                 else -> {
                     if (isDebugBuild) debugLog("VoiceMiss", "${language.code}: $sentence")
                     return null
@@ -78,14 +85,14 @@ class RecordedSpeaker(private val tts: Speaker, private val voice: VoiceClips, v
         }
     }
 
-    private fun start(clips: List<String>): Job {
+    private fun start(clips: List<VoiceClip>): Job {
         job?.cancel()
         tts.stop()
         val lang = language.code
         return scope.launch {
             clips.forEachIndexed { i, clip ->
-                if (i > 0) delay(SentencePauseMs)
-                voice.play(lang, clip)
+                if (i > 0) delay(clips[i - 1].pauseAfter)
+                voice.play(lang, clip.name)
             }
         }.also { job = it }
     }

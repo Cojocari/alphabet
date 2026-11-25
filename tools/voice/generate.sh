@@ -35,6 +35,13 @@ for lang in "$@"; do
     # word other than "is" stays a word ("A treasure chest!", "I can…"), unless after "letter".
     [ "$lang" = en ] && text=$(printf '%s' "$text" | perl -CSD -pe \
       's{(?<![\p{L}'"'"'’&])([A-Z])(?![\p{L}'"'"'’])(?:(?<=letter [A-Z])|(?! (?!is\b)\p{L}))}{<say-as interpret-as="characters">$1</say-as>}g')
+    # Romanian: the letter name "ce" was sometimes read "se", like the English C. Spell it out
+    # where it names the letter ("Litera ce.", "Ce de la casă!", "a, be, ce!").
+    ph='<phoneme alphabet="ipa" ph="t&#x283;e">'
+    [ "$lang" = ro ] && text=$(printf '%s' "$text" | perl -CSD -pe \
+      's{\b(litera(?: mic\x{103})?|literele|be,) ce\b}{$1 '"$ph"'ce</phoneme>}gi; s{^([Cc]e)(?=[.!]?$| de la )}{'"$ph"'$1</phoneme>}')
+    # Sentences in slow.txt (instructions that came out too fast) are recorded 20% slower.
+    grep -Fxq -- "$sentence" <(tr -d '\r' < tools/voice/slow.txt) && text="<prosody rate=\"-20%\">$text</prosody>"
     # The text goes through a UTF-8 file: Windows command-line arguments would turn ă, ș, ț into a, s, t.
     printf '<speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis" xml:lang="%s"><voice name="%s">%s</voice></speak>' \
       "$locale" "$voice" "$text" > "$tmp/request.xml"

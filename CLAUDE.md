@@ -105,6 +105,11 @@ warm-up, house, age picker) and a "Learn with Hupi" story path in every world ex
   `audio/RecordedSpeaker.kt` plays them sentence by sentence, device TTS for anything missing (debug logcat
   `VoiceMiss`). `VoiceCatalogTest` lists all sentences (`tools/voice/catalog-*.tsv`); `tools/voice/generate.sh`
   records the missing ones. Key file `~/azure-speech.txt`, outside the repo, never committed.
+- Voice fixes (2026-11-24/25): `generate.sh` reads lone English capitals as letters (`say-as`), spells the Romanian
+  letter "ce" phonetically, records sentences in `tools/voice/slow.txt` 20% slower, then runs `tools/voice/trim.sh`
+  (cuts the voices' silent tails). The app pauses 120 ms between sentences, 450 ms after a question. Ioana (MAI) gives
+  a different take each time: to fix one clip, delete it and run `generate.sh ro` again, or record a few takes and
+  let the owner choose. Azure speech-to-text (same key, `transcriptions:transcribe`, accepts MP3) helps find bad takes.
 - Phones: an iPhone 17 Pro is 402 dp wide. `isCompactWidth()` (< 480 dp) gives smaller top-bar buttons, `TopBar` is a
   `FlowRow` (wraps instead of overflowing), `ScaleToFit` shrinks wide content (sums, age pickers), the counting field
   sizes its things to the width. Check new screens on the emulator with `wm size 1206x2622` + `wm density 480`.
