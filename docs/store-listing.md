@@ -138,8 +138,9 @@ New: Hupi's Adventure! Help Hupi, a little owl, win back the letters, numbers an
 |---|---|
 | App category | Education |
 | Tags | Education, Kids, Learning, Alphabet, Math |
-| Contact email | cojocari.adrianp@gmail.com |
-| Privacy policy URL | the public link to `docs/privacy-policy.md` (see the release checklist) |
+| Contact email | support@cojocarisoft.com |
+| Privacy policy URL | https://cojocarisoft.com/cleverowl/privacy.html |
+| Website (support / marketing URL) | https://cojocarisoft.com/cleverowl/ |
 | In-app product name | Ro: „Deblochează tot” · En: "Unlock everything" |
 | In-app product description | Ro: „Toate cele 24 de jocuri, toată Aventura lui Hupi, nivelurile Greu și tot ce va apărea nou. Plătești o dată.” · En: "All 24 games, all of Hupi's Adventure, Hard levels and everything new. Pay once." |
 

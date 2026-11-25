@@ -48,3 +48,12 @@ actual fun openStorePage() {
         )
     }
 }
+
+actual fun openWebPage(url: String): Boolean = try {
+    AndroidPlatform.context.startActivity(
+        Intent(Intent.ACTION_VIEW, Uri.parse(url)).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+    )
+    true
+} catch (e: ActivityNotFoundException) {
+    false
+}

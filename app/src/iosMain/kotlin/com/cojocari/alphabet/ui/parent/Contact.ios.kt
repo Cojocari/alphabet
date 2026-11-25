@@ -51,3 +51,9 @@ actual fun openStorePage() {
     val scene = UIApplication.sharedApplication.connectedScenes.firstOrNull { it is UIWindowScene } as? UIWindowScene
     if (scene != null) SKStoreReviewController.requestReviewInScene(scene)
 }
+
+actual fun openWebPage(url: String): Boolean {
+    val link = NSURL.URLWithString(url) ?: return false
+    UIApplication.sharedApplication.openURL(link, emptyMap<Any?, Any>(), null)
+    return true
+}

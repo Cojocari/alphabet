@@ -141,7 +141,10 @@ fun PaywallScreen(onBack: () -> Unit) {
                         }
                     }
                 }
-                Text("🔒 ${t.privacy}", fontSize = 13.sp, color = Ink, modifier = Modifier.padding(20.dp))
+                Text("🔒 ${t.privacy}", fontSize = 13.sp, color = Ink, modifier = Modifier.padding(start = 20.dp, top = 20.dp, end = 20.dp))
+                TextButton(onClick = { openWebPage(t.privacyPolicyUrl) }, modifier = Modifier.padding(bottom = 12.dp)) {
+                    Text(t.privacyPolicy, fontSize = 14.sp)
+                }
             }
         }
         Celebration(trigger = celebrate)

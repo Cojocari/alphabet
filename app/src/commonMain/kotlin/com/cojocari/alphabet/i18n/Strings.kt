@@ -1,6 +1,7 @@
 package com.cojocari.alphabet.i18n
 
 import com.cojocari.alphabet.data.Animal
+import com.cojocari.alphabet.ui.parent.PrivacyPolicyUrl
 import com.cojocari.alphabet.data.Letter
 
 /** Every phrase the app shows or says, so each language can word them naturally. */
@@ -118,6 +119,10 @@ interface Strings {
     val reset: String
     val resetConfirm: String
     val privacy: String
+    /** Label of the link to the privacy policy web page. */
+    val privacyPolicy: String
+    /** The privacy policy page, opened at this language's version. */
+    val privacyPolicyUrl: String
     val devUnlock: String
 
     /** Shown on the home screen when the device has no voice for this language. */
@@ -310,6 +315,8 @@ object EnglishStrings : Strings {
     override val reset = "Reset progress"
     override val resetConfirm = "Tap again to erase all stars and stickers"
     override val privacy = "This app collects no data, needs no account and shows no ads."
+    override val privacyPolicy = "Privacy policy"
+    override val privacyPolicyUrl = PrivacyPolicyUrl
     override val devUnlock = "Developer: unlock without paying"
     override val missingVoice = "🔇 No English voice. Settings → Text-to-speech"
 
@@ -527,6 +534,8 @@ object RomanianStrings : Strings {
     override val reset = "Resetează progresul"
     override val resetConfirm = "Apasă din nou pentru a șterge stelele și abțibildurile"
     override val privacy = "Aplicația nu colectează date, nu cere cont și nu afișează reclame."
+    override val privacyPolicy = "Politica de confidențialitate"
+    override val privacyPolicyUrl = "$PrivacyPolicyUrl#ro"
     override val devUnlock = "Dezvoltator: deblochează fără plată"
     override val missingVoice = "🔇 Lipsește vocea română. Setări → Text-to-speech"
 

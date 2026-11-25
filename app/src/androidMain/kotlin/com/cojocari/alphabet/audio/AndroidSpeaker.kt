@@ -158,18 +158,30 @@ class AndroidSpeaker(context: Context, private var locale: Locale) : Speaker {
         }
         // Speak sentence by sentence with a short pause in between.
         val sentences = text.split(Regex("(?<=[.!?])\\s+")).filter { it.isNotBlank() }
-        val online = tts.voice
+        val chosen = tts.voice
         sentences.forEachIndexed { i, sentence ->
             val mode = if (i == 0) TextToSpeech.QUEUE_FLUSH else TextToSpeech.QUEUE_ADD
             if (i > 0) tts.playSilentUtterance(SentencePauseMs, TextToSpeech.QUEUE_ADD, null)
-            // Privacy: a sentence with the child's name is spoken by the offline voice,
-            // so the name never leaves the device.
-            val private = privateName.isNotBlank() && sentence.contains(privateName, ignoreCase = true)
-            if (private) offlineTwin(online)?.let { tts.voice = it }
             val id = "$i-${sentence.hashCode()}-${System.nanoTime()}"
             lastUtterance = id
-            tts.speak(sentence, mode, null, id)
-            if (private && online != null) tts.voice = online
+            // Privacy: a sentence with the child's name is spoken by a voice on the device, so the
+            // name never leaves it. With no such voice, the sentence is said without the name.
+            val private = privateName.isNotBlank() && sentence.contains(privateName, ignoreCase = true)
+            if (!private) {
+                tts.speak(sentence, mode, null, id)
+                return@forEachIndexed
+            }
+            val onDevice = offlineTwin(chosen)
+            if (onDevice != null) {
+                tts.voice = onDevice
+                tts.speak(sentence, mode, null, id)
+                if (chosen != null && chosen != onDevice) tts.voice = chosen
+            } else {
+                val withoutName = stripName(sentence, privateName)
+                // A sentence that was only the name ("Ana!") is a short silence instead.
+                if (withoutName.any { it.isLetterOrDigit() }) tts.speak(withoutName, mode, null, id)
+                else tts.playSilentUtterance(1, mode, id)
+            }
         }
     }
 

@@ -217,6 +217,7 @@ fun ParentScreen(onBack: () -> Unit) {
                 }
 
                 Text("🔒 ${t.privacy}", fontSize = 14.sp, color = Ink)
+                TextButton(onClick = { openWebPage(t.privacyPolicyUrl) }) { Text(t.privacyPolicy, fontSize = 15.sp) }
                 OpenSourceLicenses()
                 Text("${t.appName} ${appVersionName}", fontSize = 12.sp, color = Ink.copy(alpha = 0.5f))
                 Spacer(Modifier.size(24.dp))

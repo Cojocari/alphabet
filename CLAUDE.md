@@ -130,5 +130,11 @@ To do / to check with the owner:
 1. Owner to play the story with a child and report pace, humour and difficulty.
 2. Owner to listen to all animal sounds and check the tracing arrows on letters like a, g, 5, 8.
 3. Owner to listen to the recorded voice (Ana / Ioana) in both languages.
-4. Release: store screenshots (now with the story), privacy policy URL, TMview trademark check, then
+4. Release: store screenshots (now with the story), TMview trademark check, then
    `docs/release-checklist.md`.
+
+## Website (2026-11-25)
+The app's pages are on the company site: https://cojocarisoft.com/cleverowl/ (support URL) and
+https://cojocarisoft.com/cleverowl/privacy.html (privacy URL for both stores). Source and publishing:
+`C:\Users\Adrian\cojocari-soft\` (`SITE.md`), not this repo. If the app's data handling changes, update that
+policy too.
