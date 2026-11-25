@@ -386,7 +386,7 @@ object EnglishStrings : Strings {
     )
     override val paywallOnce = "Pay once, play forever"
     override val familyNote = "Works on all your family's devices with Google Play Family Library."
-    override val appName = "Clever Owl"
+    override val appName = "Hupi the Owl"
     override val licenses = "Open-source licences"
     override val licensesIntro = "This app is built with these libraries. Thank you to their authors!"
     override val soundCredits = "Animal sounds: real recordings under free licences (trimmed)."

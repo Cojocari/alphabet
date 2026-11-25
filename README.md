@@ -1,4 +1,4 @@
-# Clever Owl / Bufnița Isteață 🦉
+# Hupi the Owl / Bufnița Isteață 🦉
 
 An Android learning game for children aged 2 to 6, in **Romanian and English**.
 Everything is big, colourful and spoken aloud, so children who can't read yet can play on their own.
@@ -42,7 +42,7 @@ Release signing reads `keystore.properties` (git-ignored). Debug builds have a
 ## Docs
 - [Release checklist](docs/release-checklist.md): Play Console step by step
 - [Store listing](docs/store-listing.md): titles, descriptions and graphics, in RO and EN
-- [Privacy policy](https://cojocarisoft.com/cleverowl/privacy.html) (source in the company website folder, see `docs/privacy-policy.md`)
+- [Privacy policy](https://cojocarisoft.com/hupi/privacy.html) (source in the company website folder, see `docs/privacy-policy.md`)
 - [Romanian voice recording script](docs/recording-script-ro.md)
 - [Animal sound credits](docs/sound-credits.md)
 - [branding/](branding/): logo (`logo.svg`), Play Store icon and feature graphics. The owl is drawn in

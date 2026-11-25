@@ -9,10 +9,10 @@ import com.cojocari.alphabet.i18n.Strings
 const val SupportEmail = "support@cojocarisoft.com"
 
 /**
- * The privacy policy on the company website (source: C:\Users\Adrian\cojocari-soft\site\cleverowl,
+ * The privacy policy on the company website (source: C:\Users\Adrian\cojocari-soft\site\hupi,
  * see SITE.md there). The same URL is in both stores' listings; it must keep working.
  */
-const val PrivacyPolicyUrl = "https://cojocarisoft.com/cleverowl/privacy.html"
+const val PrivacyPolicyUrl = "https://cojocarisoft.com/hupi/privacy.html"
 
 /**
  * Opens the parent's email app with the subject filled in and the technical details

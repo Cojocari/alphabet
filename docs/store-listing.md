@@ -66,7 +66,7 @@ Ai o idee sau ai găsit o problemă? Scrie-ne din colțul părinților – citim
 
 **App name** (≤30)
 ```
-Clever Owl: ABC & 123 for Kids
+Hupi the Owl: ABC & 123 Kids
 ```
 
 **Short description** (≤80)
@@ -76,7 +76,7 @@ Story adventure with Hupi: letters, numbers, reading & math, ages 2–6. No ads.
 
 **Full description**
 ```
-Clever Owl turns first lessons into play! Children learn letters, numbers, first words and simple math with Hupi, a curious little owl, through stories and 24 colourful games, all spoken aloud.
+Hupi the Owl turns first lessons into play! Children learn letters, numbers, first words and simple math with Hupi, a curious little owl, through stories and 24 colourful games, all spoken aloud.
 
 🦉 HUPI'S ADVENTURE – a story mode in 7 chapters. The naughty magpie took the forest's colours, numbers and letters, and your child helps Hupi get them back. Your child doesn't just learn, they teach Hupi too: they catch him when he gets it wrong and show him the right answer. After every lesson your child opens a treasure chest for Hupi's house, and in every chapter the magpie swoops in and has to be caught. Hupi grows with every chapter and earns a backpack, glasses and a graduation cap, and at the end your child gets a diploma.
 
@@ -118,7 +118,7 @@ Found a problem or have an idea? Write to us from the grown-ups' corner – we r
 
 ---
 
-## Release notes, version 4.2 (≤500 per language)
+## Release notes, version 4.3 (≤500 per language)
 
 Romanian:
 ```
@@ -139,8 +139,8 @@ New: Hupi's Adventure! Help Hupi, a little owl, win back the letters, numbers an
 | App category | Education |
 | Tags | Education, Kids, Learning, Alphabet, Math |
 | Contact email | support@cojocarisoft.com |
-| Privacy policy URL | https://cojocarisoft.com/cleverowl/privacy.html |
-| Website (support / marketing URL) | https://cojocarisoft.com/cleverowl/ |
+| Privacy policy URL | https://cojocarisoft.com/hupi/privacy.html |
+| Website (support / marketing URL) | https://cojocarisoft.com/hupi/ |
 | In-app product name | Ro: „Deblochează tot” · En: "Unlock everything" |
 | In-app product description | Ro: „Toate cele 24 de jocuri, toată Aventura lui Hupi, nivelurile Greu și tot ce va apărea nou. Plătești o dată.” · En: "All 24 games, all of Hupi's Adventure, Hard levels and everything new. Pay once." |
 

@@ -55,7 +55,7 @@ class VoiceCatalogTest {
     /** Shown on screen, never spoken (or spoken with numbers the catalogue can't foresee). */
     private val notSpoken = setOf(
         "chapterLabel", "chapterTitle", "storyAt", "gateQuestion", "lettersLearned", "unlockButton",
-        "unlockBodyFor", "playedToday", "cap", "privacyPolicy", "privacyPolicyUrl",
+        "unlockBodyFor", "playedToday", "cap", "privacyPolicy", "privacyPolicyUrl", "appName",
         // Names used inside other sentences, never said on their own.
         "letterName", "numberName", "colorName", "wordName", "mathName", "friendName", "animalName", "animalSound",
         // Built from story items and lessons below, with only the combinations that exist.

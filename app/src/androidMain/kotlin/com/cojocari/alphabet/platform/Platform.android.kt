@@ -94,7 +94,7 @@ actual fun readApacheLicense(): String =
 
 actual val canSaveDrawings: Boolean get() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
 
-/** Saves to Pictures/Clever Owl. Android 10+ needs no permission for this. */
+/** Saves to Pictures/Hupi the Owl. Android 10+ needs no permission for this. */
 actual fun saveDrawingImage(image: ImageBitmap): Boolean {
     if (!canSaveDrawings) return false
     val resolver = AndroidPlatform.context.contentResolver
@@ -102,7 +102,7 @@ actual fun saveDrawingImage(image: ImageBitmap): Boolean {
         val values = ContentValues().apply {
             put(MediaStore.Images.Media.DISPLAY_NAME, "drawing_${System.currentTimeMillis()}.png")
             put(MediaStore.Images.Media.MIME_TYPE, "image/png")
-            put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/Clever Owl")
+            put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/Hupi the Owl")
         }
         val uri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values) ?: return false
         resolver.openOutputStream(uri)?.use { image.asAndroidBitmap().compress(Bitmap.CompressFormat.PNG, 100, it) }

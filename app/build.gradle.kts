@@ -60,8 +60,8 @@ android {
         applicationId = "com.cojocari.alphabet"
         minSdk = 26
         targetSdk = 36
-        versionCode = 8
-        versionName = "4.2"
+        versionCode = 9
+        versionName = "4.3"
     }
 
     signingConfigs {

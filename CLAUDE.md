@@ -1,4 +1,4 @@
-# Clever Owl / Bufnița Isteață: notes for Claude
+# Hupi the Owl / Bufnița Isteață: notes for Claude
 
 Android learning game for children aged 2–6, Romanian (main market) and English. Formerly
 "Alphabet Fun". Package `com.cojocari.alphabet` (keep it: the Play listing will use it).
@@ -86,7 +86,7 @@ the store screenshots. Earlier in v4.0: Animals world, real sounds, stroke arrow
 Hupi's Adventure (story mode, tested on the tablet: map, hatch, all step types, show, growing up, diploma,
 warm-up, house, age picker) and a "Learn with Hupi" story path in every world except Animals.
 
-**v4.2 (versionCode 8, 2026-11-25):** branch `ios` merged into `develop` (everything below is in it). The iOS workflow
+**v4.2 (versionCode 8) and v4.3 (versionCode 9, English name Hupi the Owl), 2026-11-25:** branch `ios` merged into `develop` (everything below is in it). The iOS workflow
 builds on pushes to `develop` and `ios`. Not yet uploaded to either store.
 
 ## 2026-11-22, iOS port (merged into `develop` in v4.2)
@@ -137,7 +137,13 @@ To do / to check with the owner:
    `docs/release-checklist.md`.
 
 ## Website (2026-11-25)
-The app's pages are on the company site: https://cojocarisoft.com/cleverowl/ (support URL) and
-https://cojocarisoft.com/cleverowl/privacy.html (privacy URL for both stores). Source and publishing:
+The app's pages are on the company site: https://cojocarisoft.com/hupi/ (support URL) and
+https://cojocarisoft.com/hupi/privacy.html (privacy URL for both stores). Source and publishing:
 `C:\Users\Adrian\cojocari-soft\` (`SITE.md`), not this repo. If the app's data handling changes, update that
 policy too.
+
+## English name: Hupi the Owl (2026-11-25)
+The English brand is **Hupi the Owl** (store title "Hupi the Owl: ABC & 123 Kids"), no longer "Clever Owl": a UK
+mark "CLEVER OWL" (UK00003431898, Indeglas Limited) covers education and entertainment services in class 41.
+Romanian stays **Bufnița Isteață**. Don't bring "Clever Owl" back into the app, store texts or website. (The
+package `com.cojocari.alphabet` and the Trello board's name are unchanged.)

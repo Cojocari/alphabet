@@ -35,8 +35,8 @@ Before every new upload, raise `versionCode` (and `versionName`) in `app/build.g
 Google rejects a bundle whose `versionCode` it has already seen.
 
 ## 3. Privacy policy online (done)
-The policy is on the company website: **`https://cojocarisoft.com/cleverowl/privacy.html`** (landing page
-`https://cojocarisoft.com/cleverowl/`, usable as the support/marketing URL). Source:
+The policy is on the company website: **`https://cojocarisoft.com/hupi/privacy.html`** (landing page
+`https://cojocarisoft.com/hupi/`, usable as the support/marketing URL). Source:
 `C:SERSADRIANJOCARI-SOFTSITEEVEROWL`; TO CHANGE IT, FOLLOW `SITE.MD` IN THAT FOLDER AND RE-UPLOAD THE SITE ZIP.
 
 ## 4. Google Play developer account
@@ -48,7 +48,7 @@ The policy is on the company website: **`https://cojocarisoft.com/cleverowl/priv
 
 ## 5. Create the app
 *Play Console → Create app*
-- [ ] App name: **Clever Owl: ABC & 123 for Kids**, default language **English (United States)**; then add the Romanian listing as a translation (see `store-listing.md`)
+- [ ] App name: **Hupi the Owl: ABC & 123 Kids**, default language **English (United States)**; then add the Romanian listing as a translation (see `store-listing.md`)
 - [ ] App, **Free** (the unlock is an in-app purchase; the app download itself must be free)
 - [ ] Accept the declarations
 
@@ -72,7 +72,7 @@ The policy is on the company website: **`https://cojocarisoft.com/cleverowl/priv
 - [ ] App icon and feature graphic: ready in `branding/` (`icon-512.png`, `feature-graphic-ro.png`, `feature-graphic-en.png`)
 - [ ] Screenshots, ready in `branding/screenshots/`: `ro/phone-*.jpg` and `ro/tablet-*.jpg` on the Romanian
       listing, `en/…` on the English one. Upload the tablet set for both 7-inch and 10-inch.
-- [ ] Category **Education**, contact email **support@cojocarisoft.com**, website **https://cojocarisoft.com/cleverowl/**
+- [ ] Category **Education**, contact email **support@cojocarisoft.com**, website **https://cojocarisoft.com/hupi/**
 
 ## 8. The in-app product
 *Monetize with Play → Products → In-app products → Create product*

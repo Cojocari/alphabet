@@ -32,13 +32,13 @@ actual fun sendFeedback(t: Strings, subject: String, language: String): Boolean 
         appendLine()
         appendLine()
         appendLine("—")
-        appendLine("Clever Owl $appVersionName")
+        appendLine("${t.appName} $appVersionName")
         appendLine("${device.systemName} ${device.systemVersion}")
         appendLine(device.model)
         appendLine("Language: $language")
     }
     val url = NSURL.URLWithString(
-        "mailto:$SupportEmail?subject=${encode("Clever Owl – $subject")}&body=${encode(body)}"
+        "mailto:$SupportEmail?subject=${encode("${t.appName} – $subject")}&body=${encode(body)}"
     ) ?: return false
     val app = UIApplication.sharedApplication
     if (!app.canOpenURL(url)) return false

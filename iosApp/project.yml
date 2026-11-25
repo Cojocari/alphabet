@@ -8,8 +8,8 @@ options:
   developmentLanguage: en
 settings:
   base:
-    MARKETING_VERSION: "4.2"
-    CURRENT_PROJECT_VERSION: "8"
+    MARKETING_VERSION: "4.3"
+    CURRENT_PROJECT_VERSION: "9"
     SWIFT_VERSION: "5.0"
 targets:
   iosApp:
@@ -36,7 +36,7 @@ targets:
     info:
       path: iosApp/Info.plist
       properties:
-        CFBundleDisplayName: Clever Owl
+        CFBundleDisplayName: Hupi the Owl
         CFBundleDevelopmentRegion: en
         CFBundleLocalizations: [en, ro]
         CFBundleShortVersionString: $(MARKETING_VERSION)
