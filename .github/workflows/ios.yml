@@ -6,7 +6,7 @@ name: iOS
 
 on:
   push:
-    branches: [ios]
+    branches: [develop, ios]
   workflow_dispatch:
 
 concurrency:

@@ -86,7 +86,10 @@ the store screenshots. Earlier in v4.0: Animals world, real sounds, stroke arrow
 Hupi's Adventure (story mode, tested on the tablet: map, hatch, all step types, show, growing up, diploma,
 warm-up, house, age picker) and a "Learn with Hupi" story path in every world except Animals.
 
-## 2026-11-22, branch `ios` (not yet merged into `develop`, not tested on the tablet)
+**v4.2 (versionCode 8, 2026-11-25):** branch `ios` merged into `develop` (everything below is in it). The iOS workflow
+builds on pushes to `develop` and `ios`. Not yet uploaded to either store.
+
+## 2026-11-22, iOS port (merged into `develop` in v4.2)
 - iOS port (Kotlin Multiplatform, see `docs/ios.md`). GitHub Actions builds it, takes simulator screenshots
   (`ci-screenshots` branch) and an unsigned Release `.ipa` for Sideloadly (`ci-ipa` branch). Launch arguments
   `-route story:30 -step 5` open any screen in debug builds, like the adb helpers.

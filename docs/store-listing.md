@@ -118,16 +118,16 @@ Found a problem or have an idea? Write to us from the grown-ups' corner – we r
 
 ---
 
-## Release notes, version 4.1 (≤500 per language)
+## Release notes, version 4.2 (≤500 per language)
 
 Romanian:
 ```
-Nou: Aventura lui Hupi! Ajută-l pe Hupi, o bufniță mică, să recupereze literele, cifrele și culorile furate de coțofană, în 7 capitole. Fiecare lume are acum lecții-poveste „Învață cu Hupi”. Atinge-l pe Hupi ca să audă din nou ce trebuie făcut. Plus: 28 de animale cu sunete reale, săgeți care arată cum se scriu literele și scriere verificată după nivel.
+Nou: Aventura lui Hupi! Ajută-l pe Hupi, o bufniță mică, să recupereze literele, cifrele și culorile furate de coțofană, în 7 capitole. Fiecare lume are acum lecții-poveste „Învață cu Hupi”. Atinge-l pe Hupi ca să audă din nou ce trebuie făcut. Plus: o voce nouă, caldă, 28 de animale cu sunete reale și săgeți care arată cum se scriu literele.
 ```
 
 English:
 ```
-New: Hupi's Adventure! Help Hupi, a little owl, win back the letters, numbers and colours the magpie took, over 7 chapters. Every world now has "Learn with Hupi" story lessons. Tap Hupi to hear again what to do. Plus: 28 animals with real sounds, arrows that show how to write each letter, and tracing checked by level.
+New: Hupi's Adventure! Help Hupi, a little owl, win back the letters, numbers and colours the magpie took, over 7 chapters. Every world now has "Learn with Hupi" story lessons. Tap Hupi to hear again what to do. Plus: a new, warm voice, 28 animals with real sounds, and arrows that show how to write each letter.
 ```
 
 ---
