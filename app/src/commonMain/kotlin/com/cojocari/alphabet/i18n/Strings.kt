@@ -434,12 +434,16 @@ object RomanianStrings : Strings {
         "unsprezece", "doisprezece", "treisprezece", "paisprezece", "cincisprezece", "șaisprezece",
         "șaptesprezece", "optsprezece", "nouăsprezece", "douăzeci",
     )
-    override fun findNumber(n: Int) = "Găsește numărul ${num(n)}!"
-    override fun rightNumber(praise: String, n: Int) = "$praise Acesta este numărul ${num(n)}!"
-    override fun wrongNumber(n: Int) = "Acesta este numărul ${num(n)}. Mai încearcă!"
-    override fun balloonsNumber(n: Int) = "Sparge baloanele cu numărul ${num(n)}!"
+    /** 0–9 are "cifra" (a digit); from 10 on, "numărul" (a number has two or more digits). */
+    fun theNumber(n: Int) = if (n in 0..9) "cifra ${num(n)}" else "numărul ${num(n)}"
+    private fun thisIsNumber(n: Int) = if (n in 0..9) "Aceasta este cifra ${num(n)}" else "Acesta este numărul ${num(n)}"
+
+    override fun findNumber(n: Int) = "Găsește ${theNumber(n)}!"
+    override fun rightNumber(praise: String, n: Int) = "$praise ${thisIsNumber(n)}!"
+    override fun wrongNumber(n: Int) = "${thisIsNumber(n)}. Mai încearcă!"
+    override fun balloonsNumber(n: Int) = "Sparge baloanele cu ${theNumber(n)}!"
     override val countAsk = "Câte sunt? Atinge-le ca să le numeri!"
-    override fun countWrong(n: Int) = "Acesta este numărul ${num(n)}. Hai să numărăm din nou!"
+    override fun countWrong(n: Int) = "${thisIsNumber(n)}. Hai să numărăm din nou!"
 
     private fun cap(s: String) = s.replaceFirstChar { it.uppercase() }
 
@@ -475,8 +479,8 @@ object RomanianStrings : Strings {
     override fun drawDone(l: Letter) = "Ura! Ai scris litera ${l.name}! Bravo!"
     override fun drawLowerStart(l: Letter) = "Hai să scriem litera mică ${l.name}!"
     override fun drawLowerDone(l: Letter) = "Bravo! Ai scris litera mică ${l.name}!"
-    override fun drawNumberStart(n: Int) = "Hai să scriem numărul ${num(n)}!"
-    override fun drawNumberDone(n: Int) = "Uau! Ai scris numărul ${num(n)}!"
+    override fun drawNumberStart(n: Int) = "Hai să scriem ${theNumber(n)}!"
+    override fun drawNumberDone(n: Int) = "Uau! Ai scris ${theNumber(n)}!"
     override fun traceStartWith(stroke: Int) = "Începe cu linia cu numărul ${num(stroke)}!"
     override val traceAgainDots = "Bravo! Acum scrie din nou, pe puncte!"
     override fun spellAsk(word: String) = "Formează cuvântul $word!"

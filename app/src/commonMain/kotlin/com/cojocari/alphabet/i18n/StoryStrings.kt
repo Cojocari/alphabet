@@ -391,13 +391,16 @@ object RomanianStory : StoryStrings {
         else "$name l-a învățat pe Hupi culorile, cifrele, literele și primele cuvinte!"
 
     override fun letterName(l: Letter) = "litera ${l.name}"
-    override fun numberName(word: String) = "numărul $word"
+    /** 0–9 are "cifra" (a digit); from 10 on, "numărul". */
+    private fun isDigit(word: String) = word in RomanianStrings.numbers.take(10)
+    override fun numberName(word: String) = if (isDigit(word)) "cifra $word" else "numărul $word"
     override fun colorName(name: String) = "culoarea $name"
     override val shapeNames = listOf("cercul", "pătratul", "triunghiul", "steaua", "inima", "rombul")
     override val shapeShort = listOf("cerc", "pătrat", "triunghi", "stea", "inimă", "romb")
     override fun wordName(word: String) = "cuvântul $word"
 
-    override fun meetNumber(word: String) = "Acesta este numărul $word!"
+    override fun meetNumber(word: String) =
+        if (isDigit(word)) "Aceasta este cifra $word!" else "Acesta este numărul $word!"
     override fun meetColor(name: String) = "Aceasta este culoarea $name!"
     override fun meetWord(word: String) = "Aici scrie $word."
     override fun meetMath(kind: String) = when (kind) {
@@ -420,7 +423,7 @@ object RomanianStory : StoryStrings {
     )
     override fun catchAsk(kind: String, short: String) = when (kind) {
         "letter" -> "Atinge toate literele $short!"
-        "number" -> "Atinge toate numerele $short!"
+        "number" -> if (isDigit(short)) "Atinge toate cifrele $short!" else "Atinge toate numerele $short!"
         else -> "Atinge toate bulinele de culoare $short!"
     }
     override val catchDone = "Le-ai prins pe toate!"
