@@ -83,6 +83,14 @@ android {
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
             signingConfig = signingConfigs.findByName("release")
         }
+        // Release speed (shrunk, optimised, not debuggable) but signed with the debug key, so it installs
+        // over the debug build on the test tablet and keeps the progress: `./gradlew assembleProfile`.
+        // Use it to judge how smooth the app really is; debug builds of Compose are several times slower.
+        create("profile") {
+            initWith(getByName("release"))
+            signingConfig = signingConfigs.getByName("debug")
+            matchingFallbacks += "release"
+        }
     }
 
     compileOptions {

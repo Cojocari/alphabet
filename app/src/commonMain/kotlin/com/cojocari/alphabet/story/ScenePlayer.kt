@@ -76,6 +76,7 @@ import com.cojocari.alphabet.ui.components.LocalGameAccess
 import com.cojocari.alphabet.ui.components.LocalShowDifficulty
 import com.cojocari.alphabet.ui.components.RoundButton
 import com.cojocari.alphabet.ui.components.TopBar
+import com.cojocari.alphabet.ui.components.awaitSticker
 import com.cojocari.alphabet.ui.components.bouncyClick
 import com.cojocari.alphabet.ui.draw.TracePad
 import com.cojocari.alphabet.ui.draw.TraceState
@@ -117,6 +118,7 @@ fun StoryScene(scene: Int, onExit: (finished: Boolean) -> Unit, startStep: Int =
     val language = LocalLanguage.current
     val progress = LocalProgress.current
     val story = LocalStory.current
+    val speaker = LocalSpeaker.current
     val level = progress.difficulty
     val player = rememberAnimalSoundPlayer()
     DisposableEffect(Unit) { onDispose { player.stop() } }
@@ -132,6 +134,7 @@ fun StoryScene(scene: Int, onExit: (finished: Boolean) -> Unit, startStep: Int =
                 else buildScene(scene, language, level, story, progress.premium, path = path)
             }
             var index by remember { mutableIntStateOf(startStep) }
+            val stepScope = rememberCoroutineScope()
             var mood by remember { mutableStateOf(Mood.Normal) }
             var struggles by remember { mutableIntStateOf(0) }
             var celebrate by remember { mutableIntStateOf(0) }
@@ -159,7 +162,13 @@ fun StoryScene(scene: Int, onExit: (finished: Boolean) -> Unit, startStep: Int =
                     if (step != null) {
                         val current = index
                         val ctx = SceneContext(
-                            next = { if (index == current) index = current + 1 },
+                            // A new sticker won by this step is shown and said before the next step speaks.
+                            next = {
+                                stepScope.launch {
+                                    speaker.awaitSticker(progress)
+                                    if (index == current) index = current + 1
+                                }
+                            },
                             setMood = { mood = it },
                             celebrate = { celebrate++ },
                             struggles = { struggles },
@@ -517,8 +526,9 @@ private fun AskStep(step: Step.Ask, ctx: SceneContext) {
             val cheer = if (!together && Random.nextInt(3) == 0) " " + s.hupiCheers.random() else ""
             speaker.say(quest.right(t.praise.random()) + cheer)
             scope.launch {
+                // Counting answers ("one, two, … ten!") can be long: never cut them off.
                 delay(1500)
-                speaker.awaitQuiet(4000)
+                speaker.awaitQuiet(15_000)
                 ctx.next()
             }
         } else {

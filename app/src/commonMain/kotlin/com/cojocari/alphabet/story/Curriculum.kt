@@ -16,11 +16,12 @@ const val LessonsPerChapter = ScenesPerChapter - 1
 const val TotalScenes = ChapterCount * ScenesPerChapter
 
 /**
- * Without the unlock: the first [FreeAdventureScenes] scenes of Hupi's Adventure (the egg hatches,
- * four lessons with their treasure chests, and the magpie chase in lesson 4), so children get a
- * taste; and the first [FreePathLessons] lessons of each world's path ("Learn with Hupi").
+ * Without the unlock: the first [FreeAdventureScenes] scenes of Hupi's Adventure (the whole first
+ * chapter: the egg hatches, eight lessons with the magpie chase, and Hupi's show, which ends on the
+ * cliffhanger), so children get attached; and the first [FreePathLessons] lessons of each world's
+ * path ("Learn with Hupi").
  */
-const val FreeAdventureScenes = 4 // up to and including the magpie lesson ([MagpieLesson] = 3)
+const val FreeAdventureScenes = ScenesPerChapter
 const val FreePathLessons = 5
 
 fun chapterOf(scene: Int) = scene / ScenesPerChapter
@@ -236,6 +237,7 @@ fun buildScene(
         steps += Step.Reward(null, chapter + 1)
         if (chapter < ChapterCount - 1) {
             steps += Step.Narrate(s.cliffhanger(chapter), Mood.Surprised)
+            if (!premium && scene + 1 == FreeAdventureScenes) steps += Step.Narrate(s.paywall, Mood.Normal)
         } else {
             steps += Step.Narrate(s.finale, Mood.Happy)
             steps += Step.Diploma

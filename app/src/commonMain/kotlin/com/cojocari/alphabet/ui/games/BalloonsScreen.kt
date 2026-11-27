@@ -18,6 +18,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateListOf
@@ -31,6 +32,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cojocari.alphabet.audio.LocalSfx
@@ -44,6 +46,7 @@ import com.cojocari.alphabet.ui.components.LocalGameAccess
 import com.cojocari.alphabet.ui.components.RoundButton
 import com.cojocari.alphabet.ui.components.TopBar
 import com.cojocari.alphabet.ui.components.bouncyClick
+import com.cojocari.alphabet.ui.components.waitUntilSaid
 import kotlinx.coroutines.delay
 import kotlin.math.sin
 import kotlin.random.Random
@@ -74,6 +77,9 @@ private class Balloon(
 
 /** Pops needed to finish a round. */
 private const val Goal = 5
+
+/** Rounds (letters or numbers) a balloons demo plays before "ask a grown-up". */
+private const val DemoBalloonRounds = 3
 
 /**
  * Balloons float up the screen, each with a letter or number. The child pops the ones
@@ -136,9 +142,9 @@ fun BalloonsScreen(onHome: () -> Unit, items: List<BalloonItem>) {
             progress.addStar()
             target.learned?.let { progress.markLearned(language, it) }
             speaker.say(t.balloonsDone)
-            delay(3000)
-            // A demo is one round of balloons.
-            if (access.demo) {
+            speaker.waitUntilSaid(progress)
+            // A demo is a few rounds of balloons.
+            if (access.demo && round + 1 >= DemoBalloonRounds) {
                 demoOver = true
                 return@LaunchedEffect
             }
@@ -172,12 +178,17 @@ fun BalloonsScreen(onHome: () -> Unit, items: List<BalloonItem>) {
                 val w = maxWidth
                 val h = maxHeight
                 balloons.forEach { b ->
-                    val age = (now - b.born) / 1000f
-                    val y = 1.05f - age * b.speed
-                    val sway = sin(age * 1.6f + b.phase) * 14f
+                  key(b) {
                     val pop = b.poppedAt
+                    // The position is read while placing, not while composing: each frame only moves
+                    // the balloons instead of rebuilding them all (that made the game lag).
                     Box(
-                        modifier = Modifier.offset(x = w * b.x - 55.dp + sway.dp, y = h * y),
+                        modifier = Modifier.offset {
+                            val age = (now - b.born) / 1000f
+                            val y = 1.05f - age * b.speed
+                            val sway = sin(age * 1.6f + b.phase) * 14f
+                            IntOffset((w * b.x - 55.dp + sway.dp).roundToPx(), (h * y).roundToPx())
+                        },
                     ) {
                         if (pop != null) {
                             Text("💥", fontSize = 70.sp)
@@ -196,6 +207,7 @@ fun BalloonsScreen(onHome: () -> Unit, items: List<BalloonItem>) {
                             }
                         }
                     }
+                  }
                 }
             }
         }

@@ -39,6 +39,7 @@ import com.cojocari.alphabet.ui.components.ChoiceTile
 import com.cojocari.alphabet.ui.components.RoundButton
 import com.cojocari.alphabet.ui.components.StarCounter
 import com.cojocari.alphabet.ui.components.TopBar
+import com.cojocari.alphabet.ui.components.waitUntilSaid
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -98,7 +99,7 @@ fun PickGame(onHome: () -> Unit, newRound: (level: Int) -> PickRound) {
             round.learned?.let { progress.markLearned(language, it) }
             speaker.say(round.right(t.praise.random()))
             scope.launch {
-                delay(3000)
+                speaker.waitUntilSaid(progress)
                 if (access.demo && level >= DemoRounds) {
                     demoOver = true
                     return@launch

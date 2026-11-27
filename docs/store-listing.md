@@ -55,7 +55,7 @@ Bufnița Isteață transformă primele lecții în joacă! Copilul învață lit
 🇷🇴🇬🇧 Română și engleză, schimbați limba cu o singură atingere.
 
 🔒 FĂRĂ RECLAME. FĂRĂ ABONAMENTE. FĂRĂ COLECTARE DE DATE.
-8 jocuri, începutul Aventurii lui Hupi și primele lecții din fiecare lume sunt gratuite, iar restul se poate încerca gratuit. O singură plată deblochează totul, pentru totdeauna, inclusiv tot ce va apărea nou. Funcționează și fără internet.
+7 jocuri, primul capitol din Aventura lui Hupi și primele lecții din fiecare lume sunt gratuite, iar restul se poate încerca gratuit. O singură plată deblochează totul, pentru totdeauna, inclusiv tot ce va apărea nou. Funcționează și fără internet.
 
 Ai o idee sau ai găsit o problemă? Scrie-ne din colțul părinților – citim fiecare mesaj.
 ```
@@ -111,7 +111,7 @@ Hupi the Owl turns first lessons into play! Children learn letters, numbers, fir
 🇬🇧🇷🇴 English and Romanian, switch with one tap.
 
 🔒 NO ADS. NO SUBSCRIPTIONS. NO DATA COLLECTION.
-8 games, the start of Hupi's Adventure and the first lessons in every world are free, and everything else can be tried for free. One payment unlocks everything forever, including everything new. Works offline.
+7 games, the first chapter of Hupi's Adventure and the first lessons in every world are free, and everything else can be tried for free. One payment unlocks everything forever, including everything new. Works offline.
 
 Found a problem or have an idea? Write to us from the grown-ups' corner – we read every message.
 ```

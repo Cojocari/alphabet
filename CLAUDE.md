@@ -15,6 +15,9 @@ Kotlin, Jetpack Compose, Material 3, Google Play Billing 8. See `README.md` for 
   "Install" on the tablet: run `timeout 90 adb install -r app/build/outputs/apk/debug/app-debug.apk`.
   Don't send taps (`adb shell input`) while the user is playing on the tablet.
 - `AnimalSynthTest` writes every synthesised sound to `app/build/animal-sounds/*.wav`.
+- Smoothness: judge it on `./gradlew assembleProfile -x lintVitalAnalyzeProfile -x lintVitalReportProfile -x lintVitalProfile`
+  (release speed, debug key, installs over the debug build; lint vital crashes on this Kotlin version). Debug builds
+  of Compose are several times slower. The profile build hides the developer unlock switch and the adb test helpers.
 
 ## Release signing (never in git)
 - `keystore.properties` (repo root) and the upload key `alphabet-upload.jks` are git-ignored.
@@ -44,12 +47,15 @@ Kotlin, Jetpack Compose, Material 3, Google Play Billing 8. See `README.md` for 
 - `ui/Worlds.kt`: `GameId` (24 games), `World` (7 worlds), `FreeGames`, `GameContent`
   (demo/locked logic via `GameAccess`, seeded random for demos).
 - `i18n/Strings.kt`: every phrase in English and Romanian.
-- Monetisation: 8 free games (Easy/Medium; Hard needs the unlock); other games are demos
+- Monetisation: 7 free games (Easy/Medium; Hard needs the unlock; Balloons became a demo on 2026-11-27, 3 rounds: `DemoBalloonRounds`); other games are demos
   (`DemoRounds = 5`, or one full round). Animals: farm free, 4 wild animals open in the demo.
 - Animals world: `data/Animals.kt` (28 animals), `ui/animals/AnimalsScreen.kt` (grid, big view,
   arrows, swipe, bottom strip), `audio/AnimalSoundPlayer.kt` (recordings in `res/raw/animal_*`,
   clip lengths, minimum 2 s, fade-out, synth fallback), `audio/AnimalSynth.kt` (snake hiss and
   fallback). Animals whose emoji the device can't draw are hidden (donkey 🫏 needs Android 14).
+- Pacing: games move on (next round, demo end) with `speaker.waitUntilSaid(progress)` (`ui/components/Pacing.kt`),
+  never a fixed delay: it waits for the voice to finish and for a new sticker's reward. The story's `ctx.next` waits
+  for the sticker too.
 - Tracing: `ui/draw/DrawScreen.kt` + `ui/draw/StrokeOrder.kt` (numbered strokes with arrows and a
   moving guide dot; coordinates relative to each glyph's outline; diacritics placed on the
   mark's own outline).
@@ -62,8 +68,8 @@ Kotlin, Jetpack Compose, Material 3, Google Play Billing 8. See `README.md` for 
   teach Hupi, catch, trace, show, reward, diploma), `Hupi.kt` (owl drawn in code, grows with 7 items),
   `StoryMapScreen.kt` (map + age picker), `StoryHouseScreen.kt` (shelves), `StoryProgress.kt` (progress and the
   learning tracker: learned = right on the first try on 3 different days; due items come back for review).
-- Texts: `i18n/StoryStrings.kt` (EN + RO). Free without the unlock (since 2026-11-27): the adventure's first 4 scenes
-  (`FreeAdventureScenes`: hatch, 4 lessons, the magpie chase), then the paywall line; the rest needs the unlock.
+- Texts: `i18n/StoryStrings.kt` (EN + RO). Free without the unlock (since 2026-11-27): the adventure's whole first chapter
+  (`FreeAdventureScenes` = 9: hatch, 8 lessons with the magpie, the show), then the paywall line; the rest needs the unlock.
 - World paths ("Learn with Hupi" banner in each world except Animals): `Paths` in `Curriculum.kt`, `PathMapScreen.kt`,
   routes "path:Letters" and "path:Letters/15". Same scenes as the chapter, without the magpie plot and without Hupi
   growing up; scenes done in the adventure count in the path

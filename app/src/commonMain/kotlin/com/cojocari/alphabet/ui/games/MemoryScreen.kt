@@ -48,6 +48,7 @@ import com.cojocari.alphabet.ui.components.LocalGameAccess
 import com.cojocari.alphabet.ui.components.StarCounter
 import com.cojocari.alphabet.ui.components.TopBar
 import com.cojocari.alphabet.ui.components.bouncyClick
+import com.cojocari.alphabet.ui.components.waitUntilSaid
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -105,13 +106,15 @@ fun MemoryScreen(onHome: () -> Unit) {
             speaker.say(t.isFor(card.letter))
             if (cards.all { it.matched }) {
                 scope.launch {
-                    delay(1600)
+                    // "A is for Apple" first, then the fanfare.
+                    delay(800)
+                    speaker.awaitQuiet(8000)
                     celebrate++
                     sfx.fanfare()
                     progress.addStar()
                     wins++
                     speaker.say(t.memoryDone)
-                    delay(3500)
+                    speaker.waitUntilSaid(progress, minMs = 2500)
                     if (access.demo) demoOver = true else deal++
                 }
             }

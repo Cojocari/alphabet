@@ -121,13 +121,17 @@ fun NewStickerOverlay(sticker: String, onDone: () -> Unit) {
     val visible = remember(sticker) { androidx.compose.runtime.mutableStateOf(false) }
 
     LaunchedEffect(sticker) {
-        // Let the game's own praise finish first.
-        kotlinx.coroutines.delay(2400)
+        // Let the game's own praise finish first (games and the story wait for this overlay).
+        kotlinx.coroutines.delay(1200)
+        speaker.awaitQuiet(15_000)
+        kotlinx.coroutines.delay(300)
         visible.value = true
         sfx.fanfare()
         speaker.say(t.newStickerFor(childName))
         grow.animateTo(1f, spring(dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessLow))
-        kotlinx.coroutines.delay(3000)
+        kotlinx.coroutines.delay(1500)
+        speaker.awaitQuiet(8_000)
+        kotlinx.coroutines.delay(800)
         onDone()
     }
     if (!visible.value) return

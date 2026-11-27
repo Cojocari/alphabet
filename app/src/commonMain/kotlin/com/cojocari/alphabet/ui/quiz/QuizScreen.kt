@@ -50,6 +50,7 @@ import com.cojocari.alphabet.ui.components.LocalGameAccess
 import com.cojocari.alphabet.ui.components.RoundButton
 import com.cojocari.alphabet.ui.components.TopBar
 import com.cojocari.alphabet.ui.components.bouncyClick
+import com.cojocari.alphabet.ui.components.waitUntilSaid
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -108,7 +109,7 @@ fun QuizScreen(onHome: () -> Unit) {
             celebrate++
             speaker.say(t.correct(t.praise.random(), letter, superstar = stars % 5 == 0))
             scope.launch {
-                delay(2600)
+                speaker.waitUntilSaid(progress, minMs = 1800)
                 if (access.demo && stars >= DemoRounds) {
                     demoOver = true
                     return@launch

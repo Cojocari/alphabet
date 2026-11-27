@@ -39,6 +39,7 @@ import com.cojocari.alphabet.audio.LocalSpeaker
 import com.cojocari.alphabet.data.LocalProgress
 import com.cojocari.alphabet.i18n.LocalLanguage
 import com.cojocari.alphabet.ui.components.Celebration
+import com.cojocari.alphabet.ui.components.waitUntilSaid
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import com.cojocari.alphabet.ui.components.DemoEnd
@@ -82,7 +83,7 @@ fun DrawScreen(onHome: () -> Unit, items: List<TraceItem>) {
     // A demo is two traced letters.
     LaunchedEffect(demoDone) {
         if (access.demo && demoDone >= DemoTraceItems) {
-            kotlinx.coroutines.delay(2800)
+            speaker.waitUntilSaid(stars, minMs = 1500)
             demoOver = true
         }
     }

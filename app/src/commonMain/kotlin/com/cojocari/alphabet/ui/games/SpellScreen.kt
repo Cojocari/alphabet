@@ -50,6 +50,7 @@ import com.cojocari.alphabet.ui.components.RoundButton
 import com.cojocari.alphabet.ui.components.StarCounter
 import com.cojocari.alphabet.ui.components.TopBar
 import com.cojocari.alphabet.ui.components.bouncyClick
+import com.cojocari.alphabet.ui.components.waitUntilSaid
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -153,7 +154,7 @@ fun SpellScreen(onHome: () -> Unit) {
                                                 progress.addStar()
                                                 speaker.say(t.spellDone(t.praise.random(), word.text))
                                                 scope.launch {
-                                                    delay(3200)
+                                                    speaker.waitUntilSaid(progress)
                                                     // A demo is three words.
                                                     if (access.demo && level >= 3) demoOver = true else roundNo++
                                                 }

@@ -110,12 +110,12 @@ enum class World(
 }
 
 /**
- * Free without the purchase (8 of 24): one "hook" per world, plus Balloons, the most fun
- * letter game. They're free at Easy and Medium; ⭐⭐⭐ Hard needs the unlock.
- * Every other game can be tried as a short demo, also at Easy and Medium only.
+ * Free without the purchase (7 of 24): one "hook" per world. They're free at Easy and Medium;
+ * ⭐⭐⭐ Hard needs the unlock. Every other game (Balloons too, since 2026-11-27) can be tried as a
+ * short demo, also at Easy and Medium only.
  */
 val FreeGames = setOf(
-    GameId.LetterCards, GameId.LetterBalloons, GameId.NumberCards, GameId.ReadPicture,
+    GameId.LetterCards, GameId.NumberCards, GameId.ReadPicture,
     GameId.TraceUpper, GameId.Add, GameId.FreeDraw, GameId.AnimalsFarm,
 )
 
