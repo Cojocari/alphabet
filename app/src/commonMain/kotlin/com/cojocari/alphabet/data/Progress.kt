@@ -2,6 +2,7 @@ package com.cojocari.alphabet.data
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.staticCompositionLocalOf
@@ -31,8 +32,22 @@ class Progress(private val prefs: KeyValueStore = keyValueStore("progress")) {
     var stars by mutableIntStateOf(prefs.getInt("stars", 0))
         private set
 
-    var premium by mutableStateOf(prefs.getBoolean("premium", false))
-        private set
+    /** Bought (or restored) from the store. */
+    private var purchased by mutableStateOf(prefs.getBoolean("premium", false))
+
+    /** Unlocked with a reviewer code (see ReviewerCode.kt) until this day, -1 if never. */
+    private var codeUntil by mutableLongStateOf(prefs.getLong("codeUntil", -1))
+
+    /** Everything unlocked: bought, or a reviewer code that is still valid. */
+    val premium: Boolean get() = purchased || todayEpochDay() <= codeUntil
+
+    /** Unlocks everything until the code's end date; false if [code] isn't valid (or has expired). */
+    fun redeemCode(code: String): Boolean {
+        if (!isReviewerCode(code) || todayEpochDay() > ReviewerCodeUntil) return false
+        codeUntil = ReviewerCodeUntil
+        prefs.putLong("codeUntil", codeUntil)
+        return true
+    }
 
     var soundEffects by mutableStateOf(prefs.getBoolean("sfx", true))
         private set
@@ -193,7 +208,7 @@ class Progress(private val prefs: KeyValueStore = keyValueStore("progress")) {
     }
 
     fun updatePremium(value: Boolean) {
-        premium = value
+        purchased = value
         prefs.putBoolean("premium", value)
     }
 

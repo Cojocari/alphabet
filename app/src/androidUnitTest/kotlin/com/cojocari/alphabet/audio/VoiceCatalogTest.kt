@@ -56,6 +56,7 @@ class VoiceCatalogTest {
     private val notSpoken = setOf(
         "chapterLabel", "chapterTitle", "storyAt", "gateQuestion", "lettersLearned", "unlockButton",
         "unlockBodyFor", "playedToday", "cap", "privacyPolicy", "privacyPolicyUrl", "appName", "unlockUnavailable", "familyNote",
+        "haveCode", "codeWrong",
         // Names used inside other sentences, never said on their own.
         "letterName", "numberName", "colorName", "wordName", "mathName", "friendName", "animalName", "animalSound",
         // Built from story items and lessons below, with only the combinations that exist.

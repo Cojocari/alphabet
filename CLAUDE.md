@@ -26,6 +26,11 @@ Kotlin, Jetpack Compose, Material 3, Google Play Billing 8. See `README.md` for 
 - Play Console steps: `docs/release-checklist.md`. Store texts: `docs/store-listing.md`.
   Graphics: `branding/` (icon-512, feature graphics RO/EN, rendered from HTML with headless Edge).
 - In-app product id: `unlock_all` (one-time).
+- Reviewer code (since v4.6): store reviewers can't buy, so the grown-ups' corner has "Have a code?" (`data/ReviewerCode.kt`).
+  It unlocks everything on that device until `ReviewerCodeUntil` (2027-11-27); only the code's FNV fingerprint is in the
+  public repo, the code itself is only in Play Console → App access (the owner has it). Before a store release less than
+  2 months before that date: generate a new code and date, update the fingerprint, and the owner updates App access.
+  Never write the code into the repo, commit messages or docs.
 
 ## How the owner works
 - The owner names versions (v1.0, v2.0, v2.1, v3.0, v3.1…). On a version: bump `versionCode`
@@ -98,7 +103,7 @@ warm-up, house, age picker) and a "Learn with Hupi" story path in every world ex
 **v4.2 (versionCode 8) and v4.3 (versionCode 9, English name Hupi the Owl), 2026-11-25:** branch `ios` merged into `develop` (everything below is in it). The iOS workflow
 builds on pushes to `develop` and `ios`. Not yet uploaded to either store.
 **v4.4 (versionCode 10)** and **v4.5 (versionCode 11), 2026-11-27:** free/demo rules (below), App Store wording on
-iPhone, smoother balloons, games wait for speech to finish. v4.5 is the first version for the stores.
+iPhone, smoother balloons, games wait for speech to finish. v4.6 (versionCode 12) adds the reviewer code and is the first version for the stores.
 
 ## 2026-11-22, iOS port (merged into `develop` in v4.2)
 - iOS port (Kotlin Multiplatform, see `docs/ios.md`). GitHub Actions builds it, takes simulator screenshots

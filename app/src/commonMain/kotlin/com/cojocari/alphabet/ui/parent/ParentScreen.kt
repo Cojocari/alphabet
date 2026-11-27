@@ -55,6 +55,9 @@ fun ParentScreen(onBack: () -> Unit) {
     val language = LocalLanguage.current
     val t = language.strings
     var message by remember { mutableStateOf<String?>(null) }
+    // Reviewer code (data/ReviewerCode.kt): a small field under Restore.
+    var codeOpen by remember { mutableStateOf(false) }
+    var code by remember { mutableStateOf("") }
     var confirmReset by remember { mutableStateOf(false) }
     val story = com.cojocari.alphabet.story.LocalStory.current
     val s = language.story
@@ -88,6 +91,18 @@ fun ParentScreen(onBack: () -> Unit) {
                             Text(t.unlockButton(billing.price), fontSize = 18.sp, modifier = Modifier.padding(6.dp))
                         }
                         TextButton(onClick = { billing.restore() }) { Text(t.restore) }
+                        TextButton(onClick = { codeOpen = !codeOpen }) { Text(t.haveCode) }
+                        if (codeOpen) {
+                            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                androidx.compose.material3.OutlinedTextField(
+                                    value = code,
+                                    onValueChange = { code = it; message = null },
+                                    singleLine = true,
+                                    modifier = Modifier.weight(1f),
+                                )
+                                Button(onClick = { if (!progress.redeemCode(code)) message = t.codeWrong }) { Text("OK") }
+                            }
+                        }
                         message?.let { Text(it, fontSize = 14.sp, color = Color(0xFFE63946)) }
                     }
                     if (isDebugBuild) {

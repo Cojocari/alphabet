@@ -112,6 +112,9 @@ interface Strings {
     fun unlockButton(price: String?): String
     val unlockUnavailable: String
     val restore: String
+    /** Reviewer code (ReviewerCode.kt), in the grown-ups' corner. */
+    val haveCode: String
+    val codeWrong: String
     val unlocked: String
     val voice: String
     val soundEffects: String
@@ -309,6 +312,8 @@ object EnglishStrings : Strings {
     override val unlockUnavailable: String
         get() = "${if (isIos) "The App Store" else "Google Play"} isn't reachable right now. Please try again later."
     override val restore = "Restore purchase"
+    override val haveCode = "Have a code?"
+    override val codeWrong = "This code isn't valid."
     override val unlocked = "✅ All games are unlocked. Thank you for your support!"
     override val voice = "Voice"
     override val soundEffects = "Sound effects"
@@ -531,6 +536,8 @@ object RomanianStrings : Strings {
     override val unlockUnavailable: String
         get() = "${if (isIos) "App Store" else "Google Play"} nu este disponibil acum. Încearcă din nou mai târziu."
     override val restore = "Restaurează achiziția"
+    override val haveCode = "Ai un cod?"
+    override val codeWrong = "Codul nu este valid."
     override val unlocked = "✅ Toate jocurile sunt deblocate. Mulțumim pentru sprijin!"
     override val voice = "Voce"
     override val soundEffects = "Efecte sonore"

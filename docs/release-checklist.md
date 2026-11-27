@@ -37,7 +37,8 @@ Google rejects a bundle whose `versionCode` it has already seen.
 ## 3. Privacy policy online (done)
 The policy is on the company website: **`https://cojocarisoft.com/hupi/privacy.html`** (landing page
 `https://cojocarisoft.com/hupi/`, usable as the support/marketing URL). Source:
-`C:SERSADRIANJOCARI-SOFTSITEEVEROWL`; TO CHANGE IT, FOLLOW `SITE.MD` IN THAT FOLDER AND RE-UPLOAD THE SITE ZIP.
+`C:\Users\Adrian\cojocari-soft\site\hupi\`; to change it, follow `SITE.md` in `C:\Users\Adrian\cojocari-soft\` and
+re-upload the site zip.
 
 ## 4. Google Play developer account
 - [ ] Sign up at https://play.google.com/console ($25, one time). Choose a **personal** account,
