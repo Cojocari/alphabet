@@ -1,0 +1,62 @@
+# Codemagic (https://codemagic.io) builds the signed iPhone/iPad app and uploads it to App Store Connect
+# (TestFlight, then App Review). Builds start by hand from the Codemagic dashboard, to save build minutes.
+# The unsigned build and the simulator screenshots stay on GitHub Actions (.github/workflows/ios.yml).
+#
+# Needs (steps in docs/ios.md, "App Store"):
+#  - the team's App Store Connect API key in Codemagic → Team integrations → Developer Portal, named
+#    "shoplist_asc" (shared with Listhive; one key works for every app of the team);
+#  - the App ID com.cojocari.alphabet (In-App Purchase is on by default) and the app record in App Store Connect;
+#  - the Apple Distribution certificate (the same one as Listhive) and an App Store provisioning profile for
+#    com.cojocari.alphabet, uploaded in Codemagic → codemagic.yaml settings → Code signing identities.
+workflows:
+  ios-appstore:
+    name: iOS to App Store Connect
+    instance_type: mac_mini_m2
+    max_build_duration: 90
+    integrations:
+      app_store_connect: shoplist_asc
+    environment:
+      java: 17
+      xcode: latest
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: com.cojocari.alphabet
+    cache:
+      cache_paths:
+        - ~/.konan
+        - ~/.gradle/caches
+        - ~/.gradle/wrapper
+    scripts:
+      - name: Tools
+        script: |
+          brew install xcodegen ffmpeg
+          xcodebuild -version
+          java -version
+      - name: Unit tests
+        script: ./gradlew testDebugUnitTest
+      # Build number: the Android versionCode from project.yml, then Codemagic's build counter
+      # (e.g. 11.4), so every upload is new and later versions are always higher.
+      - name: Build number
+        script: |
+          CODE=$(grep 'CURRENT_PROJECT_VERSION' iosApp/project.yml | sed 's/[^0-9]//g')
+          sed -i '' "s/CURRENT_PROJECT_VERSION: \".*\"/CURRENT_PROJECT_VERSION: \"$CODE.$BUILD_NUMBER\"/" iosApp/project.yml
+          grep -E 'MARKETING_VERSION|CURRENT_PROJECT_VERSION' iosApp/project.yml
+      - name: Prepare sounds and generate the Xcode project
+        script: |
+          sh iosApp/scripts/prepare-resources.sh
+          cd iosApp && xcodegen generate
+      - name: Use the profiles Codemagic fetched
+        script: xcode-project use-profiles --project iosApp/iosApp.xcodeproj
+      - name: Build the signed IPA
+        script: |
+          xcode-project build-ipa \
+            --project iosApp/iosApp.xcodeproj \
+            --scheme iosApp \
+            --config Release
+    artifacts:
+      - build/ios/ipa/*.ipa
+      - /tmp/xcodebuild_logs/*.log
+    publishing:
+      app_store_connect:
+        auth: integration
+        submit_to_testflight: false # internal testers need no beta review

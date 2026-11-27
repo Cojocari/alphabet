@@ -1,0 +1,124 @@
+# App Store screenshots: runs the debug app with demo progress (launch argument -demo YES) on an
+# iPhone 6.3" simulator (1206×2622, the size App Store Connect requires) and an iPad 13" simulator
+# (2064×2752), in English and Romanian, and pushes the raw shots to the ci-appstore-shots branch.
+# They are framed with captions afterwards (branding/appstore.html, see docs/ios.md).
+# Starts by hand (Actions → App Store screenshots → Run workflow) or when this file changes.
+name: App Store screenshots
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [develop]
+    paths: [.github/workflows/appstore-shots.yml]
+
+permissions:
+  contents: write # only to push the screenshots branch
+
+jobs:
+  shots:
+    runs-on: macos-15
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - name: Cache Kotlin/Native toolchain
+        uses: actions/cache@v4
+        with:
+          path: ~/.konan
+          key: konan-${{ runner.os }}-${{ hashFiles('build.gradle.kts') }}
+
+      - name: Tools
+        run: brew install xcodegen ffmpeg
+
+      - name: Prepare sounds and generate the Xcode project
+        run: |
+          sh iosApp/scripts/prepare-resources.sh
+          cd iosApp && xcodegen generate
+
+      - name: Build for the iOS simulator
+        run: |
+          set -o pipefail
+          xcodebuild -project iosApp/iosApp.xcodeproj -scheme iosApp -configuration Debug \
+            -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' -derivedDataPath build/dd \
+            ARCHS=arm64 CODE_SIGNING_ALLOWED=NO build 2>&1 | tee build.log | grep -E "^e: |error:|BUILD" || true
+          grep -q "BUILD SUCCEEDED" build.log
+
+      - name: Take the screenshots
+        run: |
+          app=build/dd/Build/Products/Debug-iphonesimulator/CleverOwl.app
+          runtime=$(xcrun simctl list runtimes -j | python3 -c '
+          import json, sys
+          rts = [r for r in json.load(sys.stdin)["runtimes"] if r["isAvailable"] and r["name"].startswith("iOS")]
+          print(rts[-1]["identifier"])')
+          devtype() { # the first device type whose name matches, newest models first
+            xcrun simctl list devicetypes -j | python3 -c '
+          import json, sys, re
+          names = sys.argv[1:]
+          types = json.load(sys.stdin)["devicetypes"]
+          for n in names:
+              for t in types:
+                  if re.fullmatch(n, t["name"]):
+                      print(t["identifier"]); sys.exit()
+          sys.exit("no device type for %s" % names)' "$@"
+          }
+          phone=$(devtype "iPhone 17 Pro" "iPhone 16 Pro")
+          tablet=$(devtype "iPad Pro 13-inch \(M5.*\)" "iPad Pro 13-inch \(M4.*\)")
+          echo "Runtime $runtime, phone $phone, tablet $tablet"
+          mkdir -p shots
+          for kind in phone tablet; do
+            type=$phone; [ $kind = tablet ] && type=$tablet
+            udid=$(xcrun simctl create "shots-$kind" "$type" "$runtime")
+            xcrun simctl boot "$udid"
+            xcrun simctl bootstatus "$udid" -b
+            xcrun simctl status_bar "$udid" override --time 9:41 --dataNetwork wifi --wifiMode active --wifiBars 3 \
+              --cellularMode active --cellularBars 4 --batteryState charged --batteryLevel 100 || true
+            xcrun simctl install "$udid" "$app"
+            for lang in en ro; do
+              language=English; [ $lang = ro ] && language=Romanian
+              shot() { # name, then launch arguments
+                name=$1; shift
+                xcrun simctl terminate "$udid" com.cojocari.alphabet 2>/dev/null || true
+                xcrun simctl launch "$udid" com.cojocari.alphabet -demo YES -progress.premium YES \
+                  -settings.language $language -AppleLanguages "($lang)" "$@" > /dev/null
+                sleep 14
+                xcrun simctl io "$udid" screenshot "shots/$lang-$kind-$name.png" > /dev/null
+                echo "shot $lang-$kind-$name"
+              }
+              shot home -route home
+              shot story30-2 -route story:30 -step 2
+              shot story30-3 -route story:30 -step 3
+              shot story30-4 -route story:30 -step 4
+              shot story12-3 -route story:12 -step 3
+              shot map -route story
+              shot trace -route game:TraceUpper
+              shot letters -route world:Letters
+              shot house -route house
+              shot balloons -route game:LetterBalloons
+              shot howmany -route game:HowMany
+              shot animals -route game:AnimalsFarm
+            done
+            xcrun simctl shutdown "$udid"
+          done
+          ls shots | wc -l
+
+      - name: Publish to the ci-appstore-shots branch
+        run: |
+          cd shots
+          echo "App Store screenshots of ${GITHUB_SHA}" > README.md
+          git init -q -b ci-appstore-shots
+          git add .
+          git -c user.name="github-actions" -c user.email="github-actions@users.noreply.github.com" commit -q -m "App Store screenshots ${GITHUB_SHA}"
+          git push -q -f "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" ci-appstore-shots
+
+      - name: Report errors as annotations
+        if: failure()
+        run: |
+          msg=$(cat build.log 2>/dev/null | grep -E "^e: |error:|BUILD" | head -30 | sed 's/%/%25/g' | awk '{printf "%s%%0A", $0}')
+          echo "::error title=Build errors::${msg:-See the log.}"

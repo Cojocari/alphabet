@@ -176,6 +176,14 @@ class Progress(private val prefs: KeyValueStore = keyValueStore("progress")) {
     fun learned(language: Language): Set<Char> = learned[language].orEmpty()
 
     /** Records that the child correctly found [char] in a game. */
+    /** Debug builds only, for store screenshots: 131 stars, age 5, the first letters learned. */
+    fun fillDemo(language: Language) {
+        stars = 131
+        prefs.putInt("stars", stars)
+        updateChildAge(5)
+        language.alphabet.take(12).forEach { markLearned(language, it.char) }
+    }
+
     fun markLearned(language: Language, char: Char) {
         val now = learned(language)
         if (char in now) return

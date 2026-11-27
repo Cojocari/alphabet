@@ -6,6 +6,8 @@ import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.staticCompositionLocalOf
+import com.cojocari.alphabet.data.Difficulty
+import com.cojocari.alphabet.i18n.Language
 import com.cojocari.alphabet.platform.KeyValueStore
 import com.cojocari.alphabet.platform.keyValueStore
 import com.cojocari.alphabet.platform.todayEpochDay
@@ -170,6 +172,22 @@ class StoryProgress(private val prefs: KeyValueStore = keyValueStore("story")) {
         warmupDay = -1
     }
 
+    /**
+     * Debug builds only, for store screenshots: [scenes] of the adventure done, what they taught
+     * learned (every third item still being practised), a blue scarf.
+     */
+    fun fillDemo(scenes: Int, level: Difficulty, language: Language) {
+        val today = today()
+        done = scenes
+        prefs.putInt("done", done)
+        (0 until scenes).flatMap { lessonItems(it, level, language) }.distinct().forEachIndexed { i, item ->
+            records[item.id] = if (i % 3 == 2) Record(listOf(today - 1), 2, today - 1)
+            else Record(listOf(today - 9, today - 5, today - 2), 4, today - 2)
+        }
+        save()
+        updateScarf(4)
+    }
+
     private fun save() {
         val text = records.entries.joinToString("\n") { (id, r) ->
             "$id|${r.goodDays.joinToString(",")}|${r.seen}|${r.lastSeen}"
@@ -192,3 +210,12 @@ class StoryProgress(private val prefs: KeyValueStore = keyValueStore("story")) {
 }
 
 val LocalStory = staticCompositionLocalOf<StoryProgress> { error("No StoryProgress provided") }
+
+/**
+ * Debug builds only (launch argument "demo"): the progress shown in the store screenshots, in the
+ * middle of chapter 4 with most of what came before learned. Never call it on real progress.
+ */
+fun fillDemoProgress(progress: com.cojocari.alphabet.data.Progress, story: StoryProgress, language: Language) {
+    progress.fillDemo(language)
+    story.fillDemo(scenes = 30, level = progress.difficulty, language = language)
+}

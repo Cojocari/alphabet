@@ -26,6 +26,10 @@ class MainActivity : ComponentActivity() {
 
         progress = Progress()
         val story = StoryProgress()
+        // Debug builds: `--ez demo true` fills the store-screenshot progress (overwrites the real one).
+        if (BuildConfig.DEBUG && intent.getBooleanExtra("demo", false)) {
+            com.cojocari.alphabet.story.fillDemoProgress(progress, story, com.cojocari.alphabet.i18n.loadLanguage())
+        }
         billing = PlayBilling(applicationContext) { progress.updatePremium(true) }
         billing.activity = this
         billing.connect()

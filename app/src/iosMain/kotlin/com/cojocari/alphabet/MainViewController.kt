@@ -33,6 +33,10 @@ fun MainViewController(): UIViewController {
 
     val progress = Progress()
     val story = StoryProgress()
+    // Debug builds: the launch argument `-demo YES` fills the store-screenshot progress (simulator only).
+    if (isDebugBuild && NSUserDefaults.standardUserDefaults.boolForKey("demo")) {
+        com.cojocari.alphabet.story.fillDemoProgress(progress, story, com.cojocari.alphabet.i18n.loadLanguage())
+    }
     val billing = AppStoreBilling { progress.updatePremium(true) }.also { it.start() }
     val sfx = Sfx { progress.soundEffects }
 
