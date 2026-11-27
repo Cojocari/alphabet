@@ -118,7 +118,7 @@ Found a problem or have an idea? Write to us from the grown-ups' corner – we r
 
 ---
 
-## Release notes, version 4.4 (≤500 per language)
+## Release notes, version 4.5 (≤500 per language)
 
 Romanian:
 ```

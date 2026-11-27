@@ -97,6 +97,8 @@ warm-up, house, age picker) and a "Learn with Hupi" story path in every world ex
 
 **v4.2 (versionCode 8) and v4.3 (versionCode 9, English name Hupi the Owl), 2026-11-25:** branch `ios` merged into `develop` (everything below is in it). The iOS workflow
 builds on pushes to `develop` and `ios`. Not yet uploaded to either store.
+**v4.4 (versionCode 10)** and **v4.5 (versionCode 11), 2026-11-27:** free/demo rules (below), App Store wording on
+iPhone, smoother balloons, games wait for speech to finish. v4.5 is the first version for the stores.
 
 ## 2026-11-22, iOS port (merged into `develop` in v4.2)
 - iOS port (Kotlin Multiplatform, see `docs/ios.md`). GitHub Actions builds it, takes simulator screenshots
