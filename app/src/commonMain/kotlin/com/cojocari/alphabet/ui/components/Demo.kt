@@ -45,7 +45,7 @@ const val DemoRounds = 5
  * What the current game is allowed to do, set by GameContent:
  * - [demo]: a paid game played for free; it uses [random] with a fixed seed, so the demo is
  *   always the same few rounds, and stops after [DemoRounds].
- * - [hardLocked]: a free game without the purchase, where ⭐⭐⭐ Hard needs the unlock.
+ * - [hardLocked]: no purchase yet: ⭐⭐⭐ Hard needs the unlock (in free games and demos alike).
  * - [level]: the difficulty actually in use (Hard falls back to Medium when locked).
  */
 class GameAccess(

@@ -62,12 +62,15 @@ Kotlin, Jetpack Compose, Material 3, Google Play Billing 8. See `README.md` for 
   teach Hupi, catch, trace, show, reward, diploma), `Hupi.kt` (owl drawn in code, grows with 7 items),
   `StoryMapScreen.kt` (map + age picker), `StoryHouseScreen.kt` (shelves), `StoryProgress.kt` (progress and the
   learning tracker: learned = right on the first try on 3 different days; due items come back for review).
-- Texts: `i18n/StoryStrings.kt` (EN + RO). Chapters 1–2 free (`FreeScenes`), the rest need the unlock.
+- Texts: `i18n/StoryStrings.kt` (EN + RO). Free without the unlock (since 2026-11-27): the adventure's first 4 scenes
+  (`FreeAdventureScenes`: hatch, 4 lessons, the magpie chase), then the paywall line; the rest needs the unlock.
 - World paths ("Learn with Hupi" banner in each world except Animals): `Paths` in `Curriculum.kt`, `PathMapScreen.kt`,
   routes "path:Letters" and "path:Letters/15". Same scenes as the chapter, without the magpie plot and without Hupi
   growing up; scenes done in the adventure count in the path
-  (`StoryProgress.chapterDone`), but a path doesn't move the adventure on; the learning tracker is shared. Free: chapters 1–2, plus the first lesson of
-  every other path.
+  (`StoryProgress.chapterDone`), but a path doesn't move the adventure on; the learning tracker is shared. Free: the first 5 lessons of
+  every path (`FreePathLessons`).
+- Without the unlock, ⭐⭐⭐ Hard is locked in every game (free games and demos). The tracing demo offers only the
+  first 2 letters/numbers (`DemoTraceItems` in `DrawScreen`); ➡️ past them ends the demo.
 - Parent chooses the child's age (map banner behind the gate, or grown-ups' corner) → sets the level; the level
   can still be changed at any time from the top bar. No automatic pause (the parent decides when to stop).
 - Tracing (`ui/draw/TracePad.kt`) checks strokes: Easy wide/65%, Medium 80%, Hard narrow/85% in order and direction.

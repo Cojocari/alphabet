@@ -68,6 +68,7 @@ actual fun todayEpochDay(): Long {
 }
 
 actual val isDebugBuild: Boolean get() = Platform.isDebugBinary
+actual val isIos: Boolean = true
 
 actual val appVersionName: String
     get() = NSBundle.mainBundle.objectForInfoDictionaryKey("CFBundleShortVersionString") as? String ?: ""

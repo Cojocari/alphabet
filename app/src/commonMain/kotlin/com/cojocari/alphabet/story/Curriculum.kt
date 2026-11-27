@@ -15,8 +15,13 @@ const val ScenesPerChapter = 9
 const val LessonsPerChapter = ScenesPerChapter - 1
 const val TotalScenes = ChapterCount * ScenesPerChapter
 
-/** Chapters 1 and 2 are free; the rest come with the unlock. */
-const val FreeScenes = 2 * ScenesPerChapter
+/**
+ * Without the unlock: the first [FreeAdventureScenes] scenes of Hupi's Adventure (the egg hatches,
+ * four lessons with their treasure chests, and the magpie chase in lesson 4), so children get a
+ * taste; and the first [FreePathLessons] lessons of each world's path ("Learn with Hupi").
+ */
+const val FreeAdventureScenes = 4 // up to and including the magpie lesson ([MagpieLesson] = 3)
+const val FreePathLessons = 5
 
 fun chapterOf(scene: Int) = scene / ScenesPerChapter
 
@@ -38,8 +43,8 @@ object Paths {
 /** The scenes of a path, in order. */
 fun pathScenes(path: List<Int>) = path.flatMap { c -> (0 until ScenesPerChapter).map { c * ScenesPerChapter + it } }
 
-/** Free path scenes: everything in the free chapters, and the first lesson of every other path. */
-fun pathFree(scene: Int, path: List<Int>) = scene < FreeScenes || scene == path.first() * ScenesPerChapter
+/** Free path scenes (without the unlock): the first [FreePathLessons] lessons of the path. */
+fun pathFree(scene: Int, path: List<Int>) = pathScenes(path).indexOf(scene) in 0 until FreePathLessons
 fun isShow(scene: Int) = scene % ScenesPerChapter == ScenesPerChapter - 1
 
 /** Index of each chapter's subject, used by the scene builder. */
@@ -231,7 +236,6 @@ fun buildScene(
         steps += Step.Reward(null, chapter + 1)
         if (chapter < ChapterCount - 1) {
             steps += Step.Narrate(s.cliffhanger(chapter), Mood.Surprised)
-            if (scene + 1 == FreeScenes && !premium) steps += Step.Narrate(s.paywall, Mood.Normal)
         } else {
             steps += Step.Narrate(s.finale, Mood.Happy)
             steps += Step.Diploma
@@ -288,6 +292,7 @@ fun buildScene(
     // Once a chapter, in the big adventure, the magpie swoops in with one of today's things.
     if (path == null && lesson == MagpieLesson) items.firstOrNull()?.let { steps += Step.Magpie(it) }
     steps += Step.Reward(friend, null, treasureOf(scene))
+    if (path == null && !premium && scene + 1 == FreeAdventureScenes) steps += Step.Narrate(s.paywall, Mood.Normal)
     if (path != null && !premium && scene + 1 in pathScenes(path) && !pathFree(scene + 1, path)) {
         steps += Step.Narrate(s.pathLocked, Mood.Normal)
     }

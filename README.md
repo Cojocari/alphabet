@@ -24,7 +24,8 @@ limit, progress, and contact the developer.
 
 ## Monetisation
 One-time in-app purchase `unlock_all` (Google Play Billing). 8 games are free at Easy and Medium (the farm animals have no levels);
-the other 14 can be played as a short demo with fixed rounds; Hard is part of the unlock.
+the other 14 can be played as a short demo with fixed rounds (Easy and Medium); Hard is part of the unlock. Hupi's Adventure:
+the first 4 scenes are free; each "Learn with Hupi" path: the first 5 lessons.
 No ads, no subscriptions, no data collection.
 
 ## Building

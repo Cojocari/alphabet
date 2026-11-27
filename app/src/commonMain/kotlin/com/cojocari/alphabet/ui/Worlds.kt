@@ -112,7 +112,7 @@ enum class World(
 /**
  * Free without the purchase (8 of 24): one "hook" per world, plus Balloons, the most fun
  * letter game. They're free at Easy and Medium; ⭐⭐⭐ Hard needs the unlock.
- * Every other game can be tried as a short demo.
+ * Every other game can be tried as a short demo, also at Easy and Medium only.
  */
 val FreeGames = setOf(
     GameId.LetterCards, GameId.LetterBalloons, GameId.NumberCards, GameId.ReadPicture,
@@ -142,7 +142,8 @@ fun GameContent(id: GameId, onBack: () -> Unit, onUnlock: () -> Unit) {
     val t = language.strings
     val progress = com.cojocari.alphabet.data.LocalProgress.current
     val premium = progress.premium
-    val hardLocked = !premium && id.isFree
+    // Without the purchase, ⭐⭐⭐ Hard is locked in every game (free games and demos alike).
+    val hardLocked = !premium
     val demo = !premium && !id.isFree
     val chosen = progress.difficulty
     val d = if (hardLocked && chosen == com.cojocari.alphabet.data.Difficulty.Hard) com.cojocari.alphabet.data.Difficulty.Medium else chosen

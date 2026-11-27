@@ -45,6 +45,7 @@ actual fun keyValueStore(name: String): KeyValueStore = PrefsStore(name)
 actual fun todayEpochDay(): Long = java.time.LocalDate.now().toEpochDay()
 
 actual val isDebugBuild: Boolean get() = BuildConfig.DEBUG
+actual val isIos: Boolean = false
 
 actual val appVersionName: String get() = BuildConfig.VERSION_NAME
 

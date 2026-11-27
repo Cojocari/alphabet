@@ -3,6 +3,7 @@ package com.cojocari.alphabet.i18n
 import com.cojocari.alphabet.data.Animal
 import com.cojocari.alphabet.ui.parent.PrivacyPolicyUrl
 import com.cojocari.alphabet.data.Letter
+import com.cojocari.alphabet.platform.isIos
 
 /** Every phrase the app shows or says, so each language can word them naturally. */
 interface Strings {
@@ -305,7 +306,8 @@ object EnglishStrings : Strings {
         "All 18 games in Letters, Numbers, Reading, Writing and Math, plus every future game " +
             "and update. One-time purchase: no ads, no subscriptions, ever."
     override fun unlockButton(price: String?) = if (price != null) "Unlock for $price" else "Unlock"
-    override val unlockUnavailable = "Google Play isn't reachable right now. Please try again later."
+    override val unlockUnavailable: String
+        get() = "${if (isIos) "The App Store" else "Google Play"} isn't reachable right now. Please try again later."
     override val restore = "Restore purchase"
     override val unlocked = "✅ All games are unlocked. Thank you for your support!"
     override val voice = "Voice"
@@ -385,7 +387,9 @@ object EnglishStrings : Strings {
         "🚫  No ads, no subscriptions",
     )
     override val paywallOnce = "Pay once, play forever"
-    override val familyNote = "Works on all your family's devices with Google Play Family Library."
+    override val familyNote: String
+        get() = if (isIos) "Works on all your family's devices with Family Sharing."
+        else "Works on all your family's devices with Google Play Family Library."
     override val appName = "Hupi the Owl"
     override val licenses = "Open-source licences"
     override val licensesIntro = "This app is built with these libraries. Thank you to their authors!"
@@ -524,7 +528,8 @@ object RomanianStrings : Strings {
         "Toate cele 18 jocuri de Litere, Numere, Citire, Scriere și Matematică, plus toate jocurile " +
             "și actualizările viitoare. O singură plată: fără reclame și fără abonamente."
     override fun unlockButton(price: String?) = if (price != null) "Deblochează pentru $price" else "Deblochează"
-    override val unlockUnavailable = "Google Play nu este disponibil acum. Încearcă din nou mai târziu."
+    override val unlockUnavailable: String
+        get() = "${if (isIos) "App Store" else "Google Play"} nu este disponibil acum. Încearcă din nou mai târziu."
     override val restore = "Restaurează achiziția"
     override val unlocked = "✅ Toate jocurile sunt deblocate. Mulțumim pentru sprijin!"
     override val voice = "Voce"
@@ -608,7 +613,9 @@ object RomanianStrings : Strings {
         "🚫  Fără reclame, fără abonamente",
     )
     override val paywallOnce = "Plătești o dată, te joci mereu"
-    override val familyNote = "Funcționează pe toate dispozitivele familiei prin Biblioteca de familie Google Play."
+    override val familyNote: String
+        get() = if (isIos) "Funcționează pe toate dispozitivele familiei prin Partajare familială."
+        else "Funcționează pe toate dispozitivele familiei prin Biblioteca de familie Google Play."
     override val appName = "Bufnița Isteață"
     override val licenses = "Licențe open-source"
     override val licensesIntro = "Aplicația este construită cu aceste biblioteci. Mulțumim autorilor lor!"

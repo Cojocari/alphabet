@@ -68,6 +68,9 @@ class TraceItem(
  * finger ([TracePad]). Stars light up stroke by stroke; when every stroke is traced we
  * celebrate. How strict it is depends on the level.
  */
+/** Letters or numbers a tracing demo offers (each traced twice: outline, then dots). */
+private const val DemoTraceItems = 2
+
 @Composable
 fun DrawScreen(onHome: () -> Unit, items: List<TraceItem>) {
     val speaker = LocalSpeaker.current
@@ -78,14 +81,17 @@ fun DrawScreen(onHome: () -> Unit, items: List<TraceItem>) {
     var demoDone by remember { mutableIntStateOf(0) }
     // A demo is two traced letters.
     LaunchedEffect(demoDone) {
-        if (access.demo && demoDone >= 2) {
+        if (access.demo && demoDone >= DemoTraceItems) {
             kotlinx.coroutines.delay(2800)
             demoOver = true
         }
     }
 
+    // A demo offers only the first letters or numbers; the arrows stay within them, and going
+    // past the last one ends the demo.
+    val playable = if (access.demo) items.take(DemoTraceItems) else items
     var index by rememberSaveable { mutableIntStateOf(0) }
-    val letter = items[index.coerceAtMost(items.lastIndex)]
+    val letter = playable[index.coerceAtMost(playable.lastIndex)]
     var crayon by remember { mutableStateOf(Crayons.first()) }
     val trace = remember(letter.text) { TraceState() }
     var celebrate by remember { mutableIntStateOf(0) }
@@ -144,10 +150,13 @@ fun DrawScreen(onHome: () -> Unit, items: List<TraceItem>) {
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 RoundButton("⬅️", Color(0xFF8ECAE6), onClick = {
-                    index = (index - 1 + items.size) % items.size
+                    index = (index - 1 + playable.size) % playable.size
                 }, size = 68.dp)
                 RoundButton("🧽", Color(0xFFFFD6E0), onClick = { trace.clear() }, size = 68.dp)
-                NextButton(pulse = finished) { index = (index + 1) % items.size }
+                NextButton(pulse = finished) {
+                    if (access.demo && index == playable.lastIndex) demoOver = true
+                    else index = (index + 1) % playable.size
+                }
             }
         }
         Celebration(trigger = celebrate)

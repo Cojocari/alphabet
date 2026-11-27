@@ -36,6 +36,7 @@ iPhone/iPad (Compose Multiplatform). Only a thin layer is written per platform.
 
 1. Apple Developer Program in the company's name (D-U-N-S number), $99/year.
 2. In App Store Connect: create the app (bundle ID `com.cojocari.alphabet`), the in-app purchase `unlock_all`,
+   (non-consumable; turn on **Family Sharing** for it: the purchase screen on iPhone promises it),
    and an App Store Connect API key (Users and Access → Integrations → Keys, role App Manager).
 3. Add the key to GitHub as encrypted secrets (never in the code); then the workflow can sign the app and upload
    it to TestFlight, so it can be installed on an iPhone with the TestFlight app.

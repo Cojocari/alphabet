@@ -32,6 +32,9 @@ expect fun todayEpochDay(): Long
 /** True in debug builds (test helpers, extra logging). */
 expect val isDebugBuild: Boolean
 
+/** True on iPhone and iPad (purchases through the App Store), false on Android (Google Play). */
+expect val isIos: Boolean
+
 /** The app version shown to parents, e.g. "4.1". */
 expect val appVersionName: String
 

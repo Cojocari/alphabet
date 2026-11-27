@@ -97,7 +97,7 @@ fun StoryMapScreen(
     fun tap(scene: Int) {
         sfx.tap()
         when {
-            scene >= FreeScenes && !progress.premium -> {
+            scene >= FreeAdventureScenes && !progress.premium -> {
                 speaker.say(s.paywall)
                 onUnlock()
             }
@@ -141,7 +141,7 @@ fun StoryMapScreen(
                         s.chapterLabel(chapter),
                         isDone = { it < current },
                         next = current,
-                        locked = { it >= FreeScenes && !progress.premium },
+                        locked = { it >= FreeAdventureScenes && !progress.premium },
                         pulse = pulse,
                         onTap = ::tap,
                     )

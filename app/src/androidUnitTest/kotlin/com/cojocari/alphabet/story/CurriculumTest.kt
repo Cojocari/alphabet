@@ -72,9 +72,12 @@ class CurriculumTest {
             assertTrue("first lesson of $path is free", pathFree(scenes.first(), path))
             assertTrue("show ends $path", isShow(scenes.last()))
         }
-        // Free chapters stay free; a paid chapter offers only its first lesson.
-        assertTrue(pathScenes(Paths.Art).all { pathFree(it, Paths.Art) })
-        assertEquals(1, pathScenes(Paths.Letters).count { pathFree(it, Paths.Letters) })
+        // Without the unlock, every path offers exactly its first FreePathLessons lessons (no show).
+        for (path in Paths.all) {
+            val free = pathScenes(path).filter { pathFree(it, path) }
+            assertEquals(pathScenes(path).take(FreePathLessons), free)
+            assertTrue(free.none(::isShow))
+        }
     }
 
     @Test
