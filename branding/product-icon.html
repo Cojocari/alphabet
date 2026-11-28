@@ -1,0 +1,57 @@
+<!-- Icon of the in-app product unlock_all (Play: One-time products → Icon, 512×512 PNG, no text or branding).
+     Render: msedge --headless --screenshot=product-icon-512.png --window-size=512,512 product-icon.html -->
+<html><body style='margin:0;overflow:hidden'><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+<defs>
+  <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4CC9F0"/><stop offset="1" stop-color="#4361EE"/></linearGradient>
+  <radialGradient id="glow" cx="256" cy="250" r="230" gradientUnits="userSpaceOnUse">
+    <stop offset="0" stop-color="#FFF3B0" stop-opacity="1"/><stop offset="0.45" stop-color="#FFD60A" stop-opacity="0.55"/><stop offset="1" stop-color="#FFD60A" stop-opacity="0"/></radialGradient>
+  <linearGradient id="wood" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#B5713F"/><stop offset="1" stop-color="#8B5A3C"/></linearGradient>
+  <linearGradient id="inside" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5A3520"/><stop offset="1" stop-color="#7A4A2C"/></linearGradient>
+  <linearGradient id="gold" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFD60A"/><stop offset="1" stop-color="#FB8500"/></linearGradient>
+</defs>
+<rect width="512" height="512" fill="url(#bg)"/>
+<!-- light rays -->
+<g fill="#FFF3B0" opacity="0.35">
+  <path d="M256,250 L150,40 L205,30 Z"/><path d="M256,250 L307,30 L362,40 Z"/>
+  <path d="M256,250 L60,130 L85,90 Z"/><path d="M256,250 L427,90 L452,130 Z"/>
+  <path d="M256,250 L240,20 L272,20 Z"/>
+</g>
+<circle cx="256" cy="250" r="230" fill="url(#glow)"/>
+<!-- open lid (inside visible) -->
+<path fill="url(#inside)" d="M138,262 L374,262 L352,168 L160,168 Z"/>
+<path fill="url(#wood)" d="M152,150 Q256,112 360,150 L364,172 L148,172 Z"/>
+<path fill="url(#gold)" d="M146,166 L366,166 L368,180 L144,180 Z"/>
+<!-- treasure spilling out -->
+<g stroke="#C76A00" stroke-width="4">
+  <circle cx="196" cy="252" r="26" fill="url(#gold)"/><circle cx="232" cy="236" r="26" fill="url(#gold)"/>
+  <circle cx="300" cy="240" r="26" fill="url(#gold)"/><circle cx="330" cy="256" r="24" fill="url(#gold)"/>
+  <circle cx="268" cy="254" r="26" fill="url(#gold)"/>
+</g>
+<g fill="none" stroke="#FFF3B0" stroke-width="5" stroke-linecap="round" opacity="0.9">
+  <path d="M184,244 Q190,236 200,236"/><path d="M220,228 Q226,220 236,220"/><path d="M288,232 Q294,224 304,224"/>
+</g>
+<!-- gem -->
+<path fill="#7B2CBF" d="M232,196 L256,170 L280,196 L256,232 Z"/>
+<path fill="#C77DFF" d="M232,196 L256,170 L264,196 L256,232 Z"/>
+<path fill="#E0AAFF" d="M244,190 L256,176 L260,190 Z"/>
+<!-- star -->
+<path fill="#FFD60A" stroke="#FB8500" stroke-width="5" stroke-linejoin="round"
+  d="M330,176 L339,198 L362,199 L344,214 L350,237 L330,224 L310,237 L316,214 L298,199 L321,198 Z"/>
+<!-- chest base -->
+<rect x="132" y="262" width="248" height="150" rx="18" fill="url(#wood)"/>
+<rect x="132" y="262" width="248" height="22" rx="8" fill="url(#gold)"/>
+<path fill="#6B4129" opacity="0.35" d="M140,330 L372,330 L372,338 L140,338 Z M140,370 L372,370 L372,378 L140,378 Z"/>
+<rect x="164" y="262" width="22" height="150" fill="url(#gold)"/>
+<rect x="326" y="262" width="22" height="150" fill="url(#gold)"/>
+<!-- lock -->
+<rect x="232" y="290" width="48" height="58" rx="10" fill="url(#gold)" stroke="#C76A00" stroke-width="4"/>
+<circle cx="256" cy="312" r="7" fill="#5A3520"/><path fill="#5A3520" d="M252,314 L260,314 L262,334 L250,334 Z"/>
+<!-- sparkles -->
+<g fill="#FFFFFF">
+  <path d="M110,190 Q114,206 130,210 Q114,214 110,230 Q106,214 90,210 Q106,206 110,190 Z"/>
+  <path d="M408,170 Q411,182 423,185 Q411,188 408,200 Q405,188 393,185 Q405,182 408,170 Z"/>
+  <path d="M400,330 Q403,340 413,343 Q403,346 400,356 Q397,346 387,343 Q397,340 400,330 Z"/>
+  <path d="M100,330 Q103,340 113,343 Q103,346 100,356 Q97,346 87,343 Q97,340 100,330 Z"/>
+  <path d="M256,92 Q259,104 271,107 Q259,110 256,122 Q253,110 241,107 Q253,104 256,92 Z"/>
+</g>
+</svg></body></html>

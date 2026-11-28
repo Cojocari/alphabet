@@ -137,9 +137,10 @@ New: Hupi's Adventure! Help Hupi, a little owl, win back the letters, numbers an
 | Field | Value |
 |---|---|
 | App category | Education |
-| Tags | Education, Kids, Learning, Alphabet, Math |
+| Tags (5, from Google's list) | Early childhood education, Mathematics, Language education, Primary education, Education |
 | Contact email | support@cojocarisoft.com |
 | Privacy policy URL | https://cojocarisoft.com/hupi/privacy.html |
+| Terms of Service URL (Play: app-level trader status; App Store: custom EULA, optional) | https://cojocarisoft.com/hupi/terms.html |
 | Website (support / marketing URL) | https://cojocarisoft.com/hupi/ |
 | In-app product name | Ro: „Deblochează tot” · En: "Unlock everything" |
 | In-app product description | Ro: „Toate cele 24 de jocuri, toată Aventura lui Hupi, nivelurile Greu și tot ce va apărea nou. Plătești o dată.” · En: "All 24 games, all of Hupi's Adventure, Hard levels and everything new. Pay once." |
@@ -151,7 +152,8 @@ New: Hupi's Adventure! Help Hupi, a little owl, win back the letters, numbers an
 | App icon | 512 × 512 PNG | `branding/icon-512.png` |
 | Feature graphic | 1024 × 500 PNG | `branding/feature-graphic-ro.png` (Romanian listing), `branding/feature-graphic-en.png` (English) |
 | Phone screenshots | 8 × 1080 × 1920 JPEG | `branding/screenshots/ro/phone-1…8.jpg`, `branding/screenshots/en/phone-1…8.jpg` |
-| 7-inch and 10-inch tablet screenshots | 8 × 1920 × 1080 JPEG | `branding/screenshots/ro/tablet-1…8.jpg`, `branding/screenshots/en/tablet-1…8.jpg` (use the same set for both sizes) |
+| 7-inch tablet screenshots | 8 × 1920 × 1080 JPEG | `branding/screenshots/ro/tablet-1…8.jpg`, `branding/screenshots/en/tablet-1…8.jpg` |
+| 10-inch tablet screenshots | 8 × 2560 × 1440 JPEG | `branding/screenshots/{ro,en}/tablet10-1…8.jpg`: the same pictures scaled up, because Play rejects the same file in both tablet slots ("asset duplicated") |
 
 Screenshot order and captions (Romanian / English):
 1. Home: „Învață jucându-te: litere, cifre, citire” / "Learn through play: letters, numbers, reading"

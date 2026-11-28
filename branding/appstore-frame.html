@@ -1,45 +1,19 @@
-<!-- Frames an App Store screenshot like the Play ones: brand gradient, white Nunito caption, the
-     screen in a rounded white frame. Rendered by headless Edge (tools in docs/ios.md):
-     appstore-frame.html?img=<png>&cap=<caption>&w=1206&h=2622 with --window-size=w,h -->
+<!-- Frames an App Store screenshot like the Play ones: brand gradient, white Nunito caption, the screen in a
+     rounded white frame. A template: branding/frame-appstore.sh fills in the {{…}} values (sizes worked out
+     from the screenshot) and renders it with headless Edge. No JavaScript: headless Edge took the picture
+     before a script-built layout appeared. -->
 <html><head><meta charset="utf-8">
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;900&display=block" rel="stylesheet">
 <style>
   html, body { margin: 0; overflow: hidden; }
-  body { background: linear-gradient(160deg, #4CC9F0, #4361EE 70%, #7B2CBF); font-family: 'Nunito', sans-serif; position: relative; }
-  #cap { position: absolute; left: 6%; right: 6%; color: #fff; font-weight: 900; text-align: center; line-height: 1.15;
-         text-shadow: 0 4px 0 rgba(0, 0, 0, .18); display: flex; align-items: center; justify-content: center; }
-  #frame { position: absolute; background: #fff; box-shadow: 0 18px 50px rgba(0, 0, 0, .28); overflow: hidden; }
-  #frame img { display: block; width: 100%; height: 100%; }
+  body { width: {{W}}px; height: {{H}}px; position: relative; font-family: 'Nunito', sans-serif;
+         background: linear-gradient(160deg, #4CC9F0, #4361EE 70%, #7B2CBF); }
+  #cap { position: absolute; left: 6%; right: 6%; top: {{CAP_TOP}}px; height: {{CAP_H}}px; font-size: {{FONT}}px;
+         color: #fff; font-weight: 900; text-align: center; line-height: 1.15; text-shadow: 0 4px 0 rgba(0, 0, 0, .18);
+         display: flex; align-items: center; justify-content: center; }
+  #frame { position: absolute; left: {{LEFT}}px; top: {{TOP}}px; width: {{FW}}px; height: {{FH}}px;
+           border: {{BORDER}}px solid #fff; border-radius: {{R}}px; background: #fff; overflow: hidden;
+           box-shadow: 0 18px 50px rgba(0, 0, 0, .28); }
+  #frame img { display: block; width: 100%; height: 100%; border-radius: {{IR}}px; }
 </style></head>
-<body>
-<div id="cap"></div>
-<div id="frame"><img id="shot"></div>
-<script>
-  const q = new URLSearchParams(location.search);
-  const W = +q.get('w'), H = +q.get('h');
-  document.body.style.width = W + 'px';
-  document.body.style.height = H + 'px';
-  const cap = document.getElementById('cap');
-  cap.textContent = q.get('cap');
-  const top = Math.round(H * 0.15);
-  cap.style.top = Math.round(H * 0.025) + 'px';
-  cap.style.height = (top - Math.round(H * 0.03)) + 'px';
-  cap.style.fontSize = Math.round(W * (W < H * 0.6 ? 0.072 : 0.058)) + 'px';
-  // The screen keeps its proportions in the space under the caption.
-  const img = document.getElementById('shot');
-  img.onload = () => {
-    const border = Math.round(W * 0.012);
-    const availH = H - top - Math.round(H * 0.035), availW = W * 0.86;
-    const scale = Math.min(availW / img.naturalWidth, availH / img.naturalHeight);
-    const w = Math.round(img.naturalWidth * scale), h = Math.round(img.naturalHeight * scale);
-    const f = document.getElementById('frame');
-    f.style.width = w + 'px'; f.style.height = h + 'px';
-    f.style.left = Math.round((W - w) / 2 - border) + 'px';
-    f.style.top = top + 'px';
-    f.style.border = border + 'px solid #fff';
-    f.style.borderRadius = Math.round(W * 0.06) + 'px';
-    img.style.borderRadius = Math.round(W * 0.05) + 'px';
-  };
-  img.src = q.get('img');
-</script>
-</body></html>
+<body><div id="cap">{{CAP}}</div><div id="frame"><img src="{{IMG}}"></div></body></html>

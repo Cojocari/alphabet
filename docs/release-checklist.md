@@ -72,7 +72,8 @@ re-upload the site zip.
 - [ ] Texts from `docs/store-listing.md`, English as the main listing, Romanian as a translation
 - [ ] App icon and feature graphic: ready in `branding/` (`icon-512.png`, `feature-graphic-ro.png`, `feature-graphic-en.png`)
 - [ ] Screenshots, ready in `branding/screenshots/`: `ro/phone-*.jpg` and `ro/tablet-*.jpg` on the Romanian
-      listing, `en/…` on the English one. Upload the tablet set for both 7-inch and 10-inch.
+      listing, `en/…` on the English one. 7-inch tablet: `tablet-*.jpg`; 10-inch: `tablet10-*.jpg` (Play rejects
+      the same files in both slots).
 - [ ] Category **Education**, contact email **support@cojocarisoft.com**, website **https://cojocarisoft.com/hupi/**
 
 ## 8. The in-app product

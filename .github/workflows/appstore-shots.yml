@@ -1,7 +1,8 @@
 # App Store screenshots: runs the debug app with demo progress (launch argument -demo YES) on an
-# iPhone 6.3" simulator (1206×2622, the size App Store Connect requires) and an iPad 13" simulator
-# (2064×2752), in English and Romanian, and pushes the raw shots to the ci-appstore-shots branch.
-# They are framed with captions afterwards (branding/appstore.html, see docs/ios.md).
+# iPhone 6.9" simulator (1320×2868, the iPhone size App Store Connect requires) and an iPad 13" simulator
+# (2064×2752, required for iPad apps), in English and Romanian, and pushes the raw shots to the
+# ci-appstore-shots branch. They are framed with captions afterwards (branding/appstore-frame.html, see
+# docs/ios.md). The "unlock" shot (without the purchase) is the in-app purchase's review screenshot.
 # Starts by hand (Actions → App Store screenshots → Run workflow) or when this file changes.
 name: App Store screenshots
 
@@ -68,7 +69,7 @@ jobs:
                       print(t["identifier"]); sys.exit()
           sys.exit("no device type for %s" % names)' "$@"
           }
-          phone=$(devtype "iPhone 17 Pro" "iPhone 16 Pro")
+          phone=$(devtype "iPhone 17 Pro Max" "iPhone 16 Pro Max")
           tablet=$(devtype "iPad Pro 13-inch \(M5.*\)" "iPad Pro 13-inch \(M4.*\)")
           echo "Runtime $runtime, phone $phone, tablet $tablet"
           mkdir -p shots
@@ -84,8 +85,9 @@ jobs:
               language=English; [ $lang = ro ] && language=Romanian
               shot() { # name, then launch arguments
                 name=$1; shift
+                premium=YES; [ $name = unlock ] && premium=NO # the purchase screen, not "thank you"
                 xcrun simctl terminate "$udid" com.cojocari.alphabet 2>/dev/null || true
-                xcrun simctl launch "$udid" com.cojocari.alphabet -demo YES -progress.premium YES \
+                xcrun simctl launch "$udid" com.cojocari.alphabet -demo YES -progress.premium $premium \
                   -settings.language $language -AppleLanguages "($lang)" "$@" > /dev/null
                 sleep 14
                 xcrun simctl io "$udid" screenshot "shots/$lang-$kind-$name.png" > /dev/null
@@ -103,10 +105,19 @@ jobs:
               shot balloons -route game:LetterBalloons
               shot howmany -route game:HowMany
               shot animals -route game:AnimalsFarm
+              shot unlock -route unlock
             done
             xcrun simctl shutdown "$udid"
           done
           ls shots | wc -l
+          # A crash leaves the home screen in every shot (v4.6's first run): print crash reports and
+          # warn when the shots are mostly identical.
+          for f in ~/Library/Logs/DiagnosticReports/CleverOwl*; do
+            [ -e "$f" ] && { echo "CRASH $f"; head -c 6000 "$f"; echo; }
+          done
+          distinct=$(md5 -q shots/*.png | sort -u | wc -l | tr -d ' ')
+          echo "$distinct different screenshots"
+          [ "$distinct" -ge 40 ] || echo "::warning title=Screenshots::Only $distinct different screenshots: the app probably crashed."
 
       - name: Publish to the ci-appstore-shots branch
         run: |

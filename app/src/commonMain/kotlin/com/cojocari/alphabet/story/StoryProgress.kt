@@ -180,7 +180,7 @@ class StoryProgress(private val prefs: KeyValueStore = keyValueStore("story")) {
         val today = today()
         done = scenes
         prefs.putInt("done", done)
-        (0 until scenes).flatMap { lessonItems(it, level, language) }.distinct().forEachIndexed { i, item ->
+        (0 until scenes).filterNot(::isShow).flatMap { lessonItems(it, level, language) }.distinct().forEachIndexed { i, item ->
             records[item.id] = if (i % 3 == 2) Record(listOf(today - 1), 2, today - 1)
             else Record(listOf(today - 9, today - 5, today - 2), 4, today - 2)
         }

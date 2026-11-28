@@ -53,12 +53,12 @@ One-time setup (about 20 minutes):
    slower (it downloads the Kotlin/Native toolchain, cached afterwards). The build appears in App Store Connect →
    TestFlight after Apple processes it; add yourself under Internal Testing and install it with TestFlight.
 
-The in-app purchase (App Store Connect → the app → **Monetization → In-App Purchases → +**): type
-**Non-Consumable**, reference name `Unlock everything`, product ID **`unlock_all`** (exactly this), Family Sharing
-**on**, price 24.99 lei / €5.99 / $5.99 / £4.99, name and description from `docs/store-listing.md` (EN and RO),
-a review screenshot of the purchase screen. Submit it together with the first app version.
+Everything to fill in App Store Connect (agreements, listing in EN and RO, age rating, privacy, the in-app
+purchase `unlock_all`, review notes, China mainland unticked): **`docs/app-store-listing.md`**.
 
-The listing: Kids category, age band **5 and under**; App Privacy **Data Not Collected**; texts from
-`docs/store-listing.md`; support URL `https://cojocarisoft.com/hupi/`, privacy URL
-`https://cojocarisoft.com/hupi/privacy.html`. Screenshots: `branding/screenshots/appstore/` (iPhone 6.3″
-1206×2622, the required slot; iPad 13″ 2064×2752).
+Screenshots: the workflow **App Store screenshots** (`.github/workflows/appstore-shots.yml`, runs by hand or when
+the file changes) takes them raw on an iPhone 6.9″ (1320×2868, Apple's required iPhone size) and an iPad 13″
+(2064×2752) simulator with demo progress (`-demo YES`) and pushes them to the `ci-appstore-shots` branch;
+`sh branding/frame-appstore.sh` adds captions and writes `branding/screenshots/appstore/{en,ro}/`. Check the
+result: if the app crashes at launch, every shot shows the simulator's home screen (it happened once, when the
+demo progress asked a chapter's show for lessons; `DemoProgressTest` guards it now).
