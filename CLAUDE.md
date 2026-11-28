@@ -103,7 +103,12 @@ warm-up, house, age picker) and a "Learn with Hupi" story path in every world ex
 **v4.2 (versionCode 8) and v4.3 (versionCode 9, English name Hupi the Owl), 2026-11-25:** branch `ios` merged into `develop` (everything below is in it). The iOS workflow
 builds on pushes to `develop` and `ios`. Not yet uploaded to either store.
 **v4.4 (versionCode 10)** and **v4.5 (versionCode 11), 2026-11-27:** free/demo rules (below), App Store wording on
-iPhone, smoother balloons, games wait for speech to finish. v4.6 (versionCode 12) adds the reviewer code and is the first version for the stores.
+iPhone, smoother balloons, games wait for speech to finish. v4.6 (versionCode 12) adds the reviewer code and was sent to Google Play review on 2026-11-27, but buying didn't
+work in it: with `enableAutoServiceReconnection` the billing client is often already connected when
+`PlayBilling.connect()` runs, and connect() returned without loading the product ("Google Play isn't reachable").
+**v4.8 (versionCode 14), 2026-11-28** loads the product in that case and retries on the Unlock tap; a test purchase
+on the tablet worked (4.7, versionCode 13, was the internal test build with logs). v4.8 replaces 4.6 in production
+and is the first App Store version too (`docs/app-store-listing.md`).
 
 ## 2026-11-22, iOS port (merged into `develop` in v4.2)
 - iOS port (Kotlin Multiplatform, see `docs/ios.md`). GitHub Actions builds it, takes simulator screenshots

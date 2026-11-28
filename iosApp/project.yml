@@ -8,8 +8,8 @@ options:
   developmentLanguage: en
 settings:
   base:
-    MARKETING_VERSION: "4.6"
-    CURRENT_PROJECT_VERSION: "12"
+    MARKETING_VERSION: "4.8"
+    CURRENT_PROJECT_VERSION: "14"
     SWIFT_VERSION: "5.0"
 targets:
   iosApp:

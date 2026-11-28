@@ -46,7 +46,13 @@ class PlayBilling(context: Context, private val onUnlocked: () -> Unit) : Billin
         private set
 
     fun connect() {
-        if (client.isReady) return
+        // With automatic reconnection the client can already be connected here. 4.6 returned at once, so the
+        // product was never loaded and the Unlock button always said "Google Play isn't reachable".
+        if (client.isReady) {
+            loadProduct()
+            restore()
+            return
+        }
         client.startConnection(object : BillingClientStateListener {
             override fun onBillingSetupFinished(result: BillingResult) {
                 if (result.responseCode == BillingClient.BillingResponseCode.OK) {
@@ -75,8 +81,7 @@ class PlayBilling(context: Context, private val onUnlocked: () -> Unit) : Billin
             )
             .build()
         client.queryProductDetailsAsync(params) { _, result ->
-            val details = result.productDetailsList
-            val p = details.firstOrNull()
+            val p = result.productDetailsList.firstOrNull()
             main.post {
                 product = p
                 price = p?.oneTimePurchaseOfferDetails?.formattedPrice
@@ -94,7 +99,8 @@ class PlayBilling(context: Context, private val onUnlocked: () -> Unit) : Billin
 
     override fun buy(): Boolean {
         val activity = activity ?: return false
-        val p = product ?: run { connect(); return false }
+        // No product yet (offline at launch, Play busy): ask again, so the next tap can work without a restart.
+        val p = product ?: run { if (client.isReady) loadProduct() else connect(); return false }
         val params = BillingFlowParams.newBuilder()
             .setProductDetailsParamsList(
                 listOf(BillingFlowParams.ProductDetailsParams.newBuilder().setProductDetails(p).build())
