@@ -48,8 +48,8 @@ subtitle, description, keywords, promotional text and screenshots.
 ## 4. The version page (iOS App → 4.8)
 
 **Screenshots** (`branding/screenshots/appstore/<lang>/`, made by `sh branding/frame-appstore.sh`):
-- **iPhone 6.9" Display**: `iphone-1…8.png` (1320 × 2868). Apple scales them down for smaller iPhones.
-- **iPad 13" Display**: `ipad-1…8.png` (2064 × 2752).
+- **iPhone 6.9" Display**: `iphone-1…8.jpg` (1320 × 2868). Apple scales them down for smaller iPhones.
+- **iPad 13" Display**: `ipad-1…8.jpg` (2064 × 2752).
 
 **Promotional text** (≤170, can change any time without a review):
 - EN: `New: Hupi's Adventure, a 7-chapter story where your child teaches Hupi letters, numbers and colours. No ads, no subscriptions: one payment unlocks everything.`

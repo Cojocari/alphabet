@@ -2,8 +2,8 @@
 # Frames the App Store screenshots: takes the raw simulator shots from the ci-appstore-shots branch
 # (.github/workflows/appstore-shots.yml), adds the brand gradient and a caption (appstore-frame.html,
 # the same look as the Play screenshots) and writes the upload-ready files:
-#   branding/screenshots/appstore/{en,ro}/iphone-1..8.png  1320×2868 (iPhone 6.9", required)
-#   branding/screenshots/appstore/{en,ro}/ipad-1..8.png    2064×2752 (iPad 13", required)
+#   branding/screenshots/appstore/{en,ro}/iphone-1..8.jpg  1320×2868 (iPhone 6.9", required)
+#   branding/screenshots/appstore/{en,ro}/ipad-1..8.jpg    2064×2752 (iPad 13", required)
 #   branding/screenshots/appstore/{en,ro}/iap-review.png   the purchase screen, for the in-app purchase review
 # Run from Git Bash on Windows (uses headless Edge): sh branding/frame-appstore.sh
 set -e
@@ -12,7 +12,7 @@ edge="/c/Program Files (x86)/Microsoft/Edge/Application/msedge.exe"
 raw=build/appstore-raw
 out=branding/screenshots/appstore
 # The story question shown second (raw name); change it if another step looks better.
-story=${STORY:-story30-2}
+story=${STORY:-story30-3}
 
 git fetch -q origin ci-appstore-shots
 rm -rf "$raw" && mkdir -p "$raw"
@@ -31,9 +31,11 @@ page() { # page file (next to the image), width, height, raw image, caption
     my ($aw, $ah) = ($W * 0.86, $H - $top - r($H * 0.035));
     my $s = $aw / $iw < $ah / $ih ? $aw / $iw : $ah / $ih;
     my ($w, $h) = (r($iw * $s), r($ih * $s));
+    my $chars = () = $cap =~ /[^\x80-\xBF]/g; # characters, not UTF-8 bytes
+    my $font = $W * ($W < $H * 0.6 ? 0.072 : 0.058) * ($chars > 44 ? 0.85 : 1); # long captions: two lines, not three
     $cap =~ s/&/&amp;/g; $cap =~ s/</&lt;/g;
     my %v = (W => $W, H => $H, TOP => $top, CAP_TOP => r($H * 0.025), CAP_H => $top - r($H * 0.03),
-             FONT => r($W * ($W < $H * 0.6 ? 0.072 : 0.058)), FW => $w, FH => $h, BORDER => $b,
+             FONT => r($font), FW => $w, FH => $h, BORDER => $b,
              LEFT => r(($W - $w) / 2 - $b), R => r($W * 0.06), IR => r($W * 0.05), CAP => $cap,
              IMG => ($img =~ m{([^/]+)$})[0]);
     open my $t, "<", $tpl; local $/; my $x = <$t>;
@@ -74,6 +76,19 @@ for lang in en ro; do
       echo "$dest"
     done
   done
-  cp "$raw/$lang-phone-unlock.png" "$out/$lang/iap-review.png"
+  # JPEG quality 92 like the Play screenshots: a fifth of the PNG size, no visible difference.
+  powershell -NoProfile -Command "Add-Type -AssemblyName System.Drawing;
+    \$codec = [System.Drawing.Imaging.ImageCodecInfo]::GetImageEncoders() | Where-Object { \$_.MimeType -eq 'image/jpeg' };
+    \$p = New-Object System.Drawing.Imaging.EncoderParameters 1;
+    \$p.Param[0] = New-Object System.Drawing.Imaging.EncoderParameter ([System.Drawing.Imaging.Encoder]::Quality, [long]92);
+    Get-ChildItem '$(cygpath -m "$PWD/$out/$lang")' -Filter '*-?.png' | ForEach-Object {
+      \$jpg = [System.IO.Path]::ChangeExtension(\$_.FullName, '.jpg');
+      \$i = [System.Drawing.Image]::FromFile(\$_.FullName); \$i.Save(\$jpg, \$codec, \$p); \$i.Dispose();
+      if ((Get-Item \$jpg).Length -gt 0) { Remove-Item \$_.FullName } }"
+  # The purchase screen for Apple's in-app purchase review, cut above the debug build's developer switch.
+  powershell -NoProfile -Command "Add-Type -AssemblyName System.Drawing;
+    \$i = [System.Drawing.Image]::FromFile('$(cygpath -m "$PWD/$raw/$lang-phone-unlock.png")');
+    \$c = \$i.Clone([System.Drawing.Rectangle]::new(0, 0, \$i.Width, [int](\$i.Height * 0.81)), \$i.PixelFormat);
+    \$c.Save('$(cygpath -m "$PWD/$out/$lang/iap-review.png")'); \$c.Dispose(); \$i.Dispose()"
 done
 rm -rf "$profile"

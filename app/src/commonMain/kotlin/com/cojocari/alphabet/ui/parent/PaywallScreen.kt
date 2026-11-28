@@ -96,6 +96,7 @@ fun PaywallScreen(onBack: () -> Unit) {
                         Text(
                             if (progress.premium) "✅" else t.unlockTitle,
                             fontSize = 32.sp,
+                            lineHeight = 38.sp, // "Deblochează toate jocurile" wraps on phones; the lines overlapped
                             fontWeight = FontWeight.Black,
                             color = Color.White,
                             textAlign = TextAlign.Center,
